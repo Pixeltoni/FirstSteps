@@ -43,13 +43,12 @@ sidebarBurger.addEventListener('click', () =>
 drawerClose.addEventListener('click', closeDrawer);
 drawerOverlay.addEventListener('click', closeDrawer);
 
-navDrawer.querySelectorAll('.drawer-link').forEach(link =>
+// Close drawer on nav links — but NOT the gallery button
+navDrawer.querySelectorAll('.drawer-link:not(.drawer-link--sub)').forEach(link =>
   link.addEventListener('click', closeDrawer)
 );
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeDrawer();
-});
+// Escape handling moved to the bottom of this file (handles lb → gallery → drawer)
 
 /* ═══════════════════════════════════════════════
    PARALLAX — hero shapes follow mouse (rAF-throttled)
@@ -320,4 +319,123 @@ document.querySelectorAll('.service-card').forEach(card => {
   card.addEventListener('mouseleave', () => {
     card.style.transform = '';
   });
+});
+
+/* ═══════════════════════════════════════════════
+   GALERIE-UNTERMENÜ
+═══════════════════════════════════════════════ */
+const galleryPanel  = document.getElementById('galleryPanel');
+const openGalleryBtn  = document.getElementById('openGallery');
+const closeGalleryBtn = document.getElementById('closeGallery');
+const fileInput     = document.getElementById('fileInput');
+const dropZone      = document.getElementById('dropZone');
+const imgGrid       = document.getElementById('imgGrid');
+const galleryBar    = document.getElementById('galleryBar');
+const galleryCount  = document.getElementById('galleryCount');
+const galleryClear  = document.getElementById('galleryClear');
+const lb            = document.getElementById('lb');
+const lbImg         = document.getElementById('lbImg');
+const lbClose       = document.getElementById('lbClose');
+
+let imgs = [];   // { url, name }
+
+function openGallery() {
+  galleryPanel.classList.add('open');
+  galleryPanel.setAttribute('aria-hidden', 'false');
+}
+function closeGallery() {
+  galleryPanel.classList.remove('open');
+  galleryPanel.setAttribute('aria-hidden', 'true');
+}
+
+openGalleryBtn.addEventListener('click', openGallery);
+closeGalleryBtn.addEventListener('click', closeGallery);
+
+// ── File handling ─────────────────────────────
+function addFiles(files) {
+  Array.from(files)
+    .filter(f => f.type.startsWith('image/'))
+    .forEach(f => imgs.push({ url: URL.createObjectURL(f), name: f.name }));
+  renderGrid();
+}
+
+function renderGrid() {
+  imgGrid.innerHTML = '';
+  galleryBar.hidden = imgs.length === 0;
+  if (!imgs.length) return;
+
+  galleryCount.textContent = imgs.length === 1 ? '1 Bild' : `${imgs.length} Bilder`;
+
+  imgs.forEach((img, i) => {
+    const div = document.createElement('div');
+    div.className = 'img-item';
+    div.dataset.index = i;
+    div.innerHTML = `<img src="${img.url}" alt="${img.name}" loading="lazy">
+                     <button class="img-item__rm" aria-label="Entfernen">✕</button>`;
+    imgGrid.appendChild(div);
+    // entrance animation
+    div.style.opacity = '0';
+    div.style.transform = 'scale(.88)';
+    requestAnimationFrame(() => {
+      div.style.transition = `opacity .28s ${i * 0.04}s, transform .28s ${i * 0.04}s`;
+      div.style.opacity = '1';
+      div.style.transform = 'scale(1)';
+    });
+  });
+}
+
+// Event delegation: remove + lightbox
+imgGrid.addEventListener('click', e => {
+  const item = e.target.closest('.img-item');
+  if (!item) return;
+  const i = +item.dataset.index;
+  if (e.target.closest('.img-item__rm')) {
+    e.stopPropagation();
+    URL.revokeObjectURL(imgs[i].url);
+    imgs.splice(i, 1);
+    renderGrid();
+  } else {
+    openLb(imgs[i].url, imgs[i].name);
+  }
+});
+
+galleryClear.addEventListener('click', () => {
+  imgs.forEach(img => URL.revokeObjectURL(img.url));
+  imgs = [];
+  renderGrid();
+});
+
+// File input
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+
+// Drag & drop
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('over');
+  addFiles(e.dataTransfer.files);
+});
+
+// ── Lightbox ──────────────────────────────────
+function openLb(url, alt) {
+  lbImg.src = url; lbImg.alt = alt;
+  lb.classList.add('open');
+  lb.setAttribute('aria-hidden', 'false');
+}
+function closeLb() {
+  lb.classList.remove('open');
+  lb.setAttribute('aria-hidden', 'true');
+  lbImg.src = '';
+}
+
+lbClose.addEventListener('click', closeLb);
+lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+
+// Escape: close lightbox first, then drawer
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (lb.classList.contains('open'))          { closeLb();      return; }
+  if (galleryPanel.classList.contains('open')){ closeGallery(); return; }
+  closeDrawer();
 });
