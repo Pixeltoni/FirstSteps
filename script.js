@@ -361,16 +361,22 @@ document.querySelectorAll('.service-card').forEach(card => {
     const shuffled = shuffle(files);
     const seq = shuffled.concat(shuffled); // duplicate for seamless loop
 
+    const sizeVariants = ['sm', 'md', 'lg', 'xl', 'wide', 'sq'];
+    const posVariants  = ['top', 'mid-h', 'mid-l', 'bottom'];
+
     track.innerHTML = '';
-    seq.forEach(file => {
+    seq.forEach((file, i) => {
       const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(file.name);
+      const size = sizeVariants[(i * 3 + 1) % sizeVariants.length];
+      const pos  = posVariants[(i * 5 + 2)  % posVariants.length];
       const item = document.createElement('div');
-      item.className = 'work-marquee__item';
+      item.className = `work-marquee__item work-marquee__item--${size} work-marquee__item--${pos}`;
       item.innerHTML = `<img src="${urlData.publicUrl}" alt="" loading="lazy" decoding="async">`;
       track.appendChild(item);
     });
 
-    const dur = Math.max(40, Math.min(120, shuffled.length * 6));
+    // Slower scroll: ~14s per unique image, clamped 100–360s
+    const dur = Math.max(100, Math.min(360, shuffled.length * 14));
     track.style.animationDuration = dur + 's';
     console.log(`[work-marquee] rendered ${shuffled.length} unique images, duration ${dur}s`);
   }
