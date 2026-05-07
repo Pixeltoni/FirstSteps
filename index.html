@@ -1,135 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Studio Name</title>
+  <title>SmartStudio — Digital Agency</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="loading">
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader__bar"></div>
+    <span class="loader__text">Loading</span>
+  </div>
 
   <!-- Navigation -->
-  <header class="nav">
-    <div class="nav__logo">STUDIO</div>
-    <nav class="nav__links">
-      <a href="#work" class="nav__link nav__link--active">Work</a>
-      <a href="#stories" class="nav__link">Stories</a>
-      <a href="#offer" class="nav__link">Offer</a>
-      <a href="#why" class="nav__link">Why</a>
-      <a href="#contact" class="nav__link nav__link--bold">Contact</a>
+  <header class="nav" id="nav">
+    <a href="#" class="nav__logo">
+      <span class="nav__logo-mark">SP</span>
+      <span class="nav__logo-text">SmartStudio</span>
+    </a>
+    <button class="nav__burger" id="navBurger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav__menu" id="navMenu">
+      <a href="#work"     class="nav__link" data-text="Arbeiten">Arbeiten</a>
+      <a href="#services" class="nav__link" data-text="Leistungen">Leistungen</a>
+      <a href="#about"    class="nav__link" data-text="Über uns">Über uns</a>
+      <a href="#contact"  class="nav__link nav__link--cta">Kontakt</a>
     </nav>
-    <div class="nav__icon">
-      <svg viewBox="0 0 40 40" width="40" height="40" fill="currentColor">
-        <polygon points="0,0 40,0 40,40" />
-      </svg>
-    </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero__headline">
-      <h1>Design.</h1>
-    </div>
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero__bg" id="heroBg"></div>
     <div class="hero__content">
-      <p class="hero__description">
-        Lorem ipsum is an integrated design and production studio with a smart
-        head for strategy and a keen eye for design. We have a dedicated and
-        specialised production team with eclectic experiences and wonderful
-        tools.
+      <div class="hero__eyebrow reveal-up">Digital Agency — Wien</div>
+      <h1 class="hero__title">
+        <span class="hero__word" data-delay="0">Wir</span>
+        <span class="hero__word" data-delay="80">bauen</span>
+        <span class="hero__word hero__word--outline" data-delay="160">digitale</span>
+        <span class="hero__word" data-delay="240">Erlebnisse.</span>
+      </h1>
+      <p class="hero__sub reveal-up" style="--d:0.5s">
+        Strategie · Design · Entwicklung · Performance
       </p>
-      <a href="#contact" class="hero__cta">TALK TO US</a>
+      <div class="hero__actions reveal-up" style="--d:0.7s">
+        <a href="#work" class="btn btn--primary">Projekte ansehen</a>
+        <a href="#contact" class="btn btn--ghost">Projekt starten</a>
+      </div>
+    </div>
+    <div class="hero__scroll-hint" id="scrollHint">
+      <span>Scroll</span>
+      <div class="hero__scroll-line"></div>
+    </div>
+    <!-- Floating shapes -->
+    <div class="shape shape--1" id="shape1"></div>
+    <div class="shape shape--2" id="shape2"></div>
+    <div class="shape shape--3" id="shape3"></div>
+  </section>
+
+  <!-- Marquee / ticker -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
+      <span>Web Development</span><span class="marquee__dot">✦</span>
+      <span>Brand Identity</span><span class="marquee__dot">✦</span>
+      <span>Motion Design</span><span class="marquee__dot">✦</span>
+      <span>SEO & Performance</span><span class="marquee__dot">✦</span>
+      <span>E-Commerce</span><span class="marquee__dot">✦</span>
+      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
+      <span>Web Development</span><span class="marquee__dot">✦</span>
+      <span>Brand Identity</span><span class="marquee__dot">✦</span>
+      <span>Motion Design</span><span class="marquee__dot">✦</span>
+      <span>SEO & Performance</span><span class="marquee__dot">✦</span>
+      <span>E-Commerce</span><span class="marquee__dot">✦</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stats__grid">
+      <div class="stat reveal-up">
+        <span class="stat__number" data-target="120">0</span>
+        <span class="stat__suffix">+</span>
+        <p class="stat__label">Projekte abgeschlossen</p>
+      </div>
+      <div class="stat reveal-up" style="--d:0.1s">
+        <span class="stat__number" data-target="8">0</span>
+        <span class="stat__suffix">+</span>
+        <p class="stat__label">Jahre Erfahrung</p>
+      </div>
+      <div class="stat reveal-up" style="--d:0.2s">
+        <span class="stat__number" data-target="40">0</span>
+        <span class="stat__suffix">+</span>
+        <p class="stat__label">Zufriedene Kunden</p>
+      </div>
+      <div class="stat reveal-up" style="--d:0.3s">
+        <span class="stat__number" data-target="99">0</span>
+        <span class="stat__suffix">%</span>
+        <p class="stat__label">Positive Bewertungen</p>
+      </div>
     </div>
   </section>
 
-  <!-- Work Section -->
+  <!-- Work -->
   <section class="work" id="work">
-    <h2 class="section-title">Our Work.</h2>
-    <div class="work__grid">
-      <div class="work__item">
-        <div class="work__image work__image--1"></div>
-        <p class="work__label">Project Alpha</p>
-      </div>
-      <div class="work__item">
-        <div class="work__image work__image--2"></div>
-        <p class="work__label">Project Beta</p>
-      </div>
-      <div class="work__item">
-        <div class="work__image work__image--3"></div>
-        <p class="work__label">Project Gamma</p>
-      </div>
+    <div class="section-header reveal-up">
+      <p class="section-tag">Ausgewählte Arbeiten</p>
+      <h2 class="section-title">Unsere <em>Projekte</em></h2>
     </div>
-  </section>
+    <div class="work__list">
 
-  <!-- Stories Section -->
-  <section class="stories" id="stories">
-    <h2 class="section-title">Stories.</h2>
-    <div class="stories__grid">
-      <article class="story">
-        <p class="story__tag">Branding</p>
-        <h3 class="story__title">How we redefined a brand from the ground up</h3>
-        <p class="story__excerpt">
-          Placeholder text describing a case study or story about a project.
-          The full article covers strategy, execution and outcome.
-        </p>
+      <article class="project" data-index="01">
+        <div class="project__image-wrap">
+          <div class="project__image" style="--c1:#1a1a2e;--c2:#16213e"></div>
+          <div class="project__overlay">
+            <span class="project__view">Ansehen ↗</span>
+          </div>
+        </div>
+        <div class="project__info">
+          <span class="project__num">01</span>
+          <h3 class="project__title">NovaBrand Relaunch</h3>
+          <p class="project__tags">Branding · Web · Motion</p>
+        </div>
       </article>
-      <article class="story">
-        <p class="story__tag">Strategy</p>
-        <h3 class="story__title">Building a visual language for a global audience</h3>
-        <p class="story__excerpt">
-          Placeholder text describing another case study. We dive deep into
-          process, research and final delivery.
-        </p>
+
+      <article class="project project--right" data-index="02">
+        <div class="project__image-wrap">
+          <div class="project__image" style="--c1:#0f3460;--c2:#533483"></div>
+          <div class="project__overlay">
+            <span class="project__view">Ansehen ↗</span>
+          </div>
+        </div>
+        <div class="project__info">
+          <span class="project__num">02</span>
+          <h3 class="project__title">ShopFlow E-Commerce</h3>
+          <p class="project__tags">E-Commerce · UX · Development</p>
+        </div>
       </article>
+
+      <article class="project" data-index="03">
+        <div class="project__image-wrap">
+          <div class="project__image" style="--c1:#1b1b2f;--c2:#2c2c54"></div>
+          <div class="project__overlay">
+            <span class="project__view">Ansehen ↗</span>
+          </div>
+        </div>
+        <div class="project__info">
+          <span class="project__num">03</span>
+          <h3 class="project__title">Arktis Campaign</h3>
+          <p class="project__tags">Campaign · Motion · Social</p>
+        </div>
+      </article>
+
+      <article class="project project--right" data-index="04">
+        <div class="project__image-wrap">
+          <div class="project__image" style="--c1:#162447;--c2:#1f4068"></div>
+          <div class="project__overlay">
+            <span class="project__view">Ansehen ↗</span>
+          </div>
+        </div>
+        <div class="project__info">
+          <span class="project__num">04</span>
+          <h3 class="project__title">Verto App Design</h3>
+          <p class="project__tags">App · UI/UX · Prototyping</p>
+        </div>
+      </article>
+
     </div>
   </section>
 
-  <!-- Offer Section -->
-  <section class="offer" id="offer">
-    <h2 class="section-title">Our Offer.</h2>
-    <div class="offer__list">
-      <div class="offer__item">
-        <span class="offer__number">01</span>
-        <h3 class="offer__name">Brand Strategy</h3>
-        <p class="offer__text">Placeholder description of the service. We help you define who you are and where you are going.</p>
+  <!-- Services -->
+  <section class="services" id="services">
+    <div class="section-header reveal-up">
+      <p class="section-tag">Was wir bieten</p>
+      <h2 class="section-title">Unsere <em>Leistungen</em></h2>
+    </div>
+    <div class="services__grid">
+      <div class="service-card reveal-up" style="--d:0s">
+        <div class="service-card__icon">⬡</div>
+        <h3 class="service-card__title">Strategie & Konzept</h3>
+        <p class="service-card__text">Wir analysieren Ihren Markt und entwickeln eine maßgeschneiderte digitale Strategie, die Ihre Ziele erreicht.</p>
+        <span class="service-card__arrow">→</span>
       </div>
-      <div class="offer__item">
-        <span class="offer__number">02</span>
-        <h3 class="offer__name">Visual Design</h3>
-        <p class="offer__text">Placeholder description of the service. Crafting identities that communicate clearly and look great.</p>
+      <div class="service-card reveal-up" style="--d:0.1s">
+        <div class="service-card__icon">◈</div>
+        <h3 class="service-card__title">UI/UX Design</h3>
+        <p class="service-card__text">Interfaces, die Nutzer begeistern — von der ersten Skizze bis zum finalen Pixel-perfect Design.</p>
+        <span class="service-card__arrow">→</span>
       </div>
-      <div class="offer__item">
-        <span class="offer__number">03</span>
-        <h3 class="offer__name">Production</h3>
-        <p class="offer__text">Placeholder description of the service. From concept to final delivery across all media types.</p>
+      <div class="service-card reveal-up" style="--d:0.2s">
+        <div class="service-card__icon">⬖</div>
+        <h3 class="service-card__title">Web Development</h3>
+        <p class="service-card__text">Schnelle, skalierbare Websites und Webanwendungen mit modernsten Technologien.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.3s">
+        <div class="service-card__icon">◉</div>
+        <h3 class="service-card__title">Motion & Animation</h3>
+        <p class="service-card__text">Lebendige Animationen und Motion Design, die Ihre Marke zum Strahlen bringen.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.4s">
+        <div class="service-card__icon">⬟</div>
+        <h3 class="service-card__title">E-Commerce</h3>
+        <p class="service-card__text">Shops, die verkaufen — optimierte Conversion-Flows und nahtlose Kauferlebnisse.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.5s">
+        <div class="service-card__icon">◬</div>
+        <h3 class="service-card__title">SEO & Performance</h3>
+        <p class="service-card__text">Mehr Sichtbarkeit, bessere Core Web Vitals und nachhaltiges organisches Wachstum.</p>
+        <span class="service-card__arrow">→</span>
       </div>
     </div>
   </section>
 
-  <!-- Why Section -->
-  <section class="why" id="why">
-    <h2 class="section-title">Why Us.</h2>
-    <p class="why__text">
-      Placeholder text explaining what makes this studio different. Honest
-      partnerships, sharp thinking and meticulous execution define every
-      project we take on.
-    </p>
+  <!-- About / Philosophy -->
+  <section class="about" id="about">
+    <div class="about__grid">
+      <div class="about__visual reveal-up">
+        <div class="about__blob"></div>
+        <div class="about__img-frame">
+          <div class="about__img-placeholder"></div>
+        </div>
+        <div class="about__badge">
+          <span>Seit</span>
+          <strong>2016</strong>
+        </div>
+      </div>
+      <div class="about__text">
+        <p class="section-tag reveal-up">Über uns</p>
+        <h2 class="section-title reveal-up">Wir glauben an <em>Qualität</em> statt Quantität.</h2>
+        <p class="about__body reveal-up" style="--d:0.2s">
+          Wir sind ein kleines, schlagkräftiges Team aus Wien. Kein Bullshit,
+          keine endlosen Meetings — nur echte Arbeit, die Ergebnisse liefert.
+          Jedes Projekt behandeln wir wie unser eigenes.
+        </p>
+        <ul class="about__list reveal-up" style="--d:0.3s">
+          <li>Transparente Kommunikation</li>
+          <li>Faire Preise, klare Angebote</li>
+          <li>Lieferung on time, every time</li>
+          <li>Langfristige Partnerschaften</li>
+        </ul>
+        <a href="#contact" class="btn btn--primary reveal-up" style="--d:0.4s">Lern uns kennen</a>
+      </div>
+    </div>
   </section>
 
-  <!-- Contact Section -->
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="section-header reveal-up">
+      <p class="section-tag">Kundenstimmen</p>
+      <h2 class="section-title">Was unsere <em>Kunden</em> sagen</h2>
+    </div>
+    <div class="testimonials__track" id="testimonialsTrack">
+      <div class="testimonial">
+        <p class="testimonial__quote">"Das Team hat unsere Erwartungen bei weitem übertroffen. Die Website läuft schnell, sieht großartig aus und konvertiert viel besser als die alte."</p>
+        <div class="testimonial__author">
+          <div class="testimonial__avatar">MK</div>
+          <div>
+            <strong>Maria K.</strong>
+            <span>CEO, NovaBrand GmbH</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p class="testimonial__quote">"Professionell, kreativ und immer erreichbar. Wir würden jederzeit wieder zusammenarbeiten."</p>
+        <div class="testimonial__author">
+          <div class="testimonial__avatar">TW</div>
+          <div>
+            <strong>Thomas W.</strong>
+            <span>Marketing Director, ShopFlow</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p class="testimonial__quote">"Von der Strategie bis zur Umsetzung — ein nahtloser Prozess. Das Endergebnis spricht für sich."</p>
+        <div class="testimonial__author">
+          <div class="testimonial__avatar">SB</div>
+          <div>
+            <strong>Sophie B.</strong>
+            <span>Founder, Arktis Studio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonials__dots" id="testimonialsDots"></div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="cta-banner reveal-up">
+    <div class="cta-banner__content">
+      <h2 class="cta-banner__title">Bereit für Ihr nächstes Projekt?</h2>
+      <p class="cta-banner__sub">Lass uns gemeinsam etwas Großartiges erschaffen.</p>
+      <a href="#contact" class="btn btn--white">Jetzt starten ↗</a>
+    </div>
+    <div class="cta-banner__bg"></div>
+  </section>
+
+  <!-- Contact -->
   <section class="contact" id="contact">
-    <h2 class="section-title">Let's Talk.</h2>
-    <p class="contact__intro">Ready to start something? Drop us a line.</p>
-    <a href="mailto:hello@studio.com" class="contact__email">hello@studio.com</a>
+    <div class="section-header reveal-up">
+      <p class="section-tag">Kontakt</p>
+      <h2 class="section-title">Schreib <em>uns</em> an.</h2>
+    </div>
+    <div class="contact__grid">
+      <div class="contact__info reveal-up">
+        <div class="contact__detail">
+          <span class="contact__label">E-Mail</span>
+          <a href="mailto:hallo@smartstudio.at" class="contact__value">hallo@smartstudio.at</a>
+        </div>
+        <div class="contact__detail">
+          <span class="contact__label">Telefon</span>
+          <a href="tel:+431234567" class="contact__value">+43 1 234 567</a>
+        </div>
+        <div class="contact__detail">
+          <span class="contact__label">Adresse</span>
+          <p class="contact__value">Mariahilfer Str. 1<br>1060 Wien, Österreich</p>
+        </div>
+        <div class="contact__social">
+          <a href="#" class="social-link">Instagram</a>
+          <a href="#" class="social-link">LinkedIn</a>
+          <a href="#" class="social-link">Behance</a>
+        </div>
+      </div>
+      <form class="contact__form reveal-up" style="--d:0.2s" id="contactForm">
+        <div class="form-group">
+          <input type="text" id="name" required placeholder=" " />
+          <label for="name">Ihr Name</label>
+        </div>
+        <div class="form-group">
+          <input type="email" id="email" required placeholder=" " />
+          <label for="email">E-Mail Adresse</label>
+        </div>
+        <div class="form-group">
+          <select id="service">
+            <option value="">Leistung auswählen</option>
+            <option>Web Design</option>
+            <option>E-Commerce</option>
+            <option>Branding</option>
+            <option>SEO</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <textarea id="message" rows="4" required placeholder=" "></textarea>
+          <label for="message">Ihre Nachricht</label>
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">
+          <span class="btn__text">Nachricht senden</span>
+          <span class="btn__icon">→</span>
+        </button>
+      </form>
+    </div>
   </section>
 
   <!-- Footer -->
   <footer class="footer">
-    <span class="footer__logo">STUDIO</span>
-    <span class="footer__copy">&copy; 2026 Studio Name. All rights reserved.</span>
+    <div class="footer__top">
+      <div class="footer__brand">
+        <span class="footer__logo">SmartStudio</span>
+        <p class="footer__tagline">Digitale Erlebnisse, die bewegen.</p>
+      </div>
+      <nav class="footer__nav">
+        <a href="#work">Arbeiten</a>
+        <a href="#services">Leistungen</a>
+        <a href="#about">Über uns</a>
+        <a href="#contact">Kontakt</a>
+      </nav>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 SmartStudio GmbH. Alle Rechte vorbehalten.</span>
+      <span>Wien, Österreich</span>
+    </div>
   </footer>
 
-  <!-- Scroll to top -->
-  <button class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">&#8679;</button>
-
+  <script src="script.js"></script>
 </body>
 </html>
