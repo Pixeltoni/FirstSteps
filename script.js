@@ -229,16 +229,18 @@ const heroScrollHint = document.getElementById('scrollHint');
 const sceneSvg       = document.querySelector('.hero__scene-svg');
 
 const scn = {
-  sun:          document.getElementById('sceneSun'),
-  glow:         document.getElementById('sceneSunGlowCircle'),
-  cloudL:       document.getElementById('sceneCloudLeft'),
-  cloudR:       document.getElementById('sceneCloudRight'),
-  mountains:    document.getElementById('sceneMountains'),
-  pier:         document.getElementById('scenePier'),
-  reflection:   document.getElementById('sceneReflection'),
-  stars:        document.getElementById('sceneStars'),
-  moon:         document.getElementById('sceneMoon'),
-  nightOverlay: document.getElementById('sceneNightOverlay')
+  sun:           document.getElementById('sceneSun'),
+  glow:          document.getElementById('sceneSunGlowCircle'),
+  horizonBand:   document.getElementById('sceneHorizonBand'),
+  horizonSpread: document.getElementById('sceneHorizonSpread'),
+  cloudL:        document.getElementById('sceneCloudLeft'),
+  cloudR:        document.getElementById('sceneCloudRight'),
+  mountains:     document.getElementById('sceneMountains'),
+  pier:          document.getElementById('scenePier'),
+  reflection:    document.getElementById('sceneReflection'),
+  stars:         document.getElementById('sceneStars'),
+  moon:          document.getElementById('sceneMoon'),
+  nightOverlay:  document.getElementById('sceneNightOverlay')
 };
 
 // Ease helper: smooth step
@@ -272,6 +274,15 @@ function updateScene() {
   // Glow shrinks and sinks with the sun
   scn.glow.setAttribute('cy', sunCy + 10);
   scn.glow.setAttribute('r',  Math.max(0, 320 - sunT * 280));
+
+  // Warm horizon band: peaks while sun nears horizon, fades after sunset.
+  // Builds up slightly (atmosphere reddens), then fades as light dies.
+  const bandPeak   = 1 - Math.abs(sunT - 0.6) / 0.6;          // peaks around sunT≈0.6
+  const bandOp     = Math.max(0, Math.min(1, 0.55 + bandPeak * 0.45 - Math.max(0, sunT - 0.7) * 3));
+  scn.horizonBand.setAttribute('opacity', bandOp);
+
+  // Wide sunset flare follows the sun position; fades when sun is gone
+  scn.horizonSpread.setAttribute('opacity', Math.max(0, 1 - sunT * 1.15));
 
   // Clouds fade out as daylight ends
   const cloudOpacity = Math.max(0, 1 - sunT * 1.3);

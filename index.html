@@ -100,6 +100,20 @@
           <pattern id="sceneHalftoneFaint" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
             <circle cx="3.5" cy="3.5" r="1.1" fill="#c84444"/>
           </pattern>
+          <!-- Atmospheric warm haze near horizon (vertical fade) -->
+          <linearGradient id="sceneHorizonBandFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#ff7959" stop-opacity="0"/>
+            <stop offset="40%"  stop-color="#ff8159" stop-opacity=".18"/>
+            <stop offset="75%"  stop-color="#f06040" stop-opacity=".48"/>
+            <stop offset="100%" stop-color="#e64545" stop-opacity=".75"/>
+          </linearGradient>
+          <!-- Wide sunset flare radiating from the sun across the sky -->
+          <radialGradient id="sceneHorizonSpreadFill" cx="0.5" cy="1" r="0.7" fx="0.5" fy="1">
+            <stop offset="0%"  stop-color="#ffa470" stop-opacity=".7"/>
+            <stop offset="35%" stop-color="#ee6f4a" stop-opacity=".3"/>
+            <stop offset="75%" stop-color="#e64545" stop-opacity=".08"/>
+            <stop offset="100%" stop-color="#e64545" stop-opacity="0"/>
+          </radialGradient>
         </defs>
 
         <!-- Sky -->
@@ -139,6 +153,13 @@
           <!-- crescent shadow to suggest a moon phase -->
           <circle cx="1518" cy="175" r="34" fill="#19303e" opacity=".7"/>
         </g>
+
+        <!-- Warm horizon band (atmospheric scattering during sunset) -->
+        <rect id="sceneHorizonBand" y="380" width="1920" height="350"
+              fill="url(#sceneHorizonBandFill)" opacity="1"/>
+        <!-- Wide sunset flare around the sun -->
+        <rect id="sceneHorizonSpread" y="320" width="1920" height="410"
+              fill="url(#sceneHorizonSpreadFill)" opacity="1"/>
 
         <!-- Sun glow halo -->
         <circle id="sceneSunGlowCircle" cx="960" cy="690" r="320" fill="url(#sceneSunGlow)"/>
