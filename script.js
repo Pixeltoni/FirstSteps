@@ -229,48 +229,72 @@ const heroScrollHint = document.getElementById('scrollHint');
 const sceneSvg       = document.querySelector('.hero__scene-svg');
 
 const scn = {
-  sun:        document.getElementById('sceneSun'),
-  glow:       document.getElementById('sceneSunGlowCircle'),
-  cloudL:     document.getElementById('sceneCloudLeft'),
-  cloudR:     document.getElementById('sceneCloudRight'),
-  mountains:  document.getElementById('sceneMountains'),
-  pier:       document.getElementById('scenePier'),
-  reflection: document.getElementById('sceneReflection'),
-  stars:      document.getElementById('sceneStars')
+  sun:          document.getElementById('sceneSun'),
+  glow:         document.getElementById('sceneSunGlowCircle'),
+  cloudL:       document.getElementById('sceneCloudLeft'),
+  cloudR:       document.getElementById('sceneCloudRight'),
+  mountains:    document.getElementById('sceneMountains'),
+  pier:         document.getElementById('scenePier'),
+  reflection:   document.getElementById('sceneReflection'),
+  stars:        document.getElementById('sceneStars'),
+  moon:         document.getElementById('sceneMoon'),
+  nightOverlay: document.getElementById('sceneNightOverlay')
 };
+
+// Ease helper: smooth step
+function smoothstep(t) { return t * t * (3 - 2 * t); }
 
 function updateScene() {
   const y = window.scrollY;
-  // Normalised scroll progress through the WHOLE document (0 → 1)
   const docScrollable = Math.max(1,
     document.documentElement.scrollHeight - window.innerHeight);
+  // t: 0 = top of page, 1 = bottom
   const t = Math.min(1, Math.max(0, y / docScrollable));
 
-  /* — UI fade (still tied to local hero scroll) — */
+  /* ── Sunset phase: t 0→0.5 (sun fully gone by midpoint) ── */
+  const sunT    = smoothstep(Math.min(t / 0.5, 1));   // 0→1 over first half
+
+  /* ── Night phase: t 0.35→1 (stars/moon fade in after sun is half-set) ── */
+  const nightT  = smoothstep(Math.max(0, (t - 0.35) / 0.65));  // 0→1
+
+  /* ── Moon: appears a little later than stars ── */
+  const moonT   = smoothstep(Math.max(0, (t - 0.5) / 0.5));
+
+  /* — UI fade (tied to local hero scroll) — */
   heroContent.style.opacity    = Math.max(0, 1 - y / 500);
   heroContent.style.transform  = `translateY(${y * 0.15}px)`;
   heroScrollHint.style.opacity = Math.max(0, 1 - y / 200);
 
-  /* — Scene transforms — */
-  // Sun rises (cy moves up)
-  scn.sun.setAttribute('cy', 680 - t * 220);
-  // Glow follows sun + grows slightly
-  scn.glow.setAttribute('cy', 690 - t * 220);
-  scn.glow.setAttribute('r',  320 + t * 60);
-  // Clouds drift outward
-  scn.cloudL.setAttribute('transform', `translate(${-t * 260}, ${-t * 25})`);
-  scn.cloudR.setAttribute('transform', `translate(${ t * 260}, ${-t * 25})`);
-  // Mountains drift down (camera tilt-up illusion)
-  scn.mountains.setAttribute('transform', `translate(0, ${t * 35})`);
-  // Pier subtly zooms toward viewer
-  scn.pier.setAttribute('transform',
-    `translate(0, ${t * 80}) scale(${1 + t * 0.06}, ${1 - t * 0.05})`);
-  // Reflection fades and stretches
-  scn.reflection.setAttribute('opacity', Math.max(0, 0.6 - t * 0.5));
-  // Stars fade in toward "night"
-  scn.stars.setAttribute('opacity', t * 0.7);
-  // Whole scene gentle zoom + lift
-  sceneSvg.style.transform = `scale(${1 + t * 0.08}) translateY(${t * -20}px)`;
+  /* — Sun sinks below the water line (y=730, radius=120 → fully hidden at cy=855) — */
+  const sunCy = 680 + sunT * 200;   // 680 (visible) → 880 (fully below water)
+  scn.sun.setAttribute('cy', sunCy);
+
+  // Glow shrinks and sinks with the sun
+  scn.glow.setAttribute('cy', sunCy + 10);
+  scn.glow.setAttribute('r',  Math.max(0, 320 - sunT * 280));
+
+  // Clouds fade out as daylight ends
+  const cloudOpacity = Math.max(0, 1 - sunT * 1.3);
+  scn.cloudL.style.opacity = cloudOpacity;
+  scn.cloudR.style.opacity = cloudOpacity;
+
+  // Reflection brightens briefly as sun hits horizon, then fades
+  const reflPeak   = Math.max(0, 1 - Math.abs(sunT - 0.35) / 0.35);  // peaks at ~35%
+  const reflFade   = Math.max(0, 0.6 + reflPeak * 0.5 - sunT * 1.2);
+  scn.reflection.setAttribute('opacity', reflFade);
+
+  // Stars: lower sky stars lag slightly via separate child opacity manipulation
+  scn.stars.setAttribute('opacity', nightT * 0.85);
+
+  // Moon drifts in from right as sun is gone
+  scn.moon.setAttribute('opacity', moonT * 0.9);
+  scn.moon.setAttribute('transform', `translate(${(1 - moonT) * 120}, ${(1 - moonT) * 60})`);
+
+  // Night overlay darkens sky
+  scn.nightOverlay.setAttribute('opacity', nightT * 0.62);
+
+  // Whole scene: slight slow zoom as time passes
+  sceneSvg.style.transform = `scale(${1 + t * 0.04})`;
 }
 
 window.addEventListener('scroll', updateScene, { passive: true });
