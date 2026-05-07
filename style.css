@@ -390,8 +390,9 @@ img, svg { display: block; max-width: 100%; }
   overflow: hidden;
 }
 
+/* Sunset scene as fixed full-page background */
 .hero__scene {
-  position: absolute; inset: 0;
+  position: fixed; inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -400,13 +401,27 @@ img, svg { display: block; max-width: 100%; }
 .hero__scene-svg {
   width: 100%; height: 100%;
   display: block;
-  /* the scene itself zooms slightly on scroll via JS */
   transform-origin: 50% 60%;
   will-change: transform;
 }
 
-/* Existing decorative blobs sit subtly on top of the scene */
+/* Existing decorative blobs become subtle atmospheric overlays */
 .hero .shape { opacity: 0.05; mix-blend-mode: screen; }
+
+/* All page sections sit ABOVE the fixed scene */
+.hero,
+.marquee,
+.stats,
+.work,
+.services,
+.about,
+.testimonials,
+.cta-banner,
+.contact,
+.footer {
+  position: relative;
+  z-index: 1;
+}
 
 .hero__content {
   position: relative; z-index: 2;
@@ -589,7 +604,8 @@ img, svg { display: block; max-width: 100%; }
   border-bottom: 1px solid var(--border);
   padding: 1.1rem 0;
   overflow: hidden;
-  background: var(--bg-2);
+  background: rgba(8,8,8,.55);
+  backdrop-filter: blur(6px);
 }
 
 .marquee__track {
@@ -776,7 +792,8 @@ img, svg { display: block; max-width: 100%; }
 ═══════════════════════════════════════════════ */
 .services {
   padding: 6rem 3rem;
-  background: var(--bg-2);
+  background: rgba(8,8,8,.5);
+  backdrop-filter: blur(8px);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -955,7 +972,8 @@ img, svg { display: block; max-width: 100%; }
 ═══════════════════════════════════════════════ */
 .testimonials {
   padding: 6rem 3rem;
-  background: var(--bg-2);
+  background: rgba(8,8,8,.5);
+  backdrop-filter: blur(8px);
   border-top: 1px solid var(--border);
   overflow: hidden;
 }
@@ -1037,8 +1055,9 @@ img, svg { display: block; max-width: 100%; }
 .cta-banner__bg {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(123,94,167,.2), transparent 70%),
-    var(--bg);
+    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(123,94,167,.25), transparent 70%),
+    rgba(8,8,8,.45);
+  backdrop-filter: blur(6px);
   pointer-events: none;
 }
 
@@ -1062,7 +1081,8 @@ img, svg { display: block; max-width: 100%; }
 ═══════════════════════════════════════════════ */
 .contact {
   padding: 6rem 3rem;
-  background: var(--bg-2);
+  background: rgba(8,8,8,.55);
+  backdrop-filter: blur(8px);
   border-top: 1px solid var(--border);
 }
 

@@ -226,7 +226,6 @@ document.getElementById('contactForm').addEventListener('submit', e => {
 ═══════════════════════════════════════════════ */
 const heroContent    = document.querySelector('.hero__content');
 const heroScrollHint = document.getElementById('scrollHint');
-const heroEl         = document.getElementById('hero');
 const sceneSvg       = document.querySelector('.hero__scene-svg');
 
 const scn = {
@@ -241,13 +240,13 @@ const scn = {
 };
 
 function updateScene() {
-  const y    = window.scrollY;
-  const rect = heroEl.getBoundingClientRect();
-  const heroH = rect.height || window.innerHeight;
-  // Normalised scroll progress through the hero (0 → 1)
-  const t = Math.max(0, Math.min(1, -rect.top / heroH));
+  const y = window.scrollY;
+  // Normalised scroll progress through the WHOLE document (0 → 1)
+  const docScrollable = Math.max(1,
+    document.documentElement.scrollHeight - window.innerHeight);
+  const t = Math.min(1, Math.max(0, y / docScrollable));
 
-  /* — UI fade (existing) — */
+  /* — UI fade (still tied to local hero scroll) — */
   heroContent.style.opacity    = Math.max(0, 1 - y / 500);
   heroContent.style.transform  = `translateY(${y * 0.15}px)`;
   heroScrollHint.style.opacity = Math.max(0, 1 - y / 200);
