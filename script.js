@@ -303,8 +303,16 @@ document.querySelectorAll('.service-card').forEach(card => {
 ═══════════════════════════════════════════════ */
 (function initWorkMarquee() {
   const track = document.getElementById('workTrack');
-  const empty = document.getElementById('workEmpty');
-  if (!track || typeof supabase === 'undefined') return;
+  if (!track) return;
+
+  function showMsg(text, isError) {
+    track.innerHTML = `<p class="work-marquee__empty"${isError ? ' style="color:#e64545"' : ''}>${text}</p>`;
+  }
+
+  if (typeof supabase === 'undefined') {
+    showMsg('Supabase SDK nicht geladen (CDN blockiert?)', true);
+    return;
+  }
 
   const SUPABASE_URL = 'https://rtzvvthcdxklwayhsuha.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0enZ2dGhjZHhrbHdheWhzdWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzUxMzEsImV4cCI6MjA5Mzc1MTEzMX0.8nGc1tqVq2PL1QK2EArexbXpX01-OK8-9MfLUI4Wnfw';
@@ -321,20 +329,37 @@ document.querySelectorAll('.service-card').forEach(card => {
   }
 
   async function loadWorkMarquee() {
-    const { data, error } = await db.storage.from(BUCKET).list('', {
-      limit: 200,
-      sortBy: { column: 'created_at', order: 'desc' }
-    });
-    if (error) { console.error('Work marquee load error:', error); return; }
+    let resp;
+    try {
+      resp = await db.storage.from(BUCKET).list('', {
+        limit: 200,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
+    } catch (e) {
+      console.error('[work-marquee] network error:', e);
+      showMsg('Netzwerkfehler beim Laden der Bilder', true);
+      return;
+    }
+
+    const { data, error } = resp;
+    if (error) {
+      console.error('[work-marquee] supabase error:', error);
+      showMsg('Ladefehler: ' + error.message, true);
+      return;
+    }
+
+    console.log('[work-marquee] raw list:', data);
 
     const files = (data || []).filter(f =>
-      f.name && f.id && f.name !== '.emptyFolderPlaceholder'
+      f && f.name && f.name !== '.emptyFolderPlaceholder'
     );
-    if (!files.length) return;
+    if (!files.length) {
+      showMsg('Noch keine Bilder hochgeladen.', false);
+      return;
+    }
 
     const shuffled = shuffle(files);
-    // Duplicate the list so the keyframes 0% → -50% loop seamlessly
-    const seq = shuffled.concat(shuffled);
+    const seq = shuffled.concat(shuffled); // duplicate for seamless loop
 
     track.innerHTML = '';
     seq.forEach(file => {
@@ -345,9 +370,9 @@ document.querySelectorAll('.service-card').forEach(card => {
       track.appendChild(item);
     });
 
-    // Vary speed slightly with image count: more images = faster pixels/sec feels right
     const dur = Math.max(40, Math.min(120, shuffled.length * 6));
     track.style.animationDuration = dur + 's';
+    console.log(`[work-marquee] rendered ${shuffled.length} unique images, duration ${dur}s`);
   }
 
   loadWorkMarquee();
