@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartStudio — Digital Agency</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="loading">
 
@@ -287,67 +288,13 @@
   <!-- Work -->
   <section class="work" id="work">
     <div class="section-header reveal-up">
-      <p class="section-tag">Ausgewählte Arbeiten</p>
-      <h2 class="section-title">Unsere <em>Projekte</em></h2>
+      <p class="section-tag">Aus der Galerie</p>
+      <h2 class="section-title">Unsere <em>Bilder</em></h2>
     </div>
-    <div class="work__list">
-
-      <article class="project" data-index="01">
-        <div class="project__image-wrap">
-          <div class="project__image" style="--c1:#1a1a2e;--c2:#16213e"></div>
-          <div class="project__overlay">
-            <span class="project__view">Ansehen ↗</span>
-          </div>
-        </div>
-        <div class="project__info">
-          <span class="project__num">01</span>
-          <h3 class="project__title">NovaBrand Relaunch</h3>
-          <p class="project__tags">Branding · Web · Motion</p>
-        </div>
-      </article>
-
-      <article class="project project--right" data-index="02">
-        <div class="project__image-wrap">
-          <div class="project__image" style="--c1:#0f3460;--c2:#533483"></div>
-          <div class="project__overlay">
-            <span class="project__view">Ansehen ↗</span>
-          </div>
-        </div>
-        <div class="project__info">
-          <span class="project__num">02</span>
-          <h3 class="project__title">ShopFlow E-Commerce</h3>
-          <p class="project__tags">E-Commerce · UX · Development</p>
-        </div>
-      </article>
-
-      <article class="project" data-index="03">
-        <div class="project__image-wrap">
-          <div class="project__image" style="--c1:#1b1b2f;--c2:#2c2c54"></div>
-          <div class="project__overlay">
-            <span class="project__view">Ansehen ↗</span>
-          </div>
-        </div>
-        <div class="project__info">
-          <span class="project__num">03</span>
-          <h3 class="project__title">Arktis Campaign</h3>
-          <p class="project__tags">Campaign · Motion · Social</p>
-        </div>
-      </article>
-
-      <article class="project project--right" data-index="04">
-        <div class="project__image-wrap">
-          <div class="project__image" style="--c1:#162447;--c2:#1f4068"></div>
-          <div class="project__overlay">
-            <span class="project__view">Ansehen ↗</span>
-          </div>
-        </div>
-        <div class="project__info">
-          <span class="project__num">04</span>
-          <h3 class="project__title">Verto App Design</h3>
-          <p class="project__tags">App · UI/UX · Prototyping</p>
-        </div>
-      </article>
-
+    <div class="work-marquee" id="workMarquee">
+      <div class="work-marquee__track" id="workTrack">
+        <p class="work-marquee__empty" id="workEmpty">Noch keine Bilder hochgeladen.</p>
+      </div>
     </div>
   </section>
 

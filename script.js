@@ -274,30 +274,6 @@ window.addEventListener('resize', () => { recalcDocSize(); onScroll(); }, { pass
 applyScroll();
 
 /* ═══════════════════════════════════════════════
-   PROJECT CARDS — tilt on hover (rAF-throttled per card)
-═══════════════════════════════════════════════ */
-document.querySelectorAll('.project__image-wrap').forEach(card => {
-  let ticking = false, mx = 0, my = 0;
-
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    mx = (e.clientX - rect.left) / rect.width  - 0.5;
-    my = (e.clientY - rect.top)  / rect.height - 0.5;
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        card.style.transform =
-          `perspective(800px) rotateY(${mx * 8}deg) rotateX(${my * -6}deg) scale(1.02)`;
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) scale(1)';
-  });
-});
-
-/* ═══════════════════════════════════════════════
    SERVICE CARDS — magnetic hover (rAF-throttled per card)
 ═══════════════════════════════════════════════ */
 document.querySelectorAll('.service-card').forEach(card => {
@@ -321,3 +297,58 @@ document.querySelectorAll('.service-card').forEach(card => {
   });
 });
 
+
+/* ═══════════════════════════════════════════════
+   WORK MARQUEE — load gallery images from Supabase, shuffle, scroll right→left
+═══════════════════════════════════════════════ */
+(function initWorkMarquee() {
+  const track = document.getElementById('workTrack');
+  const empty = document.getElementById('workEmpty');
+  if (!track || typeof supabase === 'undefined') return;
+
+  const SUPABASE_URL = 'https://rtzvvthcdxklwayhsuha.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0enZ2dGhjZHhrbHdheWhzdWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzUxMzEsImV4cCI6MjA5Mzc1MTEzMX0.8nGc1tqVq2PL1QK2EArexbXpX01-OK8-9MfLUI4Wnfw';
+  const BUCKET = 'galerie';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  async function loadWorkMarquee() {
+    const { data, error } = await db.storage.from(BUCKET).list('', {
+      limit: 200,
+      sortBy: { column: 'created_at', order: 'desc' }
+    });
+    if (error) { console.error('Work marquee load error:', error); return; }
+
+    const files = (data || []).filter(f =>
+      f.name && f.id && f.name !== '.emptyFolderPlaceholder'
+    );
+    if (!files.length) return;
+
+    const shuffled = shuffle(files);
+    // Duplicate the list so the keyframes 0% → -50% loop seamlessly
+    const seq = shuffled.concat(shuffled);
+
+    track.innerHTML = '';
+    seq.forEach(file => {
+      const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(file.name);
+      const item = document.createElement('div');
+      item.className = 'work-marquee__item';
+      item.innerHTML = `<img src="${urlData.publicUrl}" alt="" loading="lazy" decoding="async">`;
+      track.appendChild(item);
+    });
+
+    // Vary speed slightly with image count: more images = faster pixels/sec feels right
+    const dur = Math.max(40, Math.min(120, shuffled.length * 6));
+    track.style.animationDuration = dur + 's';
+  }
+
+  loadWorkMarquee();
+})();
