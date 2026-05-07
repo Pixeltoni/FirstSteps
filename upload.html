@@ -290,17 +290,28 @@
 
     // ── Load gallery ──────────────────────────
     async function loadGallery() {
+      galleryGrid.innerHTML = '<p class="gallery-empty">Lade Bilder…</p>';
+
       const { data, error } = await db.storage.from(BUCKET).list('', {
+        limit: 200,
         sortBy: { column: 'created_at', order: 'desc' }
       });
 
       if (error) {
-        galleryGrid.innerHTML = `<p class="gallery-empty">Fehler beim Laden: ${error.message}</p>`;
+        galleryGrid.innerHTML = `<p class="gallery-empty" style="color:#e64545">
+          Ladefehler: ${error.message}<br>
+          <small style="opacity:.6">Stelle sicher, dass die SELECT-Policy in Supabase gesetzt ist.</small>
+        </p>`;
+        console.error('Gallery load error:', error);
         return;
       }
 
-      const files = (data || []).filter(f => f.name !== '.emptyFolderPlaceholder');
-      galleryCount.textContent = files.length ? (files.length === 1 ? '1 Bild' : `${files.length} Bilder`) : '';
+      const files = (data || []).filter(f =>
+        f.name !== '.emptyFolderPlaceholder' && f.name && f.id
+      );
+      galleryCount.textContent = files.length
+        ? (files.length === 1 ? '1 Bild' : `${files.length} Bilder`)
+        : '';
 
       if (!files.length) {
         galleryGrid.innerHTML = '<p class="gallery-empty">Noch keine Bilder vorhanden.</p>';
@@ -309,7 +320,8 @@
 
       galleryGrid.innerHTML = '';
       files.forEach((file, i) => {
-        const { data: { publicUrl } } = db.storage.from(BUCKET).getPublicUrl(file.name);
+        const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(file.name);
+        const publicUrl = urlData.publicUrl;
         const div = document.createElement('div');
         div.className = 'gallery-item';
         div.dataset.path = file.name;
