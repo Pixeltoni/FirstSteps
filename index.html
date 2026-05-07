@@ -70,7 +70,130 @@
 
   <!-- Hero -->
   <section class="hero" id="hero">
-    <div class="hero__bg" id="heroBg"></div>
+    <!-- Animated Sunset Scene (SVG layers, scroll-controlled) -->
+    <div class="hero__scene" id="heroScene">
+      <svg class="hero__scene-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="sceneSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#1c2735"/>
+            <stop offset="55%" stop-color="#243441"/>
+            <stop offset="100%" stop-color="#2a3d4d"/>
+          </linearGradient>
+          <radialGradient id="sceneSunGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%"  stop-color="#ff6b4a" stop-opacity=".55"/>
+            <stop offset="50%" stop-color="#e64545" stop-opacity=".18"/>
+            <stop offset="100%" stop-color="#e64545" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="sceneSunFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#ff8059"/>
+            <stop offset="100%" stop-color="#e64545"/>
+          </linearGradient>
+          <linearGradient id="sceneWater" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#243441"/>
+            <stop offset="100%" stop-color="#0e1822"/>
+          </linearGradient>
+          <linearGradient id="sceneTextShade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"  stop-color="#000" stop-opacity=".5"/>
+            <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+          </linearGradient>
+          <pattern id="sceneHalftone" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="1.4" fill="#e64545"/>
+          </pattern>
+          <pattern id="sceneHalftoneFaint" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="1.1" fill="#c84444"/>
+          </pattern>
+        </defs>
+
+        <!-- Sky -->
+        <rect width="1920" height="1080" fill="url(#sceneSky)"/>
+
+        <!-- Stars (faint, fade in on scroll) -->
+        <g id="sceneStars" opacity="0">
+          <circle cx="180"  cy="120" r="1.2" fill="#fff"/>
+          <circle cx="320"  cy="220" r="1.0" fill="#fff"/>
+          <circle cx="540"  cy="90"  r="1.4" fill="#fff"/>
+          <circle cx="760"  cy="180" r="1.0" fill="#fff"/>
+          <circle cx="980"  cy="60"  r="1.3" fill="#fff"/>
+          <circle cx="1180" cy="220" r="1.1" fill="#fff"/>
+          <circle cx="1400" cy="100" r="1.4" fill="#fff"/>
+          <circle cx="1620" cy="180" r="1.0" fill="#fff"/>
+          <circle cx="1820" cy="80"  r="1.2" fill="#fff"/>
+          <circle cx="120"  cy="320" r="1.0" fill="#fff"/>
+          <circle cx="1720" cy="260" r="1.3" fill="#fff"/>
+        </g>
+
+        <!-- Sun glow halo -->
+        <circle id="sceneSunGlowCircle" cx="960" cy="690" r="320" fill="url(#sceneSunGlow)"/>
+
+        <!-- Sun (full circle, half hidden behind water) -->
+        <circle id="sceneSun" cx="960" cy="680" r="120" fill="url(#sceneSunFill)"/>
+
+        <!-- Halftone clouds -->
+        <g id="sceneCloudLeft">
+          <path d="M380,560 q-50,-40 -110,-15 q-30,-30 -75,-15 q-25,-25 -55,5 q-15,15 0,25 q-10,15 10,25 q15,20 50,15 q25,15 60,5 q30,15 65,5 q35,5 55,-15 z"
+                fill="url(#sceneHalftone)" opacity=".85"/>
+          <path d="M450,605 q-40,-25 -90,-10 q-25,-20 -60,-5 q-20,-15 -45,5 q-10,15 5,20 q-5,15 15,20 q25,15 55,5 q25,10 50,0 q30,5 50,-15 q15,-5 20,-20 z"
+                fill="url(#sceneHalftoneFaint)" opacity=".7"/>
+        </g>
+        <g id="sceneCloudRight">
+          <path d="M1530,565 q60,-35 130,-10 q35,-25 80,-10 q30,-20 60,5 q15,15 0,25 q15,15 -5,25 q-20,20 -55,15 q-30,15 -65,5 q-35,15 -70,5 q-40,5 -75,-15 z"
+                fill="url(#sceneHalftone)" opacity=".85"/>
+          <path d="M1480,615 q40,-25 90,-10 q25,-20 60,-5 q20,-15 45,5 q10,15 -5,20 q5,15 -15,20 q-25,15 -55,5 q-25,10 -50,0 q-30,5 -50,-15 q-15,-5 -20,-20 z"
+                fill="url(#sceneHalftoneFaint)" opacity=".7"/>
+        </g>
+
+        <!-- Distant mountains -->
+        <path id="sceneMountains"
+              d="M0,720
+                 L120,690 L220,710 L320,685 L440,705 L540,680 L640,700 L740,685
+                 L860,710 L960,675 L1060,705 L1180,685 L1280,710 L1380,690
+                 L1500,710 L1620,685 L1740,705 L1860,690 L1920,720
+                 L1920,740 L0,740 Z"
+              fill="#19222e"/>
+
+        <!-- Water -->
+        <rect y="730" width="1920" height="350" fill="url(#sceneWater)"/>
+
+        <!-- Sun reflection on water (vertical streak made of horizontal ellipses) -->
+        <g id="sceneReflection" opacity=".6">
+          <ellipse cx="960" cy="745"  rx="95" ry="6"  fill="#e64545" opacity=".7"/>
+          <ellipse cx="960" cy="775"  rx="70" ry="3"  fill="#e64545" opacity=".55"/>
+          <ellipse cx="960" cy="810"  rx="105" ry="3" fill="#e64545" opacity=".4"/>
+          <ellipse cx="960" cy="855"  rx="135" ry="3" fill="#e64545" opacity=".3"/>
+          <ellipse cx="960" cy="905"  rx="170" ry="3" fill="#e64545" opacity=".22"/>
+          <ellipse cx="960" cy="965"  rx="210" ry="3" fill="#e64545" opacity=".16"/>
+          <ellipse cx="960" cy="1030" rx="250" ry="3" fill="#e64545" opacity=".1"/>
+        </g>
+
+        <!-- Pier in perspective -->
+        <g id="scenePier">
+          <!-- Deck (trapezoid narrowing toward horizon) -->
+          <path d="M905,735 L1015,735 L1140,1080 L780,1080 Z"
+                fill="#1a232f" stroke="#2a3540" stroke-width="0.8"/>
+          <!-- Plank cross-lines (perspective) -->
+          <line x1="900" y1="755"  x2="1020" y2="755"  stroke="#0c1218" stroke-width=".6"/>
+          <line x1="895" y1="785"  x2="1025" y2="785"  stroke="#0c1218" stroke-width=".7"/>
+          <line x1="888" y1="820"  x2="1032" y2="820"  stroke="#0c1218" stroke-width=".8"/>
+          <line x1="880" y1="860"  x2="1040" y2="860"  stroke="#0c1218" stroke-width=".9"/>
+          <line x1="870" y1="905"  x2="1050" y2="905"  stroke="#0c1218" stroke-width="1"/>
+          <line x1="855" y1="955"  x2="1065" y2="955"  stroke="#0c1218" stroke-width="1.1"/>
+          <line x1="838" y1="1010" x2="1082" y2="1010" stroke="#0c1218" stroke-width="1.3"/>
+          <!-- Side rails / posts -->
+          <rect x="775"  y="1020" width="14" height="60" fill="#141c24"/>
+          <rect x="1131" y="1020" width="14" height="60" fill="#141c24"/>
+          <rect x="820"  y="940"  width="10" height="42" fill="#141c24"/>
+          <rect x="1090" y="940"  width="10" height="42" fill="#141c24"/>
+          <rect x="855"  y="880"  width="8"  height="32" fill="#141c24"/>
+          <rect x="1057" y="880"  width="8"  height="32" fill="#141c24"/>
+          <rect x="880"  y="830"  width="6"  height="24" fill="#141c24"/>
+          <rect x="1034" y="830"  width="6"  height="24" fill="#141c24"/>
+        </g>
+
+        <!-- Soft text-side darkening for readability -->
+        <rect width="1920" height="1080" fill="url(#sceneTextShade)" pointer-events="none"/>
+      </svg>
+    </div>
+
     <div class="hero__content">
       <div class="hero__eyebrow reveal-up">Digital Agency — Wien</div>
       <h1 class="hero__title">

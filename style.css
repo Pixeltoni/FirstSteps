@@ -390,14 +390,23 @@ img, svg { display: block; max-width: 100%; }
   overflow: hidden;
 }
 
-.hero__bg {
+.hero__scene {
   position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 60% 40%, rgba(123,94,167,0.15) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(168,123,192,0.08) 0%, transparent 50%),
-    var(--bg);
+  z-index: 0;
+  overflow: hidden;
   pointer-events: none;
 }
+
+.hero__scene-svg {
+  width: 100%; height: 100%;
+  display: block;
+  /* the scene itself zooms slightly on scroll via JS */
+  transform-origin: 50% 60%;
+  will-change: transform;
+}
+
+/* Existing decorative blobs sit subtly on top of the scene */
+.hero .shape { opacity: 0.05; mix-blend-mode: screen; }
 
 .hero__content {
   position: relative; z-index: 2;

@@ -222,18 +222,61 @@ document.getElementById('contactForm').addEventListener('submit', e => {
 });
 
 /* ═══════════════════════════════════════════════
-   HERO SCROLL FADE
+   HERO SCROLL FADE + SUNSET SCENE ANIMATION
 ═══════════════════════════════════════════════ */
-const heroContent  = document.querySelector('.hero__content');
+const heroContent    = document.querySelector('.hero__content');
 const heroScrollHint = document.getElementById('scrollHint');
+const heroEl         = document.getElementById('hero');
+const sceneSvg       = document.querySelector('.hero__scene-svg');
 
-window.addEventListener('scroll', () => {
-  const y = window.scrollY;
-  const fade = Math.max(0, 1 - y / 500);
-  heroContent.style.opacity    = fade;
+const scn = {
+  sun:        document.getElementById('sceneSun'),
+  glow:       document.getElementById('sceneSunGlowCircle'),
+  cloudL:     document.getElementById('sceneCloudLeft'),
+  cloudR:     document.getElementById('sceneCloudRight'),
+  mountains:  document.getElementById('sceneMountains'),
+  pier:       document.getElementById('scenePier'),
+  reflection: document.getElementById('sceneReflection'),
+  stars:      document.getElementById('sceneStars')
+};
+
+function updateScene() {
+  const y    = window.scrollY;
+  const rect = heroEl.getBoundingClientRect();
+  const heroH = rect.height || window.innerHeight;
+  // Normalised scroll progress through the hero (0 → 1)
+  const t = Math.max(0, Math.min(1, -rect.top / heroH));
+
+  /* — UI fade (existing) — */
+  heroContent.style.opacity    = Math.max(0, 1 - y / 500);
   heroContent.style.transform  = `translateY(${y * 0.15}px)`;
   heroScrollHint.style.opacity = Math.max(0, 1 - y / 200);
-});
+
+  /* — Scene transforms — */
+  // Sun rises (cy moves up)
+  scn.sun.setAttribute('cy', 680 - t * 220);
+  // Glow follows sun + grows slightly
+  scn.glow.setAttribute('cy', 690 - t * 220);
+  scn.glow.setAttribute('r',  320 + t * 60);
+  // Clouds drift outward
+  scn.cloudL.setAttribute('transform', `translate(${-t * 260}, ${-t * 25})`);
+  scn.cloudR.setAttribute('transform', `translate(${ t * 260}, ${-t * 25})`);
+  // Mountains drift down (camera tilt-up illusion)
+  scn.mountains.setAttribute('transform', `translate(0, ${t * 35})`);
+  // Pier subtly zooms toward viewer
+  scn.pier.setAttribute('transform',
+    `translate(0, ${t * 80}) scale(${1 + t * 0.06}, ${1 - t * 0.05})`);
+  // Reflection fades and stretches
+  scn.reflection.setAttribute('opacity', Math.max(0, 0.6 - t * 0.5));
+  // Stars fade in toward "night"
+  scn.stars.setAttribute('opacity', t * 0.7);
+  // Whole scene gentle zoom + lift
+  sceneSvg.style.transform = `scale(${1 + t * 0.08}) translateY(${t * -20}px)`;
+}
+
+window.addEventListener('scroll', updateScene, { passive: true });
+window.addEventListener('resize', updateScene);
+updateScene();
 
 /* ═══════════════════════════════════════════════
    PROJECT CARDS — tilt on hover
