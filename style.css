@@ -23,7 +23,6 @@ body {
   background: var(--bg);
   color: var(--fg);
   overflow-x: hidden;
-  cursor: none;
   padding-left: 64px;
 }
 
@@ -32,43 +31,9 @@ body.loading { overflow: hidden; }
 a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
 img, svg { display: block; max-width: 100%; }
-
-/* ═══════════════════════════════════════════════
-   CURSOR
-═══════════════════════════════════════════════ */
-.cursor {
-  position: fixed;
-  width: 40px; height: 40px;
-  border: 1.5px solid rgba(255,255,255,0.5);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%,-50%);
-  transition: width .3s var(--ease), height .3s var(--ease),
-              border-color .3s, background .3s, opacity .3s;
-  mix-blend-mode: difference;
-}
-
-.cursor-dot {
-  position: fixed;
-  width: 6px; height: 6px;
-  background: #fff;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%,-50%);
-  transition: transform .1s;
-}
-
-.cursor.hovered {
-  width: 70px; height: 70px;
-  background: rgba(123,94,167,0.15);
-  border-color: var(--accent);
-}
-
-.cursor.clicked {
-  width: 30px; height: 30px;
-}
+button, a, input[type="submit"] { cursor: pointer; }
+input, textarea, select { cursor: text; }
+select { cursor: pointer; }
 
 /* ═══════════════════════════════════════════════
    LOADER
@@ -127,7 +92,7 @@ img, svg { display: block; max-width: 100%; }
   position: fixed; left: 0; top: 0; bottom: 0;
   width: 64px;
   background: rgba(8,8,8,0.95);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
   border-right: 1px solid var(--border);
   z-index: 1100;
   display: flex; flex-direction: column; align-items: center;
@@ -164,7 +129,6 @@ img, svg { display: block; max-width: 100%; }
   justify-content: center; gap: 5px;
   width: 40px; height: 40px;
   background: none; border: 1px solid var(--border); border-radius: 10px;
-  cursor: none;
   transition: border-color .3s, background .3s;
 }
 
@@ -253,7 +217,6 @@ img, svg { display: block; max-width: 100%; }
   display: grid; place-items: center;
   background: none; border: 1px solid var(--border);
   border-radius: 8px; color: var(--fg-muted);
-  cursor: none;
   transition: color .3s, border-color .3s, background .3s;
 }
 
@@ -350,7 +313,7 @@ img, svg { display: block; max-width: 100%; }
 
 .nav.scrolled {
   background: rgba(8,8,8,0.85);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(10px);
   padding: 1rem 3rem;
   border-bottom: 1px solid var(--border);
 }
@@ -562,7 +525,6 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 600;
   letter-spacing: .04em;
   transition: transform .25s var(--ease), box-shadow .25s, background .25s, color .25s;
-  cursor: none;
   white-space: nowrap;
 }
 
@@ -605,7 +567,7 @@ img, svg { display: block; max-width: 100%; }
   padding: 1.1rem 0;
   overflow: hidden;
   background: rgba(8,8,8,.55);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
 }
 
 .marquee__track {
@@ -726,7 +688,6 @@ img, svg { display: block; max-width: 100%; }
   border-radius: var(--radius);
   overflow: hidden;
   aspect-ratio: 16/9;
-  cursor: none;
 }
 
 .project__image {
@@ -793,7 +754,7 @@ img, svg { display: block; max-width: 100%; }
 .services {
   padding: 6rem 3rem;
   background: rgba(8,8,8,.5);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -812,7 +773,6 @@ img, svg { display: block; max-width: 100%; }
   position: relative;
   overflow: hidden;
   transition: border-color .3s, transform .3s var(--ease), box-shadow .3s;
-  cursor: none;
 }
 
 .service-card::before {
@@ -973,7 +933,7 @@ img, svg { display: block; max-width: 100%; }
 .testimonials {
   padding: 6rem 3rem;
   background: rgba(8,8,8,.5);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   border-top: 1px solid var(--border);
   overflow: hidden;
 }
@@ -1031,7 +991,6 @@ img, svg { display: block; max-width: 100%; }
   border-radius: 50%;
   border: none;
   background: var(--border);
-  cursor: none;
   transition: background .3s, width .3s;
 }
 
@@ -1057,7 +1016,7 @@ img, svg { display: block; max-width: 100%; }
   background:
     radial-gradient(ellipse 80% 80% at 50% 50%, rgba(123,94,167,.25), transparent 70%),
     rgba(8,8,8,.45);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
   pointer-events: none;
 }
 
@@ -1082,7 +1041,7 @@ img, svg { display: block; max-width: 100%; }
 .contact {
   padding: 6rem 3rem;
   background: rgba(8,8,8,.55);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   border-top: 1px solid var(--border);
 }
 
@@ -1146,7 +1105,6 @@ a.contact__value:hover { color: var(--accent-2); }
   font-family: inherit;
   outline: none;
   transition: border-color .3s;
-  cursor: none;
 }
 
 .form-group input:focus,

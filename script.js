@@ -9,58 +9,10 @@ window.addEventListener('load', () => {
 });
 
 /* ═══════════════════════════════════════════════
-   CUSTOM CURSOR
-═══════════════════════════════════════════════ */
-const cursor    = document.getElementById('cursor');
-const cursorDot = document.getElementById('cursorDot');
-
-let mouseX = 0, mouseY = 0;
-let curX   = 0, curY   = 0;
-
-document.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  cursorDot.style.left = mouseX + 'px';
-  cursorDot.style.top  = mouseY + 'px';
-});
-
-// Smooth lag for the ring cursor
-(function animateCursor() {
-  curX += (mouseX - curX) * 0.12;
-  curY += (mouseY - curY) * 0.12;
-  cursor.style.left = curX + 'px';
-  cursor.style.top  = curY + 'px';
-  requestAnimationFrame(animateCursor);
-})();
-
-// Hover effects
-const hoverTargets = 'a, button, .service-card, .project__image-wrap, input, textarea, select';
-
-document.addEventListener('mouseover', e => {
-  if (e.target.closest(hoverTargets)) cursor.classList.add('hovered');
-});
-document.addEventListener('mouseout', e => {
-  if (e.target.closest(hoverTargets)) cursor.classList.remove('hovered');
-});
-
-document.addEventListener('mousedown', () => cursor.classList.add('clicked'));
-document.addEventListener('mouseup',   () => cursor.classList.remove('clicked'));
-
-/* ═══════════════════════════════════════════════
    HERO WORD ANIMATION — apply data-delay as CSS var
 ═══════════════════════════════════════════════ */
 document.querySelectorAll('.hero__word').forEach(el => {
-  const d = el.dataset.delay || 0;
-  el.style.setProperty('--delay', d);
-});
-
-/* ═══════════════════════════════════════════════
-   NAV — scroll style
-═══════════════════════════════════════════════ */
-const nav = document.getElementById('nav');
-
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 60);
+  el.style.setProperty('--delay', el.dataset.delay || 0);
 });
 
 /* ═══════════════════════════════════════════════
@@ -100,28 +52,34 @@ document.addEventListener('keydown', e => {
 });
 
 /* ═══════════════════════════════════════════════
-   PARALLAX — hero shapes follow mouse
+   PARALLAX — hero shapes follow mouse (rAF-throttled)
 ═══════════════════════════════════════════════ */
 const shape1 = document.getElementById('shape1');
 const shape2 = document.getElementById('shape2');
 const shape3 = document.getElementById('shape3');
 
+let mouseDX = 0, mouseDY = 0, parallaxTicking = false;
+
 document.addEventListener('mousemove', e => {
   const cx = window.innerWidth  / 2;
   const cy = window.innerHeight / 2;
-  const dx = (e.clientX - cx) / cx;
-  const dy = (e.clientY - cy) / cy;
+  mouseDX = (e.clientX - cx) / cx;
+  mouseDY = (e.clientY - cy) / cy;
 
-  shape1.style.transform = `translate(${dx * -25}px, ${dy * -20}px)`;
-  shape2.style.transform = `translate(${dx *  15}px, ${dy *  12}px)`;
-  shape3.style.transform = `translate(${dx * -10}px, ${dy *  18}px)`;
-});
+  if (!parallaxTicking) {
+    requestAnimationFrame(() => {
+      shape1.style.transform = `translate3d(${mouseDX * -25}px, ${mouseDY * -20}px, 0)`;
+      shape2.style.transform = `translate3d(${mouseDX *  15}px, ${mouseDY *  12}px, 0)`;
+      shape3.style.transform = `translate3d(${mouseDX * -10}px, ${mouseDY *  18}px, 0)`;
+      parallaxTicking = false;
+    });
+    parallaxTicking = true;
+  }
+}, { passive: true });
 
 /* ═══════════════════════════════════════════════
    SCROLL REVEAL — IntersectionObserver
 ═══════════════════════════════════════════════ */
-const revealEls = document.querySelectorAll('.reveal-up');
-
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -131,13 +89,11 @@ const revealObserver = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.15 });
 
-revealEls.forEach(el => revealObserver.observe(el));
+document.querySelectorAll('.reveal-up').forEach(el => revealObserver.observe(el));
 
 /* ═══════════════════════════════════════════════
    COUNTER ANIMATION
 ═══════════════════════════════════════════════ */
-const counters = document.querySelectorAll('.stat__number');
-
 const counterObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) return;
@@ -148,7 +104,6 @@ const counterObserver = new IntersectionObserver(entries => {
 
     function tick(now) {
       const progress = Math.min((now - start) / dur, 1);
-      // easeOutExpo
       const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       el.textContent = Math.floor(eased * target);
       if (progress < 1) requestAnimationFrame(tick);
@@ -160,7 +115,7 @@ const counterObserver = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.5 });
 
-counters.forEach(el => counterObserver.observe(el));
+document.querySelectorAll('.stat__number').forEach(el => counterObserver.observe(el));
 
 /* ═══════════════════════════════════════════════
    TESTIMONIALS SLIDER
@@ -170,7 +125,6 @@ const dotsWrapper = document.getElementById('testimonialsDots');
 const slides      = track.querySelectorAll('.testimonial');
 let   currentSlide = 0;
 
-// Build dots
 slides.forEach((_, i) => {
   const btn = document.createElement('button');
   btn.setAttribute('aria-label', `Slide ${i + 1}`);
@@ -191,19 +145,16 @@ function goTo(index) {
 }
 
 updateDots();
-
-// Auto-advance
 setInterval(() => goTo((currentSlide + 1) % slides.length), 5000);
 
-// Touch/swipe
 let touchStartX = 0;
-track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
 track.addEventListener('touchend', e => {
   const diff = touchStartX - e.changedTouches[0].clientX;
   if (Math.abs(diff) > 50) goTo(diff > 0
     ? Math.min(currentSlide + 1, slides.length - 1)
     : Math.max(currentSlide - 1, 0));
-});
+}, { passive: true });
 
 /* ═══════════════════════════════════════════════
    CONTACT FORM
@@ -222,11 +173,12 @@ document.getElementById('contactForm').addEventListener('submit', e => {
 });
 
 /* ═══════════════════════════════════════════════
-   HERO SCROLL FADE + SUNSET SCENE ANIMATION
+   SUNSET SCENE + NAV SCROLL (combined, rAF-throttled)
 ═══════════════════════════════════════════════ */
 const heroContent    = document.querySelector('.hero__content');
 const heroScrollHint = document.getElementById('scrollHint');
 const sceneSvg       = document.querySelector('.hero__scene-svg');
+const nav            = document.getElementById('nav');
 
 const scn = {
   sun:           document.getElementById('sceneSun'),
@@ -235,92 +187,111 @@ const scn = {
   horizonSpread: document.getElementById('sceneHorizonSpread'),
   cloudL:        document.getElementById('sceneCloudLeft'),
   cloudR:        document.getElementById('sceneCloudRight'),
-  mountains:     document.getElementById('sceneMountains'),
-  pier:          document.getElementById('scenePier'),
   reflection:    document.getElementById('sceneReflection'),
   stars:         document.getElementById('sceneStars'),
   moon:          document.getElementById('sceneMoon'),
   nightOverlay:  document.getElementById('sceneNightOverlay')
 };
 
-// Ease helper: smooth step
-function smoothstep(t) { return t * t * (3 - 2 * t); }
+const smoothstep = t => t * t * (3 - 2 * t);
 
-function updateScene() {
-  const y = window.scrollY;
-  const docScrollable = Math.max(1,
+// Cache values that only change on resize
+let docScrollable = Math.max(1,
+  document.documentElement.scrollHeight - window.innerHeight);
+
+function recalcDocSize() {
+  docScrollable = Math.max(1,
     document.documentElement.scrollHeight - window.innerHeight);
-  // t: 0 = top of page, 1 = bottom
+}
+
+let lastT = -1, scrollTicking = false;
+
+function applyScroll() {
+  const y = window.scrollY;
   const t = Math.min(1, Math.max(0, y / docScrollable));
 
-  /* ── Sunset phase: t 0→0.5 (sun fully gone by midpoint) ── */
-  const sunT    = smoothstep(Math.min(t / 0.5, 1));   // 0→1 over first half
+  // Toggle nav scrolled class (cheap, always do it)
+  if (y > 60) nav.classList.add('scrolled');
+  else        nav.classList.remove('scrolled');
 
-  /* ── Night phase: t 0.35→1 (stars/moon fade in after sun is half-set) ── */
-  const nightT  = smoothstep(Math.max(0, (t - 0.35) / 0.65));  // 0→1
+  // Skip scene work if scroll position barely changed
+  if (Math.abs(t - lastT) < 0.0008) {
+    scrollTicking = false;
+    return;
+  }
+  lastT = t;
 
-  /* ── Moon: appears a little later than stars ── */
-  const moonT   = smoothstep(Math.max(0, (t - 0.5) / 0.5));
+  const sunT   = smoothstep(Math.min(t / 0.5, 1));
+  const nightT = smoothstep(Math.max(0, (t - 0.35) / 0.65));
+  const moonT  = smoothstep(Math.max(0, (t - 0.5) / 0.5));
 
-  /* — UI fade (tied to local hero scroll) — */
+  // Hero content fade
   heroContent.style.opacity    = Math.max(0, 1 - y / 500);
-  heroContent.style.transform  = `translateY(${y * 0.15}px)`;
+  heroContent.style.transform  = `translate3d(0, ${y * 0.15}px, 0)`;
   heroScrollHint.style.opacity = Math.max(0, 1 - y / 200);
 
-  /* — Sun sinks below the water line (y=730, radius=120 → fully hidden at cy=855) — */
-  const sunCy = 680 + sunT * 200;   // 680 (visible) → 880 (fully below water)
+  // Sun sinks
+  const sunCy = 680 + sunT * 200;
   scn.sun.setAttribute('cy', sunCy);
-
-  // Glow shrinks and sinks with the sun
   scn.glow.setAttribute('cy', sunCy + 10);
   scn.glow.setAttribute('r',  Math.max(0, 320 - sunT * 280));
 
-  // Warm horizon band: peaks while sun nears horizon, fades after sunset.
-  // Builds up slightly (atmosphere reddens), then fades as light dies.
-  const bandPeak   = 1 - Math.abs(sunT - 0.6) / 0.6;          // peaks around sunT≈0.6
-  const bandOp     = Math.max(0, Math.min(1, 0.55 + bandPeak * 0.45 - Math.max(0, sunT - 0.7) * 3));
+  // Horizon glow
+  const bandPeak = 1 - Math.abs(sunT - 0.6) / 0.6;
+  const bandOp   = Math.max(0, Math.min(1, 0.55 + bandPeak * 0.45 - Math.max(0, sunT - 0.7) * 3));
   scn.horizonBand.setAttribute('opacity', bandOp);
-
-  // Wide sunset flare follows the sun position; fades when sun is gone
   scn.horizonSpread.setAttribute('opacity', Math.max(0, 1 - sunT * 1.15));
 
-  // Clouds fade out as daylight ends
+  // Clouds fade
   const cloudOpacity = Math.max(0, 1 - sunT * 1.3);
   scn.cloudL.style.opacity = cloudOpacity;
   scn.cloudR.style.opacity = cloudOpacity;
 
-  // Reflection brightens briefly as sun hits horizon, then fades
-  const reflPeak   = Math.max(0, 1 - Math.abs(sunT - 0.35) / 0.35);  // peaks at ~35%
-  const reflFade   = Math.max(0, 0.6 + reflPeak * 0.5 - sunT * 1.2);
-  scn.reflection.setAttribute('opacity', reflFade);
+  // Reflection
+  const reflPeak = Math.max(0, 1 - Math.abs(sunT - 0.35) / 0.35);
+  scn.reflection.setAttribute('opacity', Math.max(0, 0.6 + reflPeak * 0.5 - sunT * 1.2));
 
-  // Stars: lower sky stars lag slightly via separate child opacity manipulation
+  // Stars + moon + night overlay
   scn.stars.setAttribute('opacity', nightT * 0.85);
-
-  // Moon drifts in from right as sun is gone
   scn.moon.setAttribute('opacity', moonT * 0.9);
   scn.moon.setAttribute('transform', `translate(${(1 - moonT) * 120}, ${(1 - moonT) * 60})`);
-
-  // Night overlay darkens sky
   scn.nightOverlay.setAttribute('opacity', nightT * 0.62);
 
-  // Whole scene: slight slow zoom as time passes
+  // Whole-scene slow zoom
   sceneSvg.style.transform = `scale(${1 + t * 0.04})`;
+
+  scrollTicking = false;
 }
 
-window.addEventListener('scroll', updateScene, { passive: true });
-window.addEventListener('resize', updateScene);
-updateScene();
+function onScroll() {
+  if (!scrollTicking) {
+    requestAnimationFrame(applyScroll);
+    scrollTicking = true;
+  }
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', () => { recalcDocSize(); onScroll(); }, { passive: true });
+applyScroll();
 
 /* ═══════════════════════════════════════════════
-   PROJECT CARDS — tilt on hover
+   PROJECT CARDS — tilt on hover (rAF-throttled per card)
 ═══════════════════════════════════════════════ */
 document.querySelectorAll('.project__image-wrap').forEach(card => {
+  let ticking = false, mx = 0, my = 0;
+
   card.addEventListener('mousemove', e => {
     const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width  - 0.5;
-    const y = (e.clientY - rect.top)  / rect.height - 0.5;
-    card.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${y * -6}deg) scale(1.02)`;
+    mx = (e.clientX - rect.left) / rect.width  - 0.5;
+    my = (e.clientY - rect.top)  / rect.height - 0.5;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        card.style.transform =
+          `perspective(800px) rotateY(${mx * 8}deg) rotateX(${my * -6}deg) scale(1.02)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
   card.addEventListener('mouseleave', () => {
     card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) scale(1)';
@@ -328,14 +299,23 @@ document.querySelectorAll('.project__image-wrap').forEach(card => {
 });
 
 /* ═══════════════════════════════════════════════
-   SERVICE CARDS — magnetic hover
+   SERVICE CARDS — magnetic hover (rAF-throttled per card)
 ═══════════════════════════════════════════════ */
 document.querySelectorAll('.service-card').forEach(card => {
+  let ticking = false, mx = 0, my = 0;
+
   card.addEventListener('mousemove', e => {
     const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width  - 0.5) * 10;
-    const y = ((e.clientY - rect.top)  / rect.height - 0.5) * 10;
-    card.style.transform = `translateY(-4px) translate(${x * 0.3}px, ${y * 0.3}px)`;
+    mx = ((e.clientX - rect.left) / rect.width  - 0.5) * 10;
+    my = ((e.clientY - rect.top)  / rect.height - 0.5) * 10;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        card.style.transform =
+          `translate3d(${mx * 0.3}px, ${-4 + my * 0.3}px, 0)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
   card.addEventListener('mouseleave', () => {
     card.style.transform = '';
