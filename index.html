@@ -455,15 +455,15 @@
       </div>
       <form class="contact__form reveal-up" style="--d:0.2s" id="contactForm">
         <div class="form-group">
-          <input type="text" id="name" required placeholder=" " />
+          <input type="text" id="name" name="name" autocomplete="name" required placeholder=" " />
           <label for="name">Ihr Name</label>
         </div>
         <div class="form-group">
-          <input type="email" id="email" required placeholder=" " />
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder=" " />
           <label for="email">E-Mail Adresse</label>
         </div>
         <div class="form-group">
-          <select id="service">
+          <select id="service" name="service" autocomplete="off">
             <option value="">Leistung auswählen</option>
             <option>Web Design</option>
             <option>E-Commerce</option>
@@ -473,7 +473,7 @@
           </select>
         </div>
         <div class="form-group">
-          <textarea id="message" rows="4" required placeholder=" "></textarea>
+          <textarea id="message" name="message" autocomplete="off" rows="4" required placeholder=" "></textarea>
           <label for="message">Ihre Nachricht</label>
         </div>
         <button type="submit" class="btn btn--primary btn--full">
