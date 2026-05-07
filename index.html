@@ -50,52 +50,13 @@
       <li><a href="#services" class="drawer-link"><span class="drawer-link__num">02</span><span class="drawer-link__text">Leistungen</span></a></li>
       <li><a href="#about"    class="drawer-link"><span class="drawer-link__num">03</span><span class="drawer-link__text">Über uns</span></a></li>
       <li><a href="#contact"  class="drawer-link drawer-link--cta"><span class="drawer-link__num">04</span><span class="drawer-link__text">Kontakt</span></a></li>
-      <li>
-        <button class="drawer-link drawer-link--sub" id="openGallery">
-          <span class="drawer-link__num">05</span>
-          <span class="drawer-link__text">Galerie</span>
-          <svg class="drawer-link__chevron" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 3 11 8 6 13"/></svg>
-        </button>
-      </li>
+      <li><a href="upload.html" class="drawer-link"><span class="drawer-link__num">05</span><span class="drawer-link__text">Galerie</span></a></li>
     </ul>
     <div class="nav-drawer__footer">
       <a href="mailto:hallo@smartstudio.at" class="nav-drawer__contact">hallo@smartstudio.at</a>
       <a href="tel:+431234567" class="nav-drawer__contact">+43 1 234 567</a>
     </div>
-
-    <!-- Galerie-Untermenü: schiebt sich über den Drawer -->
-    <div class="sub-panel" id="galleryPanel" aria-hidden="true">
-      <div class="sub-panel__head">
-        <button class="sub-panel__back" id="closeGallery">
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="10 3 5 8 10 13"/></svg>
-          Zurück
-        </button>
-        <span class="sub-panel__title">Galerie</span>
-      </div>
-
-      <label class="drop-zone" id="dropZone" for="fileInput">
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <span class="drop-zone__text">Bilder hierher ziehen</span>
-        <span class="drop-zone__sub">oder klicken zum Auswählen</span>
-        <input type="file" id="fileInput" accept="image/*" multiple hidden />
-      </label>
-
-      <div class="gallery-bar" id="galleryBar" hidden>
-        <span id="galleryCount"></span>
-        <button id="galleryClear" class="gallery-bar__clear">Alle löschen</button>
-      </div>
-
-      <div class="img-grid" id="imgGrid"></div>
-    </div>
   </nav>
-
-  <!-- Lightbox -->
-  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
-    <button class="lb__close" id="lbClose">✕</button>
-    <img class="lb__img" id="lbImg" src="" alt="" />
-  </div>
 
   <!-- Top Bar (Logo only) -->
   <header class="nav" id="nav">

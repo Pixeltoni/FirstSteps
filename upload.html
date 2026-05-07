@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galerie — SmartStudio</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Upload page layout ── */
+    .upload-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .upload-page__back {
+      position: fixed;
+      top: 1.5rem;
+      left: calc(64px + 1.5rem);
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .82rem;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      padding: .45rem 1rem;
+      background: rgba(8,8,8,.6);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+      transition: color .25s, border-color .25s;
+    }
+    .upload-page__back:hover { color: var(--fg); border-color: var(--fg-muted); }
+
+    /* ── Big upload button ── */
+    .upload-btn {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      width: min(480px, 88vw);
+      aspect-ratio: 1;
+      border: 2px dashed rgba(255,255,255,.18);
+      border-radius: 28px;
+      background: rgba(8,8,8,.45);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: border-color .3s, background .3s, transform .3s var(--ease), box-shadow .3s;
+      outline: none;
+    }
+
+    .upload-btn:hover,
+    .upload-btn.drag-over {
+      border-color: var(--accent);
+      background: rgba(123,94,167,.12);
+      transform: scale(1.02);
+      box-shadow: 0 0 60px rgba(123,94,167,.25);
+    }
+
+    .upload-btn__icon {
+      color: rgba(255,255,255,.35);
+      transition: color .3s, transform .4s var(--ease);
+    }
+    .upload-btn:hover .upload-btn__icon,
+    .upload-btn.drag-over .upload-btn__icon {
+      color: var(--accent-2);
+      transform: translateY(-8px);
+    }
+
+    .upload-btn__label {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--fg);
+    }
+
+    .upload-btn__sub {
+      font-size: .82rem;
+      color: var(--fg-muted);
+      letter-spacing: .06em;
+    }
+
+    /* ── Gallery grid (shown after upload) ── */
+    .gallery-section {
+      width: min(900px, 92vw);
+      margin-top: 3rem;
+    }
+
+    .gallery-section__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .gallery-section__count {
+      font-size: .82rem;
+      color: var(--fg-muted);
+      letter-spacing: .06em;
+    }
+
+    .gallery-section__clear {
+      background: none; border: none;
+      font-family: inherit; font-size: .78rem;
+      color: var(--fg-muted);
+      border-bottom: 1px solid transparent;
+      padding: 0;
+      transition: color .25s, border-color .25s;
+    }
+    .gallery-section__clear:hover { color: #e64545; border-color: #e64545; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: .75rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: zoom-in;
+      background: var(--bg-card);
+    }
+
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .35s var(--ease);
+    }
+    .gallery-item:hover img { transform: scale(1.06); }
+
+    .gallery-item__rm {
+      position: absolute; top: 6px; right: 6px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.75);
+      border: none; color: #fff;
+      font-size: .7rem;
+      display: grid; place-items: center;
+      opacity: 0;
+      transition: opacity .2s, background .2s;
+    }
+    .gallery-item:hover .gallery-item__rm { opacity: 1; }
+    .gallery-item__rm:hover { background: #e64545; }
+
+    /* ── Lightbox ── */
+    .lb {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,.92);
+      backdrop-filter: blur(6px);
+      display: grid; place-items: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .28s;
+    }
+    .lb.open { opacity: 1; pointer-events: all; }
+    .lb__img {
+      max-width: min(88vw, 1100px); max-height: 88vh;
+      object-fit: contain; border-radius: 10px;
+      transform: scale(.94);
+      transition: transform .3s var(--ease);
+    }
+    .lb.open .lb__img { transform: scale(1); }
+    .lb__close {
+      position: absolute; top: 1.25rem; right: 1.25rem;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff; font-size: 1.1rem;
+      display: grid; place-items: center;
+      transition: background .2s;
+    }
+    .lb__close:hover { background: rgba(255,255,255,.22); }
+  </style>
+</head>
+<body>
+
+  <!-- Sunset scene (same as main page) -->
+  <div class="hero__scene">
+    <svg class="hero__scene-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="uSky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#0d1620"/>
+          <stop offset="100%" stop-color="#1a2733"/>
+        </linearGradient>
+        <linearGradient id="uWater" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#1a2733"/>
+          <stop offset="100%" stop-color="#060e16"/>
+        </linearGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="url(#uSky)"/>
+      <!-- Stars -->
+      <g opacity=".7">
+        <circle cx="80"  cy="80"  r="1.3" fill="#fff"/><circle cx="240" cy="50"  r="1.0" fill="#d8eaff"/>
+        <circle cx="420" cy="130" r="1.4" fill="#fff"/><circle cx="600" cy="70"  r="1.1" fill="#fff"/>
+        <circle cx="800" cy="110" r="1.0" fill="#d8eaff"/><circle cx="960" cy="55" r="1.4" fill="#fff"/>
+        <circle cx="1140" cy="90" r="1.2" fill="#fff"/><circle cx="1320" cy="60" r="1.3" fill="#d8eaff"/>
+        <circle cx="1500" cy="115" r="1.0" fill="#fff"/><circle cx="1680" cy="75" r="1.5" fill="#fff"/>
+        <circle cx="1860" cy="100" r="1.1" fill="#d8eaff"/><circle cx="150" cy="220" r="1.1" fill="#fff"/>
+        <circle cx="350" cy="260" r="1.3" fill="#d8eaff"/><circle cx="550" cy="200" r="1.0" fill="#fff"/>
+        <circle cx="750" cy="280" r="1.4" fill="#fff"/><circle cx="1050" cy="230" r="1.2" fill="#d8eaff"/>
+        <circle cx="1250" cy="215" r="1.1" fill="#fff"/><circle cx="1450" cy="275" r="1.4" fill="#fff"/>
+        <circle cx="1650" cy="230" r="1.0" fill="#fff"/><circle cx="1850" cy="200" r="1.2" fill="#d8eaff"/>
+        <!-- Moon -->
+        <circle cx="1500" cy="180" r="38" fill="#d4e8f8" opacity=".85"/>
+        <circle cx="1518" cy="175" r="34" fill="#19303e" opacity=".7"/>
+      </g>
+      <!-- Mountains -->
+      <path d="M0,720 L120,690 L220,710 L320,685 L440,705 L540,680 L640,700 L740,685
+               L860,710 L960,675 L1060,705 L1180,685 L1280,710 L1380,690
+               L1500,710 L1620,685 L1740,705 L1860,690 L1920,720 L1920,740 L0,740 Z"
+            fill="#19222e"/>
+      <!-- Water -->
+      <rect y="730" width="1920" height="350" fill="url(#uWater)"/>
+      <!-- Pier -->
+      <path d="M905,735 L1015,735 L1140,1080 L780,1080 Z" fill="#1a232f"/>
+      <line x1="888" y1="820" x2="1032" y2="820" stroke="#0c1218" stroke-width=".8"/>
+      <line x1="870" y1="905" x2="1050" y2="905" stroke="#0c1218" stroke-width="1"/>
+      <line x1="838" y1="1010" x2="1082" y2="1010" stroke="#0c1218" stroke-width="1.3"/>
+    </svg>
+  </div>
+
+  <!-- Back link -->
+  <a href="index.html" class="upload-page__back">
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="10 3 5 8 10 13"/>
+    </svg>
+    Zurück
+  </a>
+
+  <!-- Main content -->
+  <main class="upload-page" id="uploadPage">
+
+    <!-- Big upload button -->
+    <label class="upload-btn" id="uploadBtn" for="fileInput" tabindex="0">
+      <div class="upload-btn__icon">
+        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M32 44 V20 M20 32 L32 20 L44 32"/>
+          <path d="M12 44 v6 a4 4 0 0 0 4 4 h32 a4 4 0 0 0 4-4 v-6"/>
+        </svg>
+      </div>
+      <span class="upload-btn__label">UPLOAD</span>
+      <span class="upload-btn__sub">Bilder ziehen oder klicken</span>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden />
+    </label>
+
+    <!-- Gallery (hidden until first upload) -->
+    <section class="gallery-section" id="gallerySection" hidden>
+      <div class="gallery-section__head">
+        <span class="gallery-section__count" id="galleryCount"></span>
+        <button class="gallery-section__clear" id="galleryClear">Alle löschen</button>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="lb__close" id="lbClose">✕</button>
+    <img class="lb__img" id="lbImg" src="" alt="" />
+  </div>
+
+  <script>
+    const uploadBtn     = document.getElementById('uploadBtn');
+    const fileInput     = document.getElementById('fileInput');
+    const gallerySection = document.getElementById('gallerySection');
+    const galleryGrid   = document.getElementById('galleryGrid');
+    const galleryCount  = document.getElementById('galleryCount');
+    const galleryClear  = document.getElementById('galleryClear');
+    const lb            = document.getElementById('lb');
+    const lbImg         = document.getElementById('lbImg');
+
+    let imgs = [];
+
+    // ── File handling ──────────────────────────
+    function addFiles(files) {
+      Array.from(files)
+        .filter(f => f.type.startsWith('image/'))
+        .forEach(f => imgs.push({ url: URL.createObjectURL(f), name: f.name }));
+      render();
+    }
+
+    function render() {
+      galleryGrid.innerHTML = '';
+      gallerySection.hidden = imgs.length === 0;
+      if (!imgs.length) return;
+
+      galleryCount.textContent = imgs.length === 1 ? '1 Bild' : `${imgs.length} Bilder`;
+
+      imgs.forEach((img, i) => {
+        const div = document.createElement('div');
+        div.className = 'gallery-item';
+        div.dataset.index = i;
+        div.innerHTML = `<img src="${img.url}" alt="${img.name}" loading="lazy">
+                         <button class="gallery-item__rm" aria-label="Entfernen">✕</button>`;
+        div.style.cssText = 'opacity:0;transform:scale(.88)';
+        galleryGrid.appendChild(div);
+        requestAnimationFrame(() => {
+          div.style.cssText = `transition:opacity .28s ${i*.05}s,transform .28s ${i*.05}s;opacity:1;transform:scale(1)`;
+        });
+      });
+    }
+
+    // Event delegation: remove + lightbox
+    galleryGrid.addEventListener('click', e => {
+      const item = e.target.closest('.gallery-item');
+      if (!item) return;
+      const i = +item.dataset.index;
+      if (e.target.closest('.gallery-item__rm')) {
+        e.stopPropagation();
+        URL.revokeObjectURL(imgs[i].url);
+        imgs.splice(i, 1);
+        render();
+      } else {
+        lbImg.src = imgs[i].url;
+        lbImg.alt = imgs[i].name;
+        lb.classList.add('open');
+        lb.setAttribute('aria-hidden', 'false');
+      }
+    });
+
+    galleryClear.addEventListener('click', () => {
+      imgs.forEach(img => URL.revokeObjectURL(img.url));
+      imgs = [];
+      render();
+    });
+
+    // File input
+    fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+
+    // Drag & drop
+    uploadBtn.addEventListener('dragover',  e => { e.preventDefault(); uploadBtn.classList.add('drag-over'); });
+    uploadBtn.addEventListener('dragleave', () => uploadBtn.classList.remove('drag-over'));
+    uploadBtn.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadBtn.classList.remove('drag-over');
+      addFiles(e.dataTransfer.files);
+    });
+
+    // Keyboard
+    uploadBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+    });
+
+    // Lightbox close
+    document.getElementById('lbClose').addEventListener('click', () => {
+      lb.classList.remove('open');
+      lb.setAttribute('aria-hidden', 'true');
+    });
+    lb.addEventListener('click', e => {
+      if (e.target === lb) { lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && lb.classList.contains('open')) {
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden', 'true');
+      }
+    });
+  </script>
+</body>
+</html>
