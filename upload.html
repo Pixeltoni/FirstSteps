@@ -411,6 +411,129 @@
       transition: background .2s;
     }
     .lb__close:hover { background: rgba(255,255,255,.22); }
+
+    /* ── Password Screen ── */
+    #pwScreen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #07080d;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.5rem;
+      transition: opacity .4s;
+    }
+    #pwScreen.fade-out { opacity: 0; pointer-events: none; }
+    .pw-box {
+      width: min(380px, 88vw);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem 2rem 2.25rem;
+      display: flex; flex-direction: column; gap: 1.25rem;
+    }
+    .pw-box__title {
+      font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em;
+      text-align: center;
+    }
+    .pw-box__sub {
+      font-size: .78rem; color: var(--fg-muted);
+      text-align: center; letter-spacing: .06em; margin-top: -.75rem;
+    }
+    .pw-box__input {
+      width: 100%;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .8rem 1rem;
+      color: var(--fg); font-size: 1rem; font-family: inherit;
+      transition: border-color .2s;
+      box-sizing: border-box;
+    }
+    .pw-box__input:focus { outline: none; border-color: var(--accent); }
+    .pw-box__btn {
+      width: 100%;
+      padding: .85rem;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff; font-size: .95rem; font-weight: 700;
+      letter-spacing: .03em; cursor: pointer;
+      border: none;
+      transition: background .2s, transform .15s;
+    }
+    .pw-box__btn:hover { background: var(--accent-2); }
+    .pw-box__btn:active { transform: scale(.97); }
+    .pw-box__error {
+      font-size: .8rem; color: #e64545;
+      text-align: center; min-height: 1.1em;
+    }
+
+    /* ── Danger button ── */
+    .btn-modal--danger { background: #e64545; color: #fff; border-color: #e64545; }
+    .btn-modal--danger:hover:not(:disabled) { background: #c93232; border-color: #c93232; }
+
+    /* ── Selection overlay on gallery items ── */
+    .gallery-item.selected { border-color: var(--accent); }
+    .gallery-item.selected::after {
+      content: '✓';
+      position: absolute; inset: 0;
+      background: rgba(123,94,167,.45);
+      display: grid; place-items: center;
+      font-size: 1.8rem; color: #fff;
+      pointer-events: none;
+    }
+    .selection-mode .gallery-item { cursor: pointer; }
+
+    /* ── Selection action bar ── */
+    #selectionBar {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .75rem 1rem;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: .75rem;
+      flex-wrap: wrap;
+    }
+    #selectionCount { flex: 1; font-size: .85rem; color: var(--fg-muted); }
+
+    /* ── Album header action buttons ── */
+    .gallery-section__actions {
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .btn-gallery-action {
+      padding: .4rem .9rem;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, color .2s;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--fg-muted);
+    }
+    .btn-gallery-action:hover { color: var(--fg); border-color: var(--fg-muted); }
+    .btn-gallery-action--primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .btn-gallery-action--primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+
+    /* ── Move album list ── */
+    #moveAlbumList { max-height: 50vh; overflow-y: auto; margin-top: .5rem; }
+    .move-album-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .65rem .85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+      border: 1px solid transparent;
+    }
+    .move-album-item:hover { background: rgba(255,255,255,.06); border-color: var(--border); }
+    .move-album-item__thumb {
+      width: 48px; height: 48px; border-radius: 8px;
+      object-fit: cover; background: #111; flex-shrink: 0;
+    }
+    .move-album-item__name { font-size: .92rem; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -485,7 +608,14 @@
             <span class="gallery-section__sub" id="gallerySectionSub">Galerie</span>
           </div>
         </div>
-        <span class="gallery-section__count" id="galleryCount"></span>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <span class="gallery-section__count" id="galleryCount"></span>
+          <div class="gallery-section__actions" id="albumActions" hidden>
+            <button class="btn-gallery-action btn-gallery-action--primary" id="addImagesBtn" type="button">+ Bilder hinzufügen</button>
+            <button class="btn-gallery-action" id="selectModeBtn" type="button">Auswählen</button>
+          </div>
+        </div>
+        <input type="file" id="addImagesInput" accept="image/*" multiple hidden>
       </div>
 
       <div class="folder-grid" id="folderGrid" style="display:none">
@@ -493,6 +623,12 @@
       </div>
 
       <div class="gallery-grid" id="galleryGrid" style="display:none"></div>
+
+      <div id="selectionBar" hidden>
+        <span id="selectionCount">0 ausgewählt</span>
+        <button class="btn-gallery-action" id="moveSelectedBtn" type="button">Verschieben</button>
+        <button class="btn-gallery-action btn-modal--danger" id="deleteSelectedBtn" type="button" style="border-radius:8px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;letter-spacing:.02em;cursor:pointer">Löschen</button>
+      </div>
     </section>
 
   </main>
@@ -540,6 +676,46 @@
     </div>
   </div>
 
+  <!-- ── Password Screen ── -->
+  <div id="pwScreen">
+    <div class="pw-box">
+      <p class="pw-box__title">Galerie</p>
+      <p class="pw-box__sub">SMARTSTUDIO</p>
+      <input class="pw-box__input" id="pwInput" type="password" placeholder="Passwort" autocomplete="current-password" />
+      <p class="pw-box__error" id="pwError"></p>
+      <button class="pw-box__btn" id="pwSubmit" type="button">Weiter</button>
+    </div>
+  </div>
+
+  <!-- ── Confirm Modal ── -->
+  <div class="modal" id="confirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title" id="confirmTitle">Löschen</h2>
+        <button class="modal__close" id="confirmClose" aria-label="Schließen">✕</button>
+      </div>
+      <p id="confirmMsg" style="color:var(--fg-muted);font-size:.9rem;line-height:1.5;margin:0 0 .5rem"></p>
+      <div class="modal__actions">
+        <button type="button" class="btn-modal btn-modal--secondary" id="confirmCancel">Abbrechen</button>
+        <button type="button" class="btn-modal btn-modal--danger" id="confirmOk">Löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Move Modal ── -->
+  <div class="modal" id="moveModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title">In Album verschieben</h2>
+        <button class="modal__close" id="moveClose" aria-label="Schließen">✕</button>
+      </div>
+      <div id="moveAlbumList"></div>
+      <div class="modal__actions">
+        <button type="button" class="btn-modal btn-modal--secondary" id="moveCancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Lightbox -->
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
     <button class="lb__close" id="lbClose">✕</button>
@@ -579,6 +755,28 @@
 
     let currentFolder = null;       // null = folder list view; else album path
     let pendingFiles  = [];
+    let selectedPaths = new Set();
+    let isSelectMode  = false;
+
+    // ── New DOM refs ──
+    const albumActions     = document.getElementById('albumActions');
+    const addImagesBtn     = document.getElementById('addImagesBtn');
+    const addImagesInput   = document.getElementById('addImagesInput');
+    const selectModeBtn    = document.getElementById('selectModeBtn');
+    const selectionBar     = document.getElementById('selectionBar');
+    const selectionCount   = document.getElementById('selectionCount');
+    const moveSelectedBtn  = document.getElementById('moveSelectedBtn');
+    const deleteSelectedBtn= document.getElementById('deleteSelectedBtn');
+    const confirmModal     = document.getElementById('confirmModal');
+    const confirmTitle     = document.getElementById('confirmTitle');
+    const confirmMsg       = document.getElementById('confirmMsg');
+    const confirmOk        = document.getElementById('confirmOk');
+    const confirmCancel    = document.getElementById('confirmCancel');
+    const confirmClose     = document.getElementById('confirmClose');
+    const moveModal        = document.getElementById('moveModal');
+    const moveAlbumList    = document.getElementById('moveAlbumList');
+    const moveCancel       = document.getElementById('moveCancel');
+    const moveClose        = document.getElementById('moveClose');
 
     // ── Helpers ──
     function setStatus(msg, type = '') {
@@ -603,7 +801,180 @@
       return `${d}.${m}.${y}`;
     }
 
-    // ── Modal ──
+    // ── Confirm Modal ──
+    function showConfirm(title, msg) {
+      return new Promise(resolve => {
+        confirmTitle.textContent = title;
+        confirmMsg.textContent   = msg;
+        confirmModal.classList.add('open');
+        confirmModal.setAttribute('aria-hidden', 'false');
+        function ok()  { cleanup(); resolve(true);  }
+        function no()  { cleanup(); resolve(false); }
+        function cleanup() {
+          confirmOk.removeEventListener('click', ok);
+          confirmCancel.removeEventListener('click', no);
+          confirmClose.removeEventListener('click', no);
+          confirmModal.classList.remove('open');
+          confirmModal.setAttribute('aria-hidden', 'true');
+        }
+        confirmOk.addEventListener('click', ok);
+        confirmCancel.addEventListener('click', no);
+        confirmClose.addEventListener('click', no);
+      });
+    }
+    confirmModal.addEventListener('click', e => { if (e.target === confirmModal) confirmCancel.click(); });
+
+    // ── Selection mode ──
+    function enterSelectMode() {
+      isSelectMode = true;
+      galleryGrid.classList.add('selection-mode');
+      selectionBar.hidden = false;
+      addImagesBtn.hidden = true;
+      selectModeBtn.textContent = 'Abbrechen';
+      selectionCount.textContent = '0 ausgewählt';
+    }
+
+    function exitSelectMode() {
+      isSelectMode = false;
+      selectedPaths.clear();
+      galleryGrid.classList.remove('selection-mode');
+      selectionBar.hidden = true;
+      addImagesBtn.hidden = false;
+      selectModeBtn.textContent = 'Auswählen';
+      galleryGrid.querySelectorAll('.gallery-item.selected').forEach(el => el.classList.remove('selected'));
+    }
+
+    selectModeBtn.addEventListener('click', () => {
+      if (isSelectMode) exitSelectMode();
+      else              enterSelectMode();
+    });
+
+    // ── Add images to existing album ──
+    addImagesBtn.addEventListener('click', () => addImagesInput.click());
+    addImagesInput.addEventListener('change', async () => {
+      const files = Array.from(addImagesInput.files).filter(f => f.type.startsWith('image/'));
+      addImagesInput.value = '';
+      if (!files.length || !currentFolder) return;
+
+      addImagesBtn.disabled = true;
+      addImagesBtn.textContent = 'Lädt…';
+      let ok = 0, fail = 0;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const safeName = `${Date.now()}-${i}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const { error } = await db.storage
+          .from(BUCKET)
+          .upload(`${currentFolder}/${safeName}`, file, { contentType: file.type, upsert: false });
+        if (error) { fail++; console.error(error); } else ok++;
+      }
+      addImagesBtn.disabled = false;
+      addImagesBtn.textContent = '+ Bilder hinzufügen';
+      if (fail === 0) setStatus(`${ok} Bild${ok > 1 ? 'er' : ''} hinzugefügt ✓`, 'ok');
+      else            setStatus(`${ok} hochgeladen, ${fail} fehlgeschlagen`, 'error');
+      await openAlbum(currentFolder);
+    });
+
+    // ── Delete selected ──
+    deleteSelectedBtn.addEventListener('click', async () => {
+      const n = selectedPaths.size;
+      if (!n) return;
+      const confirmed = await showConfirm(
+        `${n} Bild${n > 1 ? 'er' : ''} löschen`,
+        `Sollen ${n} Bild${n > 1 ? 'er' : ''} wirklich dauerhaft gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.`
+      );
+      if (!confirmed) return;
+      const { error } = await db.storage.from(BUCKET).remove([...selectedPaths]);
+      if (error) { setStatus('Löschen fehlgeschlagen: ' + error.message, 'error'); return; }
+      exitSelectMode();
+      setStatus(`${n} Bild${n > 1 ? 'er' : ''} gelöscht`, 'ok');
+      await openAlbum(currentFolder);
+    });
+
+    // ── Move selected ──
+    moveSelectedBtn.addEventListener('click', async () => {
+      if (!selectedPaths.size) return;
+      moveAlbumList.innerHTML = '<p style="color:var(--fg-muted);font-size:.85rem;padding:.5rem .85rem">Lade Alben…</p>';
+      moveModal.classList.add('open');
+      moveModal.setAttribute('aria-hidden', 'false');
+
+      const { data } = await db.storage.from(BUCKET).list('', { limit: 200 });
+      const folders = (data || [])
+        .filter(e => e && e.name && e.id === null && e.name !== currentFolder)
+        .map(e => e.name);
+
+      if (!folders.length) {
+        moveAlbumList.innerHTML = '<p style="color:var(--fg-muted);font-size:.85rem;padding:.5rem .85rem">Keine anderen Alben vorhanden.</p>';
+        return;
+      }
+
+      const items = await Promise.all(folders.map(async folder => {
+        const { data: sub } = await db.storage.from(BUCKET).list(folder, { limit: 10 });
+        const photos = (sub || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
+        let name = folder;
+        const metaItem = (sub || []).find(f => f.name === '_meta.json');
+        if (metaItem) {
+          try {
+            const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
+            const r = await fetch(mu.publicUrl + '?t=' + Date.now());
+            if (r.ok) { const m = await r.json(); name = m.name || folder; }
+          } catch (e) {}
+        }
+        const cover = photos[0]
+          ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
+          : null;
+        return { folder, name, cover };
+      }));
+
+      moveAlbumList.innerHTML = '';
+      items.forEach(({ folder, name, cover }) => {
+        const el = document.createElement('div');
+        el.className = 'move-album-item';
+        el.innerHTML = cover
+          ? `<img class="move-album-item__thumb" src="${cover}" alt="" loading="lazy"><span class="move-album-item__name">${name}</span>`
+          : `<div class="move-album-item__thumb" style="background:#1a1a2e"></div><span class="move-album-item__name">${name}</span>`;
+        el.addEventListener('click', () => doMoveImages(folder));
+        moveAlbumList.appendChild(el);
+      });
+    });
+
+    async function doMoveImages(targetFolder) {
+      closeMoveModal();
+      const paths = [...selectedPaths];
+      const n = paths.length;
+      setStatus('Verschiebe Bilder…', '');
+      let ok = 0, fail = 0;
+
+      for (const srcPath of paths) {
+        const fileName = srcPath.split('/').pop();
+        const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(srcPath);
+        try {
+          const resp = await fetch(urlData.publicUrl);
+          if (!resp.ok) throw new Error('Download fehlgeschlagen');
+          const blob = await resp.blob();
+          const { error: upErr } = await db.storage
+            .from(BUCKET)
+            .upload(`${targetFolder}/${fileName}`, blob, { contentType: blob.type, upsert: false });
+          if (upErr) { fail++; continue; }
+          await db.storage.from(BUCKET).remove([srcPath]);
+          ok++;
+        } catch (e) { fail++; console.error(e); }
+      }
+
+      exitSelectMode();
+      if (fail === 0) setStatus(`${ok} Bild${ok > 1 ? 'er' : ''} verschoben ✓`, 'ok');
+      else            setStatus(`${ok} verschoben, ${fail} fehlgeschlagen`, 'error');
+      await openAlbum(currentFolder);
+    }
+
+    function closeMoveModal() {
+      moveModal.classList.remove('open');
+      moveModal.setAttribute('aria-hidden', 'true');
+    }
+    moveCancel.addEventListener('click', closeMoveModal);
+    moveClose.addEventListener('click', closeMoveModal);
+    moveModal.addEventListener('click', e => { if (e.target === moveModal) closeMoveModal(); });
+
+    // ── Upload Modal ──
     function openModal() {
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
@@ -699,11 +1070,14 @@
     // ── Load folder list ──
     async function loadFolders() {
       currentFolder = null;
+      exitSelectMode();
+      albumActions.hidden = true;
       backBtn.hidden = true;
       sectionTitle.textContent = 'Alben';
       sectionSub.textContent   = 'Galerie';
       folderGrid.style.display = '';
       galleryGrid.style.display = 'none';
+      selectionBar.hidden = true;
       folderGrid.innerHTML = '<p class="gallery-empty">Lade Alben…</p>';
 
       const { data, error } = await db.storage.from(BUCKET).list('', { limit: 200 });
@@ -799,6 +1173,7 @@
       folderGrid.style.display = 'none';
       galleryGrid.style.display = '';
       backBtn.hidden = false;
+      albumActions.hidden = false;
       galleryGrid.innerHTML = '<p class="gallery-empty">Lade Bilder…</p>';
 
       let files, metaText = '';
@@ -868,7 +1243,12 @@
         e.stopPropagation();
         const card = rmBtn.closest('.folder-card');
         const folder = card.dataset.folder;
-        if (!confirm(`Album "${card.querySelector('.folder-card__title').textContent}" inkl. aller Bilder wirklich löschen?`)) return;
+        const albumName = card.querySelector('.folder-card__title').textContent;
+        const confirmed = await showConfirm(
+          `Album löschen`,
+          `Album "${albumName}" inkl. aller Bilder wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`
+        );
+        if (!confirmed) return;
         const { data: items, error } = await db.storage.from(BUCKET).list(folder, { limit: 1000 });
         if (error) { setStatus('Löschen fehlgeschlagen: ' + error.message, 'error'); return; }
         const paths = (items || []).map(f => `${folder}/${f.name}`);
@@ -886,12 +1266,24 @@
 
     // ── Album grid clicks ──
     galleryGrid.addEventListener('click', async e => {
+      const item  = e.target.closest('.gallery-item');
       const rmBtn = e.target.closest('.gallery-item__rm');
       const img   = e.target.closest('.gallery-item img');
+
+      if (isSelectMode) {
+        if (!item) return;
+        const path = item.dataset.path;
+        if (selectedPaths.has(path)) { selectedPaths.delete(path); item.classList.remove('selected'); }
+        else                          { selectedPaths.add(path);    item.classList.add('selected'); }
+        selectionCount.textContent = `${selectedPaths.size} ausgewählt`;
+        return;
+      }
 
       if (rmBtn) {
         e.stopPropagation();
         const path = rmBtn.closest('.gallery-item').dataset.path;
+        const confirmed = await showConfirm('Bild löschen', 'Dieses Bild wirklich dauerhaft löschen?');
+        if (!confirmed) return;
         const { error } = await db.storage.from(BUCKET).remove([path]);
         if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
         await openAlbum(currentFolder);
@@ -910,13 +1302,54 @@
     lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      if (lb.classList.contains('open')) return closeLb();
-      if (modal.classList.contains('open')) return closeModal();
+      if (lb.classList.contains('open'))          return closeLb();
+      if (confirmModal.classList.contains('open')) return confirmCancel.click();
+      if (moveModal.classList.contains('open'))    return closeMoveModal();
+      if (modal.classList.contains('open'))        return closeModal();
     });
     function closeLb() {
       lb.classList.remove('open');
       lb.setAttribute('aria-hidden', 'true');
       lbImg.src = '';
+    }
+
+    // ── Password Protection ──
+    // To change the password:
+    //   1. Run in browser console: crypto.subtle.digest('SHA-256', new TextEncoder().encode('IhrPasswort')).then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+    //   2. Replace PW_HASH below with the printed value.
+    const PW_HASH    = '0c78845b26a28951c473b4dfc9c1a5305a657db1b2b4481de86a2dcec564fdcd'; // SmartStudio
+    const PW_SESSION = 'gallery-auth-v1';
+    const pwScreen   = document.getElementById('pwScreen');
+    const pwInput    = document.getElementById('pwInput');
+    const pwSubmit   = document.getElementById('pwSubmit');
+    const pwError    = document.getElementById('pwError');
+
+    async function hashString(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function tryUnlock() {
+      pwError.textContent = '';
+      pwSubmit.disabled = true;
+      const hash = await hashString(pwInput.value);
+      if (hash === PW_HASH) {
+        sessionStorage.setItem(PW_SESSION, '1');
+        pwScreen.classList.add('fade-out');
+        setTimeout(() => pwScreen.remove(), 420);
+      } else {
+        pwError.textContent = 'Falsches Passwort';
+        pwInput.value = '';
+        pwInput.focus();
+      }
+      pwSubmit.disabled = false;
+    }
+
+    pwSubmit.addEventListener('click', tryUnlock);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+    if (sessionStorage.getItem(PW_SESSION)) {
+      pwScreen.remove();
     }
 
     // ── Init ──
