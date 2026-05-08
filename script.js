@@ -328,45 +328,60 @@ document.querySelectorAll('.service-card').forEach(card => {
     return a;
   }
 
-  async function loadWorkMarquee() {
-    let resp;
-    try {
-      resp = await db.storage.from(BUCKET).list('', {
-        limit: 200,
-        sortBy: { column: 'created_at', order: 'desc' }
+  async function listAllImages() {
+    // List bucket root
+    const { data: rootEntries, error: rootErr } = await db.storage.from(BUCKET).list('', { limit: 200 });
+    if (rootErr) throw rootErr;
+
+    const all = [];
+
+    // Folders have id === null, files have an id
+    const folders = (rootEntries || []).filter(e => e && e.name && e.id === null);
+    const rootFiles = (rootEntries || [])
+      .filter(e => e && e.id && e.name && e.name !== '.emptyFolderPlaceholder')
+      .map(e => e.name);
+
+    all.push(...rootFiles);
+
+    // Walk into each folder
+    for (const folder of folders) {
+      const { data: items, error } = await db.storage.from(BUCKET).list(folder.name, { limit: 500 });
+      if (error) { console.warn('[work-marquee] folder list fail', folder.name, error); continue; }
+      (items || []).forEach(f => {
+        if (f.name && f.id && f.name !== '_meta.json' && f.name !== '.emptyFolderPlaceholder') {
+          all.push(`${folder.name}/${f.name}`);
+        }
       });
+    }
+    return all;
+  }
+
+  async function loadWorkMarquee() {
+    let paths;
+    try {
+      paths = await listAllImages();
     } catch (e) {
-      console.error('[work-marquee] network error:', e);
-      showMsg('Netzwerkfehler beim Laden der Bilder', true);
+      console.error('[work-marquee] supabase error:', e);
+      showMsg('Ladefehler: ' + (e.message || e), true);
       return;
     }
 
-    const { data, error } = resp;
-    if (error) {
-      console.error('[work-marquee] supabase error:', error);
-      showMsg('Ladefehler: ' + error.message, true);
-      return;
-    }
+    console.log('[work-marquee] paths:', paths);
 
-    console.log('[work-marquee] raw list:', data);
-
-    const files = (data || []).filter(f =>
-      f && f.name && f.name !== '.emptyFolderPlaceholder'
-    );
-    if (!files.length) {
+    if (!paths.length) {
       showMsg('Noch keine Bilder hochgeladen.', false);
       return;
     }
 
-    const shuffled = shuffle(files);
+    const shuffled = shuffle(paths);
     const seq = shuffled.concat(shuffled); // duplicate for seamless loop
 
     const sizeVariants = ['sm', 'md', 'lg', 'xl', 'wide', 'sq'];
     const posVariants  = ['top', 'mid-h', 'mid-l', 'bottom'];
 
     track.innerHTML = '';
-    seq.forEach((file, i) => {
-      const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(file.name);
+    seq.forEach((path, i) => {
+      const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path);
       const size = sizeVariants[(i * 3 + 1) % sizeVariants.length];
       const pos  = posVariants[(i * 5 + 2)  % posVariants.length];
       const item = document.createElement('div');
@@ -375,7 +390,6 @@ document.querySelectorAll('.service-card').forEach(card => {
       track.appendChild(item);
     });
 
-    // Slower scroll: ~14s per unique image, clamped 100–360s
     const dur = Math.max(100, Math.min(360, shuffled.length * 14));
     track.style.animationDuration = dur + 's';
     console.log(`[work-marquee] rendered ${shuffled.length} unique images, duration ${dur}s`);

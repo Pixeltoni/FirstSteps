@@ -12,7 +12,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 6rem 2rem 4rem;
       position: relative;
       z-index: 1;
@@ -37,7 +36,7 @@
     }
     .upload-page__back:hover { color: var(--fg); border-color: var(--fg-muted); }
 
-    /* ── Upload button ── */
+    /* ── Upload trigger button ── */
     .upload-btn {
       display: flex;
       flex-direction: column;
@@ -55,24 +54,17 @@
       outline: none;
       flex-shrink: 0;
     }
-    .upload-btn:hover, .upload-btn.drag-over {
+    .upload-btn:hover {
       border-color: var(--accent);
       background: rgba(123,94,167,.12);
       transform: scale(1.02);
       box-shadow: 0 0 60px rgba(123,94,167,.22);
     }
-    .upload-btn.uploading {
-      border-color: var(--accent-2);
-      pointer-events: none;
-    }
     .upload-btn__icon {
       color: rgba(255,255,255,.35);
       transition: color .3s, transform .4s var(--ease);
     }
-    .upload-btn:hover .upload-btn__icon,
-    .upload-btn.drag-over .upload-btn__icon { color: var(--accent-2); transform: translateY(-8px); }
-    .upload-btn.uploading .upload-btn__icon { color: var(--accent-2); animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .upload-btn:hover .upload-btn__icon { color: var(--accent-2); transform: translateY(-8px); }
 
     .upload-btn__label {
       font-size: clamp(2.2rem, 6vw, 3.5rem);
@@ -85,7 +77,6 @@
       letter-spacing: .06em;
     }
 
-    /* ── Status message ── */
     .status {
       margin-top: 1.25rem;
       font-size: .82rem;
@@ -97,36 +88,272 @@
     .status.ok    { color: #38c172; }
     .status.error { color: #e64545; }
 
+    /* ── Modal ── */
+    .modal {
+      position: fixed; inset: 0; z-index: 1500;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+      display: grid; place-items: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+      padding: 2rem;
+    }
+    .modal.open { opacity: 1; pointer-events: all; }
+    .modal__panel {
+      width: min(560px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem;
+      transform: translateY(20px) scale(.96);
+      transition: transform .35s var(--ease);
+    }
+    .modal.open .modal__panel { transform: translateY(0) scale(1); }
+
+    .modal__head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .modal__title {
+      font-size: 1.4rem; font-weight: 700; letter-spacing: -.01em;
+    }
+    .modal__close {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.08); border: 1px solid var(--border);
+      color: #fff; font-size: 1rem;
+      display: grid; place-items: center; cursor: pointer;
+      transition: background .2s;
+    }
+    .modal__close:hover { background: rgba(255,255,255,.18); }
+
+    .field { margin-bottom: 1.1rem; }
+    .field__label {
+      display: block;
+      font-size: .72rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: .45rem;
+    }
+    .field input[type="text"],
+    .field input[type="date"] {
+      width: 100%;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      color: var(--fg);
+      font-size: .95rem;
+      font-family: inherit;
+      transition: border-color .2s, background .2s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255,255,255,.07);
+    }
+
+    .file-drop {
+      border: 2px dashed rgba(255,255,255,.18);
+      border-radius: 12px;
+      padding: 1.6rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .25s, background .25s;
+    }
+    .file-drop:hover, .file-drop.drag-over {
+      border-color: var(--accent);
+      background: rgba(123,94,167,.08);
+    }
+    .file-drop__hint {
+      font-size: .85rem;
+      color: var(--fg-muted);
+    }
+    .file-drop__count {
+      display: block;
+      margin-top: .4rem;
+      font-size: .78rem;
+      color: var(--accent-2);
+    }
+
+    .modal__actions {
+      display: flex;
+      gap: .75rem;
+      justify-content: flex-end;
+      margin-top: 1.75rem;
+    }
+    .btn-modal {
+      padding: .75rem 1.4rem;
+      border-radius: 10px;
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, transform .15s;
+      border: 1px solid var(--border);
+    }
+    .btn-modal--secondary {
+      background: transparent;
+      color: var(--fg-muted);
+    }
+    .btn-modal--secondary:hover { color: var(--fg); }
+    .btn-modal--primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .btn-modal--primary:hover:not(:disabled) {
+      background: var(--accent-2);
+      border-color: var(--accent-2);
+    }
+    .btn-modal:disabled { opacity: .5; cursor: not-allowed; }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,.08);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+    .progress-bar__fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width .3s;
+    }
+
     /* ── Gallery ── */
     .gallery-section {
-      width: min(960px, 92vw);
+      width: min(1100px, 94vw);
       margin-top: 3.5rem;
     }
     .gallery-section__head {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1rem;
       margin-bottom: 1.25rem;
       padding-bottom: .75rem;
       border-bottom: 1px solid var(--border);
     }
-    .gallery-section__title {
-      font-size: .72rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
+    .gallery-section__title-wrap {
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .gallery-section__back-album {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .35rem .7rem;
+      font-size: .78rem;
+      cursor: pointer;
       color: var(--fg-muted);
+      transition: color .2s, border-color .2s;
+    }
+    .gallery-section__back-album:hover { color: var(--fg); border-color: var(--fg-muted); }
+    .gallery-section__title {
+      font-size: 1rem;
+      letter-spacing: -.005em;
+      color: var(--fg);
+      font-weight: 600;
+    }
+    .gallery-section__sub {
+      display: block;
+      font-size: .72rem;
+      color: var(--fg-muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 400;
+      margin-top: .15rem;
     }
     .gallery-section__count {
       font-size: .78rem;
       color: var(--fg-muted);
     }
 
+    /* Folder grid */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .folder-card {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform .35s var(--ease), border-color .25s, box-shadow .35s;
+    }
+    .folder-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--fg-muted);
+      box-shadow: 0 12px 36px rgba(0,0,0,.35);
+    }
+    .folder-card__cover {
+      aspect-ratio: 4/3;
+      background: #111;
+      position: relative;
+      overflow: hidden;
+    }
+    .folder-card__cover img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .5s var(--ease);
+    }
+    .folder-card:hover .folder-card__cover img { transform: scale(1.06); }
+    .folder-card__cover-placeholder {
+      width: 100%; height: 100%;
+      display: grid; place-items: center;
+      color: rgba(255,255,255,.2);
+      font-size: 2.6rem;
+    }
+    .folder-card__count-badge {
+      position: absolute; top: 8px; right: 8px;
+      padding: .25rem .5rem;
+      background: rgba(0,0,0,.7);
+      border-radius: 6px;
+      font-size: .68rem;
+      letter-spacing: .06em;
+      color: #fff;
+    }
+    .folder-card__body { padding: .85rem 1rem 1rem; }
+    .folder-card__title {
+      font-size: .95rem;
+      font-weight: 600;
+      margin-bottom: .35rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .folder-card__meta {
+      font-size: .72rem;
+      color: var(--fg-muted);
+      letter-spacing: .04em;
+      display: flex; flex-wrap: wrap; gap: .5rem;
+    }
+    .folder-card__meta span::before { content: '· '; opacity: .5; margin-right: .15rem; }
+    .folder-card__meta span:first-child::before { content: ''; margin: 0; }
+
+    .folder-card__rm {
+      position: absolute; top: 8px; left: 8px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(0,0,0,.75); border: none; color: #fff;
+      font-size: .72rem; display: grid; place-items: center;
+      opacity: 0; cursor: pointer;
+      transition: opacity .2s, background .2s;
+      z-index: 2;
+    }
+    .folder-card:hover .folder-card__rm { opacity: 1; }
+    .folder-card__rm:hover { background: #e64545; }
+
+    /* Photo grid (inside album) */
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: .75rem;
     }
-
     .gallery-item {
       position: relative;
       aspect-ratio: 1;
@@ -142,13 +369,12 @@
       transition: transform .35s var(--ease);
     }
     .gallery-item:hover img { transform: scale(1.06); }
-
     .gallery-item__rm {
       position: absolute; top: 6px; right: 6px;
       width: 24px; height: 24px; border-radius: 50%;
       background: rgba(0,0,0,.75); border: none; color: #fff;
       font-size: .68rem; display: grid; place-items: center;
-      opacity: 0; transition: opacity .2s, background .2s;
+      opacity: 0; transition: opacity .2s, background .2s; cursor: pointer;
     }
     .gallery-item:hover .gallery-item__rm { opacity: 1; }
     .gallery-item__rm:hover { background: #e64545; }
@@ -181,6 +407,7 @@
       width: 40px; height: 40px; border-radius: 50%;
       background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
       color: #fff; font-size: 1.1rem; display: grid; place-items: center;
+      cursor: pointer;
       transition: background .2s;
     }
     .lb__close:hover { background: rgba(255,255,255,.22); }
@@ -226,7 +453,6 @@
     </svg>
   </div>
 
-  <!-- Back -->
   <a href="index.html" class="upload-page__back">
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
       <polyline points="10 3 5 8 10 13"/>
@@ -236,33 +462,83 @@
 
   <main class="upload-page">
 
-    <!-- Upload button -->
-    <label class="upload-btn" id="uploadBtn" for="fileInput" tabindex="0">
-      <div class="upload-btn__icon" id="uploadIcon">
+    <button class="upload-btn" id="uploadBtn" type="button">
+      <div class="upload-btn__icon">
         <svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2.5">
           <path d="M32 44 V20 M20 32 L32 20 L44 32"/>
           <path d="M12 44 v6 a4 4 0 0 0 4 4 h32 a4 4 0 0 0 4-4 v-6"/>
         </svg>
       </div>
-      <span class="upload-btn__label" id="uploadLabel">UPLOAD</span>
-      <span class="upload-btn__sub" id="uploadSub">Bilder ziehen oder klicken</span>
-      <input type="file" id="fileInput" accept="image/*" multiple hidden />
-    </label>
+      <span class="upload-btn__label">UPLOAD</span>
+      <span class="upload-btn__sub">Neues Album erstellen</span>
+    </button>
 
     <p class="status" id="status"></p>
 
-    <!-- Gallery -->
+    <!-- Gallery (folders or album view) -->
     <section class="gallery-section">
       <div class="gallery-section__head">
-        <span class="gallery-section__title">Galerie</span>
+        <div class="gallery-section__title-wrap">
+          <button class="gallery-section__back-album" id="backToFolders" hidden>← Zurück</button>
+          <div>
+            <span class="gallery-section__title" id="gallerySectionTitle">Alben</span>
+            <span class="gallery-section__sub" id="gallerySectionSub">Galerie</span>
+          </div>
+        </div>
         <span class="gallery-section__count" id="galleryCount"></span>
       </div>
-      <div class="gallery-grid" id="galleryGrid">
-        <p class="gallery-empty">Lade Bilder…</p>
+
+      <div class="folder-grid" id="folderGrid" style="display:none">
+        <p class="gallery-empty">Lade Alben…</p>
       </div>
+
+      <div class="gallery-grid" id="galleryGrid" style="display:none"></div>
     </section>
 
   </main>
+
+  <!-- ── Upload Modal ── -->
+  <div class="modal" id="uploadModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title">Neues Album</h2>
+        <button class="modal__close" id="modalClose" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="albumName">Name</label>
+        <input type="text" id="albumName" placeholder="z.B. Wien Wochenende" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="albumDate">Datum</label>
+        <input type="date" id="albumDate" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="albumLocation">Ort</label>
+        <input type="text" id="albumLocation" placeholder="z.B. Wien, Österreich" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label class="field__label">Fotos</label>
+        <label class="file-drop" id="fileDrop" for="albumFiles">
+          <span class="file-drop__hint">Klicken oder Bilder hineinziehen</span>
+          <span class="file-drop__count" id="fileCount"></span>
+          <input type="file" id="albumFiles" accept="image/*" multiple hidden />
+        </label>
+      </div>
+
+      <div class="progress-bar" id="progressBar" hidden>
+        <div class="progress-bar__fill" id="progressFill"></div>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-modal btn-modal--secondary" id="modalCancel">Abbrechen</button>
+        <button type="button" class="btn-modal btn-modal--primary" id="modalSave">Album erstellen</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Lightbox -->
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
@@ -275,106 +551,340 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0enZ2dGhjZHhrbHdheWhzdWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzUxMzEsImV4cCI6MjA5Mzc1MTEzMX0.8nGc1tqVq2PL1QK2EArexbXpX01-OK8-9MfLUI4Wnfw';
     const BUCKET = 'galerie';
 
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // ── DOM ──
     const uploadBtn   = document.getElementById('uploadBtn');
-    const uploadLabel = document.getElementById('uploadLabel');
-    const uploadSub   = document.getElementById('uploadSub');
-    const fileInput   = document.getElementById('fileInput');
+    const folderGrid  = document.getElementById('folderGrid');
     const galleryGrid = document.getElementById('galleryGrid');
-    const galleryCount = document.getElementById('galleryCount');
+    const sectionTitle = document.getElementById('gallerySectionTitle');
+    const sectionSub   = document.getElementById('gallerySectionSub');
+    const sectionCount = document.getElementById('galleryCount');
+    const backBtn     = document.getElementById('backToFolders');
     const statusEl    = document.getElementById('status');
+    const modal       = document.getElementById('uploadModal');
+    const modalClose  = document.getElementById('modalClose');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalSave   = document.getElementById('modalSave');
+    const fAlbumName  = document.getElementById('albumName');
+    const fAlbumDate  = document.getElementById('albumDate');
+    const fAlbumLoc   = document.getElementById('albumLocation');
+    const fAlbumFiles = document.getElementById('albumFiles');
+    const fileDrop    = document.getElementById('fileDrop');
+    const fileCount   = document.getElementById('fileCount');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
     const lb          = document.getElementById('lb');
     const lbImg       = document.getElementById('lbImg');
 
-    // ── Load gallery ──────────────────────────
-    async function loadGallery() {
-      galleryGrid.innerHTML = '<p class="gallery-empty">Lade Bilder…</p>';
+    let currentFolder = null;       // null = folder list view; else album path
+    let pendingFiles  = [];
 
-      const { data, error } = await db.storage.from(BUCKET).list('', {
-        limit: 200,
-        sortBy: { column: 'created_at', order: 'desc' }
-      });
+    // ── Helpers ──
+    function setStatus(msg, type = '') {
+      statusEl.textContent = msg;
+      statusEl.className   = 'status ' + type;
+      if (msg) setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status'; }, 4500);
+    }
 
-      if (error) {
-        galleryGrid.innerHTML = `<p class="gallery-empty" style="color:#e64545">
-          Ladefehler: ${error.message}<br>
-          <small style="opacity:.6">Stelle sicher, dass die SELECT-Policy in Supabase gesetzt ist.</small>
-        </p>`;
-        console.error('Gallery load error:', error);
+    function slugify(s) {
+      return (s || 'album')
+        .toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40)
+        || 'album';
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const [y, m, d] = iso.split('-');
+      return `${d}.${m}.${y}`;
+    }
+
+    // ── Modal ──
+    function openModal() {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      fAlbumName.value = '';
+      fAlbumDate.value = new Date().toISOString().slice(0, 10);
+      fAlbumLoc.value  = '';
+      fAlbumFiles.value = '';
+      pendingFiles = [];
+      fileCount.textContent = '';
+      progressBar.hidden = true;
+      progressFill.style.width = '0';
+      modalSave.disabled = false;
+      modalSave.textContent = 'Album erstellen';
+      setTimeout(() => fAlbumName.focus(), 250);
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    uploadBtn.addEventListener('click', openModal);
+    modalClose.addEventListener('click', closeModal);
+    modalCancel.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    // File picker
+    fAlbumFiles.addEventListener('change', () => {
+      pendingFiles = Array.from(fAlbumFiles.files).filter(f => f.type.startsWith('image/'));
+      fileCount.textContent = pendingFiles.length
+        ? `${pendingFiles.length} Bild${pendingFiles.length > 1 ? 'er' : ''} ausgewählt`
+        : '';
+    });
+    fileDrop.addEventListener('dragover',  e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
+    fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
+    fileDrop.addEventListener('drop', e => {
+      e.preventDefault();
+      fileDrop.classList.remove('drag-over');
+      const dropped = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      if (!dropped.length) return;
+      pendingFiles = pendingFiles.concat(dropped);
+      fileCount.textContent = `${pendingFiles.length} Bild${pendingFiles.length > 1 ? 'er' : ''} ausgewählt`;
+    });
+
+    // Save album
+    modalSave.addEventListener('click', async () => {
+      const name = fAlbumName.value.trim();
+      const date = fAlbumDate.value;
+      const loc  = fAlbumLoc.value.trim();
+
+      if (!name) { fAlbumName.focus(); return; }
+      if (!pendingFiles.length) { fileDrop.click(); return; }
+
+      modalSave.disabled = true;
+      modalSave.textContent = 'Lädt…';
+      progressBar.hidden = false;
+
+      const folderId = `${slugify(name)}-${Date.now()}`;
+      const meta = { name, date, location: loc, created_at: new Date().toISOString() };
+
+      // Upload meta
+      const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+      const { error: metaErr } = await db.storage
+        .from(BUCKET)
+        .upload(`${folderId}/_meta.json`, metaBlob, { contentType: 'application/json', upsert: true });
+      if (metaErr) {
+        console.error(metaErr);
+        setStatus('Fehler beim Speichern der Album-Daten: ' + metaErr.message, 'error');
+        modalSave.disabled = false;
+        modalSave.textContent = 'Album erstellen';
         return;
       }
 
-      const files = (data || []).filter(f =>
-        f.name !== '.emptyFolderPlaceholder' && f.name && f.id
-      );
-      galleryCount.textContent = files.length
-        ? (files.length === 1 ? '1 Bild' : `${files.length} Bilder`)
+      // Upload files
+      let ok = 0, fail = 0;
+      for (let i = 0; i < pendingFiles.length; i++) {
+        const file = pendingFiles[i];
+        const safeName = `${Date.now()}-${i}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const { error } = await db.storage
+          .from(BUCKET)
+          .upload(`${folderId}/${safeName}`, file, { contentType: file.type, upsert: false });
+        if (error) { fail++; console.error(error); }
+        else ok++;
+        progressFill.style.width = `${((i + 1) / pendingFiles.length) * 100}%`;
+      }
+
+      closeModal();
+      if (fail === 0) setStatus(`Album "${name}" erstellt — ${ok} Bild${ok > 1 ? 'er' : ''} hochgeladen ✓`, 'ok');
+      else            setStatus(`Album erstellt: ${ok} hochgeladen, ${fail} fehlgeschlagen`, 'error');
+
+      await loadFolders();
+    });
+
+    // ── Load folder list ──
+    async function loadFolders() {
+      currentFolder = null;
+      backBtn.hidden = true;
+      sectionTitle.textContent = 'Alben';
+      sectionSub.textContent   = 'Galerie';
+      folderGrid.style.display = '';
+      galleryGrid.style.display = 'none';
+      folderGrid.innerHTML = '<p class="gallery-empty">Lade Alben…</p>';
+
+      const { data, error } = await db.storage.from(BUCKET).list('', { limit: 200 });
+      if (error) {
+        folderGrid.innerHTML = `<p class="gallery-empty" style="color:#e64545">Ladefehler: ${error.message}</p>`;
+        return;
+      }
+
+      // Folder entries from list() come back with id=null
+      const folderNames = (data || [])
+        .filter(e => e && e.name && e.id === null)
+        .map(e => e.name);
+
+      // Also handle legacy: files at root (uploaded before albums existed)
+      const legacyFiles = (data || []).filter(e => e && e.id && e.name && e.name !== '.emptyFolderPlaceholder');
+
+      sectionCount.textContent = folderNames.length
+        ? `${folderNames.length} Album${folderNames.length > 1 ? 'en' : ''}`
+        : '';
+
+      if (!folderNames.length && !legacyFiles.length) {
+        folderGrid.innerHTML = '<p class="gallery-empty">Noch keine Alben. Klicke auf UPLOAD um zu starten.</p>';
+        return;
+      }
+
+      // Fetch meta + first image per folder
+      const cards = await Promise.all(folderNames.map(async folder => {
+        const { data: items } = await db.storage.from(BUCKET).list(folder, { limit: 100 });
+        const photos = (items || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
+        let meta = { name: folder, date: '', location: '' };
+        const metaItem = (items || []).find(f => f.name === '_meta.json');
+        if (metaItem) {
+          try {
+            const { data: metaUrl } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
+            const r = await fetch(metaUrl.publicUrl + '?t=' + Date.now());
+            if (r.ok) meta = { ...meta, ...(await r.json()) };
+          } catch (e) { console.warn('meta load failed', folder, e); }
+        }
+        const cover = photos[0]
+          ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
+          : null;
+        return { folder, meta, count: photos.length, cover };
+      }));
+
+      // Sort: newest by meta.created_at desc
+      cards.sort((a, b) => (b.meta.created_at || '').localeCompare(a.meta.created_at || ''));
+
+      folderGrid.innerHTML = '';
+
+      cards.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'folder-card';
+        card.dataset.folder = c.folder;
+        card.innerHTML = `
+          <button class="folder-card__rm" data-action="rm-folder" aria-label="Album löschen">✕</button>
+          <div class="folder-card__cover">
+            ${c.cover ? `<img src="${c.cover}" alt="" loading="lazy">` : '<div class="folder-card__cover-placeholder">⌑</div>'}
+            <span class="folder-card__count-badge">${c.count} Foto${c.count !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="folder-card__body">
+            <div class="folder-card__title">${c.meta.name || c.folder}</div>
+            <div class="folder-card__meta">
+              ${c.meta.date     ? `<span>${formatDate(c.meta.date)}</span>` : ''}
+              ${c.meta.location ? `<span>${c.meta.location}</span>` : ''}
+            </div>
+          </div>
+        `;
+        folderGrid.appendChild(card);
+      });
+
+      if (legacyFiles.length) {
+        const legacy = document.createElement('div');
+        legacy.className = 'folder-card';
+        legacy.dataset.folder = '__legacy__';
+        const legacyCover = db.storage.from(BUCKET).getPublicUrl(legacyFiles[0].name).data.publicUrl;
+        legacy.innerHTML = `
+          <div class="folder-card__cover">
+            <img src="${legacyCover}" alt="" loading="lazy">
+            <span class="folder-card__count-badge">${legacyFiles.length} Foto${legacyFiles.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="folder-card__body">
+            <div class="folder-card__title">Ohne Album</div>
+            <div class="folder-card__meta"><span>Ältere Uploads</span></div>
+          </div>
+        `;
+        folderGrid.appendChild(legacy);
+      }
+    }
+
+    // ── Open album ──
+    async function openAlbum(folder) {
+      currentFolder = folder;
+      folderGrid.style.display = 'none';
+      galleryGrid.style.display = '';
+      backBtn.hidden = false;
+      galleryGrid.innerHTML = '<p class="gallery-empty">Lade Bilder…</p>';
+
+      let files, metaText = '';
+      if (folder === '__legacy__') {
+        const { data } = await db.storage.from(BUCKET).list('', { limit: 200 });
+        files = (data || [])
+          .filter(f => f && f.id && f.name && f.name !== '.emptyFolderPlaceholder')
+          .map(f => ({ name: f.name, fullPath: f.name }));
+        sectionTitle.textContent = 'Ohne Album';
+        sectionSub.textContent = 'Ältere Uploads';
+      } else {
+        const { data } = await db.storage.from(BUCKET).list(folder, { limit: 500 });
+        files = (data || [])
+          .filter(f => f.name && f.name !== '_meta.json' && f.id)
+          .map(f => ({ name: f.name, fullPath: `${folder}/${f.name}` }));
+
+        // Try to load meta
+        try {
+          const { data: metaUrl } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
+          const r = await fetch(metaUrl.publicUrl + '?t=' + Date.now());
+          if (r.ok) {
+            const meta = await r.json();
+            sectionTitle.textContent = meta.name || folder;
+            const parts = [];
+            if (meta.date) parts.push(formatDate(meta.date));
+            if (meta.location) parts.push(meta.location);
+            metaText = parts.join(' · ');
+          } else {
+            sectionTitle.textContent = folder;
+          }
+        } catch (e) {
+          sectionTitle.textContent = folder;
+        }
+        sectionSub.textContent = metaText || 'Album';
+      }
+
+      sectionCount.textContent = files.length
+        ? `${files.length} Bild${files.length > 1 ? 'er' : ''}`
         : '';
 
       if (!files.length) {
-        galleryGrid.innerHTML = '<p class="gallery-empty">Noch keine Bilder vorhanden.</p>';
+        galleryGrid.innerHTML = '<p class="gallery-empty">Album ist leer.</p>';
         return;
       }
 
       galleryGrid.innerHTML = '';
       files.forEach((file, i) => {
-        const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(file.name);
-        const publicUrl = urlData.publicUrl;
+        const url = db.storage.from(BUCKET).getPublicUrl(file.fullPath).data.publicUrl;
         const div = document.createElement('div');
         div.className = 'gallery-item';
-        div.dataset.path = file.name;
-        div.dataset.url  = publicUrl;
-        div.innerHTML = `<img src="${publicUrl}" alt="${file.name}" loading="lazy">
+        div.dataset.path = file.fullPath;
+        div.dataset.url  = url;
+        div.innerHTML = `<img src="${url}" alt="" loading="lazy">
                          <button class="gallery-item__rm" aria-label="Löschen">✕</button>`;
         div.style.cssText = 'opacity:0;transform:scale(.88)';
         galleryGrid.appendChild(div);
         requestAnimationFrame(() => {
-          div.style.cssText = `transition:opacity .28s ${i * .04}s,transform .28s ${i * .04}s;opacity:1;transform:scale(1)`;
+          div.style.cssText = `transition:opacity .28s ${i * .03}s,transform .28s ${i * .03}s;opacity:1;transform:scale(1)`;
         });
       });
     }
 
-    // ── Upload ────────────────────────────────
-    async function uploadFiles(files) {
-      const images = Array.from(files).filter(f => f.type.startsWith('image/'));
-      if (!images.length) return;
-
-      uploadBtn.classList.add('uploading');
-      uploadLabel.textContent = 'LÄDT…';
-      uploadSub.textContent   = `0 / ${images.length}`;
-      setStatus('');
-
-      let ok = 0, fail = 0;
-      for (const [idx, file] of images.entries()) {
-        const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-        const { error } = await db.storage.from(BUCKET).upload(path, file, {
-          contentType: file.type,
-          upsert: false
-        });
-        if (error) { fail++; console.error(error); }
-        else ok++;
-        uploadSub.textContent = `${idx + 1} / ${images.length}`;
+    // ── Folder grid clicks ──
+    folderGrid.addEventListener('click', async e => {
+      const rmBtn = e.target.closest('[data-action="rm-folder"]');
+      if (rmBtn) {
+        e.stopPropagation();
+        const card = rmBtn.closest('.folder-card');
+        const folder = card.dataset.folder;
+        if (!confirm(`Album "${card.querySelector('.folder-card__title').textContent}" inkl. aller Bilder wirklich löschen?`)) return;
+        const { data: items, error } = await db.storage.from(BUCKET).list(folder, { limit: 1000 });
+        if (error) { setStatus('Löschen fehlgeschlagen: ' + error.message, 'error'); return; }
+        const paths = (items || []).map(f => `${folder}/${f.name}`);
+        if (paths.length) {
+          const { error: rmErr } = await db.storage.from(BUCKET).remove(paths);
+          if (rmErr) { setStatus('Löschen fehlgeschlagen: ' + rmErr.message, 'error'); return; }
+        }
+        setStatus('Album gelöscht', 'ok');
+        await loadFolders();
+        return;
       }
+      const card = e.target.closest('.folder-card');
+      if (card) openAlbum(card.dataset.folder);
+    });
 
-      uploadBtn.classList.remove('uploading');
-      uploadLabel.textContent = 'UPLOAD';
-      uploadSub.textContent   = 'Bilder ziehen oder klicken';
-
-      if (fail === 0) setStatus(`${ok} Bild${ok > 1 ? 'er' : ''} hochgeladen ✓`, 'ok');
-      else            setStatus(`${ok} hochgeladen, ${fail} fehlgeschlagen`, 'error');
-
-      await loadGallery();
-    }
-
-    function setStatus(msg, type = '') {
-      statusEl.textContent = msg;
-      statusEl.className   = 'status ' + type;
-      if (msg) setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status'; }, 4000);
-    }
-
-    // ── Delete ────────────────────────────────
+    // ── Album grid clicks ──
     galleryGrid.addEventListener('click', async e => {
       const rmBtn = e.target.closest('.gallery-item__rm');
       const img   = e.target.closest('.gallery-item img');
@@ -384,7 +894,7 @@
         const path = rmBtn.closest('.gallery-item').dataset.path;
         const { error } = await db.storage.from(BUCKET).remove([path]);
         if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
-        await loadGallery();
+        await openAlbum(currentFolder);
       } else if (img) {
         const url = img.closest('.gallery-item').dataset.url;
         lbImg.src = url;
@@ -393,33 +903,24 @@
       }
     });
 
-    // ── File input & drag-drop ─────────────
-    fileInput.addEventListener('change', () => { uploadFiles(fileInput.files); fileInput.value = ''; });
+    backBtn.addEventListener('click', loadFolders);
 
-    uploadBtn.addEventListener('dragover',  e => { e.preventDefault(); uploadBtn.classList.add('drag-over'); });
-    uploadBtn.addEventListener('dragleave', () => uploadBtn.classList.remove('drag-over'));
-    uploadBtn.addEventListener('drop', e => {
-      e.preventDefault();
-      uploadBtn.classList.remove('drag-over');
-      uploadFiles(e.dataTransfer.files);
-    });
-    uploadBtn.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
-    });
-
-    // ── Lightbox ──────────────────────────────
+    // ── Lightbox ──
     document.getElementById('lbClose').addEventListener('click', closeLb);
     lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
-
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (lb.classList.contains('open')) return closeLb();
+      if (modal.classList.contains('open')) return closeModal();
+    });
     function closeLb() {
       lb.classList.remove('open');
       lb.setAttribute('aria-hidden', 'true');
       lbImg.src = '';
     }
 
-    // ── Init ──────────────────────────────────
-    loadGallery();
+    // ── Init ──
+    loadFolders();
   </script>
 </body>
 </html>
