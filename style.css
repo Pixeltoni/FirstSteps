@@ -2,15 +2,15 @@
    BASE & RESET
 ═══════════════════════════════════════════════ */
 :root {
-  --bg:       #080808;
-  --bg-2:     #111111;
-  --bg-card:  #161616;
-  --fg:       #f0f0f0;
-  --fg-muted: #888;
-  --accent:   #7b5ea7;
-  --accent-2: #a87bc0;
-  --border:   rgba(255,255,255,0.07);
-  --radius:   14px;
+  --bg:       #0d0a07;
+  --bg-2:     #131008;
+  --bg-card:  #1c1610;
+  --fg:       #f5ede0;
+  --fg-muted: #9a8a74;
+  --accent:   #e8834a;
+  --accent-2: #f0a93c;
+  --border:   rgba(240, 195, 140, 0.09);
+  --radius:   16px;
   --ease:     cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -19,7 +19,7 @@
 html { scroll-behavior: smooth; font-size: 16px; }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--fg);
   overflow-x: hidden;
@@ -91,7 +91,7 @@ select { cursor: pointer; }
 .sidebar {
   position: fixed; left: 0; top: 0; bottom: 0;
   width: 64px;
-  background: rgba(8,8,8,0.95);
+  background: rgba(13,10,7,0.95);
   backdrop-filter: blur(10px);
   border-right: 1px solid var(--border);
   z-index: 1100;
@@ -116,7 +116,7 @@ select { cursor: pointer; }
 
 .sidebar__logo-mark:hover {
   transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(123,94,167,.5);
+  box-shadow: 0 6px 20px rgba(232,131,74,.5);
 }
 
 .sidebar__mid {
@@ -134,7 +134,7 @@ select { cursor: pointer; }
 
 .sidebar__burger:hover {
   border-color: var(--accent);
-  background: rgba(123,94,167,.1);
+  background: rgba(232,131,74,.1);
 }
 
 .sidebar__burger span {
@@ -312,7 +312,7 @@ select { cursor: pointer; }
 }
 
 .nav.scrolled {
-  background: rgba(8,8,8,0.85);
+  background: rgba(13,10,7,0.85);
   backdrop-filter: blur(10px);
   padding: 1rem 3rem;
   border-bottom: 1px solid var(--border);
@@ -488,7 +488,7 @@ select { cursor: pointer; }
 
 .shape--2 {
   width: 300px; height: 300px;
-  background: #4a90e2;
+  background: var(--accent-2);
   bottom: 10%; left: 5%;
   animation: float2 10s ease-in-out infinite;
 }
@@ -534,11 +534,11 @@ select { cursor: pointer; }
 .btn--primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
-  box-shadow: 0 8px 30px rgba(123,94,167,.35);
+  box-shadow: 0 8px 30px rgba(232,131,74,.35);
 }
 
 .btn--primary:hover {
-  box-shadow: 0 12px 40px rgba(123,94,167,.5);
+  box-shadow: 0 12px 40px rgba(232,131,74,.5);
 }
 
 .btn--ghost {
@@ -566,7 +566,7 @@ select { cursor: pointer; }
   border-bottom: 1px solid var(--border);
   padding: 1.1rem 0;
   overflow: hidden;
-  background: rgba(8,8,8,.55);
+  background: rgba(13,10,7,.55);
   backdrop-filter: blur(4px);
 }
 
@@ -577,14 +577,18 @@ select { cursor: pointer; }
 }
 
 .marquee__track span {
-  font-size: .8rem;
-  letter-spacing: .12em;
+  font-size: .75rem;
+  letter-spacing: .18em;
   text-transform: uppercase;
   color: var(--fg-muted);
   white-space: nowrap;
+  font-weight: 600;
 }
 
-.marquee__dot { color: var(--accent) !important; }
+.marquee__dot {
+  color: var(--accent) !important;
+  font-size: .6rem;
+}
 
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -597,6 +601,7 @@ select { cursor: pointer; }
 .stats {
   padding: 5rem 3rem;
   border-bottom: 1px solid var(--border);
+  background: rgba(232,131,74,.03);
 }
 
 .stats__grid {
@@ -761,7 +766,7 @@ select { cursor: pointer; }
 ═══════════════════════════════════════════════ */
 .services {
   padding: 6rem 3rem;
-  background: rgba(8,8,8,.5);
+  background: rgba(13,10,7,.5);
   backdrop-filter: blur(4px);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -786,7 +791,7 @@ select { cursor: pointer; }
 .service-card::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(123,94,167,.07), transparent);
+  background: linear-gradient(135deg, rgba(232,131,74,.07), transparent);
   opacity: 0;
   transition: opacity .4s;
 }
@@ -855,7 +860,7 @@ select { cursor: pointer; }
 .about__blob {
   position: absolute;
   width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(123,94,167,.2), transparent 70%);
+  background: radial-gradient(circle, rgba(232,131,74,.2), transparent 70%);
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
   border-radius: 50%;
@@ -876,7 +881,7 @@ select { cursor: pointer; }
 
 .about__img-placeholder {
   width: 100%; height: 100%;
-  background: linear-gradient(135deg, var(--bg-card), #1e1e3a);
+  background: linear-gradient(135deg, var(--bg-card), #2a1808);
 }
 
 .about__badge {
@@ -927,7 +932,7 @@ select { cursor: pointer; }
 .about__list li::before {
   content: '✓';
   width: 22px; height: 22px;
-  background: rgba(123,94,167,.2);
+  background: rgba(232,131,74,.2);
   border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
   font-size: .7rem;
@@ -940,7 +945,7 @@ select { cursor: pointer; }
 ═══════════════════════════════════════════════ */
 .testimonials {
   padding: 6rem 3rem;
-  background: rgba(8,8,8,.5);
+  background: rgba(13,10,7,.5);
   backdrop-filter: blur(4px);
   border-top: 1px solid var(--border);
   overflow: hidden;
@@ -1022,8 +1027,8 @@ select { cursor: pointer; }
 .cta-banner__bg {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(123,94,167,.25), transparent 70%),
-    rgba(8,8,8,.45);
+    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(232,131,74,.25), transparent 70%),
+    rgba(13,10,7,.45);
   backdrop-filter: blur(4px);
   pointer-events: none;
 }
@@ -1048,7 +1053,7 @@ select { cursor: pointer; }
 ═══════════════════════════════════════════════ */
 .contact {
   padding: 6rem 3rem;
-  background: rgba(8,8,8,.55);
+  background: rgba(13,10,7,.55);
   backdrop-filter: blur(4px);
   border-top: 1px solid var(--border);
 }
@@ -1298,7 +1303,7 @@ a.contact__value:hover { color: var(--accent-2); }
   transition: border-color .25s, background .25s;
 }
 .drop-zone:hover, .drop-zone.over {
-  border-color: var(--accent); background: rgba(123,94,167,.07);
+  border-color: var(--accent); background: rgba(232,131,74,.07);
 }
 .drop-zone svg { color: var(--fg-muted); transition: transform .3s var(--ease), color .25s; }
 .drop-zone:hover svg, .drop-zone.over svg { color: var(--accent-2); transform: translateY(-4px); }

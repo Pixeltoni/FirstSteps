@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SmartStudio — Digital Agency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -67,9 +70,9 @@
     <svg class="hero__scene-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
           <linearGradient id="sceneSky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stop-color="#1c2735"/>
-            <stop offset="55%" stop-color="#243441"/>
-            <stop offset="100%" stop-color="#2a3d4d"/>
+            <stop offset="0%"  stop-color="#120c06"/>
+            <stop offset="55%" stop-color="#1a1008"/>
+            <stop offset="100%" stop-color="#22180a"/>
           </linearGradient>
           <radialGradient id="sceneSunGlow" cx="0.5" cy="0.5" r="0.5">
             <stop offset="0%"  stop-color="#ff6b4a" stop-opacity=".55"/>
@@ -81,8 +84,8 @@
             <stop offset="100%" stop-color="#e64545"/>
           </linearGradient>
           <linearGradient id="sceneWater" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stop-color="#243441"/>
-            <stop offset="100%" stop-color="#0e1822"/>
+            <stop offset="0%"  stop-color="#1e1408"/>
+            <stop offset="100%" stop-color="#080503"/>
           </linearGradient>
           <linearGradient id="sceneTextShade" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%"  stop-color="#000" stop-opacity=".5"/>
@@ -145,7 +148,7 @@
         <g id="sceneMoon" opacity="0">
           <circle cx="1500" cy="180" r="38" fill="#d4e8f8" opacity=".9"/>
           <!-- crescent shadow to suggest a moon phase -->
-          <circle cx="1518" cy="175" r="34" fill="#19303e" opacity=".7"/>
+          <circle cx="1518" cy="175" r="34" fill="#100a04" opacity=".7"/>
         </g>
 
         <!-- Warm horizon band (atmospheric scattering during sunset) -->
@@ -182,7 +185,7 @@
                  L860,710 L960,675 L1060,705 L1180,685 L1280,710 L1380,690
                  L1500,710 L1620,685 L1740,705 L1860,690 L1920,720
                  L1920,740 L0,740 Z"
-              fill="#19222e"/>
+              fill="#160e06"/>
 
         <!-- Water -->
         <rect y="730" width="1920" height="350" fill="url(#sceneWater)"/>
@@ -202,7 +205,7 @@
         <g id="scenePier">
           <!-- Deck (trapezoid narrowing toward horizon) -->
           <path d="M905,735 L1015,735 L1140,1080 L780,1080 Z"
-                fill="#1a232f" stroke="#2a3540" stroke-width="0.8"/>
+                fill="#1a1208" stroke="#2a1e0e" stroke-width="0.8"/>
           <!-- Plank cross-lines (perspective) -->
           <line x1="900" y1="755"  x2="1020" y2="755"  stroke="#0c1218" stroke-width=".6"/>
           <line x1="895" y1="785"  x2="1025" y2="785"  stroke="#0c1218" stroke-width=".7"/>
@@ -212,18 +215,18 @@
           <line x1="855" y1="955"  x2="1065" y2="955"  stroke="#0c1218" stroke-width="1.1"/>
           <line x1="838" y1="1010" x2="1082" y2="1010" stroke="#0c1218" stroke-width="1.3"/>
           <!-- Side rails / posts -->
-          <rect x="775"  y="1020" width="14" height="60" fill="#141c24"/>
-          <rect x="1131" y="1020" width="14" height="60" fill="#141c24"/>
-          <rect x="820"  y="940"  width="10" height="42" fill="#141c24"/>
-          <rect x="1090" y="940"  width="10" height="42" fill="#141c24"/>
-          <rect x="855"  y="880"  width="8"  height="32" fill="#141c24"/>
-          <rect x="1057" y="880"  width="8"  height="32" fill="#141c24"/>
-          <rect x="880"  y="830"  width="6"  height="24" fill="#141c24"/>
-          <rect x="1034" y="830"  width="6"  height="24" fill="#141c24"/>
+          <rect x="775"  y="1020" width="14" height="60" fill="#120e06"/>
+          <rect x="1131" y="1020" width="14" height="60" fill="#120e06"/>
+          <rect x="820"  y="940"  width="10" height="42" fill="#120e06"/>
+          <rect x="1090" y="940"  width="10" height="42" fill="#120e06"/>
+          <rect x="855"  y="880"  width="8"  height="32" fill="#120e06"/>
+          <rect x="1057" y="880"  width="8"  height="32" fill="#120e06"/>
+          <rect x="880"  y="830"  width="6"  height="24" fill="#120e06"/>
+          <rect x="1034" y="830"  width="6"  height="24" fill="#120e06"/>
         </g>
 
         <!-- Night overlay: darkens sky as sun disappears -->
-        <rect id="sceneNightOverlay" width="1920" height="730" fill="#02060a" opacity="0"/>
+        <rect id="sceneNightOverlay" width="1920" height="730" fill="#060301" opacity="0"/>
 
         <!-- Soft text-side darkening for readability -->
         <rect width="1920" height="1080" fill="url(#sceneTextShade)" pointer-events="none"/>
@@ -233,18 +236,18 @@
   <!-- Hero -->
   <section class="hero" id="hero">
     <div class="hero__content">
-      <div class="hero__eyebrow reveal-up">Digital Agency — Wien</div>
+      <div class="hero__eyebrow reveal-up">✦ Digital Agency aus Wien</div>
       <h1 class="hero__title">
         <span class="hero__word" data-delay="0">Wir</span>
-        <span class="hero__word" data-delay="80">bauen</span>
+        <span class="hero__word" data-delay="80">erschaffen</span>
         <span class="hero__word hero__word--outline" data-delay="160">digitale</span>
         <span class="hero__word" data-delay="240">Erlebnisse.</span>
       </h1>
       <p class="hero__sub reveal-up" style="--d:0.5s">
-        Strategie · Design · Entwicklung · Performance
+        Mit Herz &amp; Expertise — von der Idee bis zum fertigen Produkt.
       </p>
       <div class="hero__actions reveal-up" style="--d:0.7s">
-        <a href="#work" class="btn btn--primary">Projekte ansehen</a>
+        <a href="#work" class="btn btn--primary">Unsere Arbeiten ↓</a>
         <a href="#contact" class="btn btn--ghost">Projekt starten</a>
       </div>
     </div>
@@ -259,6 +262,27 @@
   </section>
 
   <!-- Marquee / ticker -->
+  <div class="marquee">
+    <div class="marquee__track">
+      <span>Web Design</span><span class="marquee__dot">✦</span>
+      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
+      <span>Branding</span><span class="marquee__dot">✦</span>
+      <span>E-Commerce</span><span class="marquee__dot">✦</span>
+      <span>SEO &amp; Performance</span><span class="marquee__dot">✦</span>
+      <span>Motion Design</span><span class="marquee__dot">✦</span>
+      <span>Webentwicklung</span><span class="marquee__dot">✦</span>
+      <span>Strategie &amp; Konzept</span><span class="marquee__dot">✦</span>
+      <span>Web Design</span><span class="marquee__dot">✦</span>
+      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
+      <span>Branding</span><span class="marquee__dot">✦</span>
+      <span>E-Commerce</span><span class="marquee__dot">✦</span>
+      <span>SEO &amp; Performance</span><span class="marquee__dot">✦</span>
+      <span>Motion Design</span><span class="marquee__dot">✦</span>
+      <span>Webentwicklung</span><span class="marquee__dot">✦</span>
+      <span>Strategie &amp; Konzept</span><span class="marquee__dot">✦</span>
+    </div>
+  </div>
+
   <!-- Stats -->
   <section class="stats">
     <div class="stats__grid">
