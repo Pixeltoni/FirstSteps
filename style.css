@@ -2,14 +2,14 @@
    BASE & RESET
 ═══════════════════════════════════════════════ */
 :root {
-  --bg:       #0d0a07;
-  --bg-2:     #131008;
-  --bg-card:  #1c1610;
-  --fg:       #f5ede0;
-  --fg-muted: #9a8a74;
+  --bg:       #ffffff;
+  --bg-2:     #f8f5f1;
+  --bg-card:  #f0ece4;
+  --fg:       #1a1208;
+  --fg-muted: #7a6a54;
   --accent:   #e8834a;
-  --accent-2: #f0a93c;
-  --border:   rgba(240, 195, 140, 0.09);
+  --accent-2: #c8720a;
+  --border:   rgba(90, 68, 38, 0.15);
   --radius:   16px;
   --ease:     cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -354,15 +354,16 @@ select { cursor: pointer; }
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  background: #ffffff;
 }
 
-/* Globe wrapper — positioned right-of-center, gently floating */
+/* Globe wrapper — centered, fills viewport like the reference image */
 .hero__globe-wrap {
   position: absolute;
-  right: -4%;
   top: 50%;
-  transform: translateY(-50%);
-  width: clamp(500px, 60vw, 840px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vmin, 900px);
   pointer-events: none;
   animation: globeFloat 10s ease-in-out infinite;
 }
@@ -373,10 +374,10 @@ select { cursor: pointer; }
   display: block;
 }
 
-/* Subtle floating up/down */
+/* Subtle floating up/down (centered transform) */
 @keyframes globeFloat {
-  0%, 100% { transform: translateY(-50%); }
-  50%       { transform: translateY(calc(-50% - 18px)); }
+  0%, 100% { transform: translate(-50%, -50%); }
+  50%       { transform: translate(-50%, calc(-50% - 18px)); }
 }
 
 /* Airplane glow pulse */
@@ -389,8 +390,8 @@ select { cursor: pointer; }
   animation: planePulse 3.5s ease-in-out infinite;
 }
 
-/* Existing decorative blobs become subtle atmospheric overlays */
-.hero .shape { opacity: 0.05; mix-blend-mode: screen; }
+/* Blobs: multiply blend so they tint white background warmly */
+.hero .shape { opacity: 0.06; mix-blend-mode: multiply; }
 
 /* All page sections sit ABOVE the fixed scene */
 .hero,
@@ -1353,3 +1354,69 @@ a.contact__value:hover { color: var(--accent-2); }
   transition: background .2s;
 }
 .lb__close:hover { background: rgba(255,255,255,.22); }
+
+/* ═══════════════════════════════════════════════
+   WHITE-BACKGROUND THEME — overrides for sections
+   that keep their own dark backgrounds
+═══════════════════════════════════════════════ */
+
+/* Sidebar stays dark (rgba hardcoded) — keep light colors inside */
+.sidebar__burger span         { background: #b0a090; }
+.sidebar__icon                { color: #9a8a74; }
+.sidebar__icon:hover          { color: #f5ede0; }
+
+/* Top nav: transparent on white → logo must be dark */
+.nav__logo-text               { color: var(--fg); }
+/* Scrolled nav turns dark → logo flips to light */
+.nav.scrolled .nav__logo-text { color: #f5ede0; }
+
+/* Navigation drawer: now light bg (var(--bg-2)), text dark — fine as-is */
+
+/* ── Marquee ticker (dark bg) ── */
+.marquee                      { background: rgba(13,10,7,.88); }
+.marquee__track span          { color: #9a8a74; }
+
+/* ── Services section (dark bg) ── */
+.services .section-tag        { color: #f0a93c; }
+.services .section-title      { color: #f5ede0; }
+/* Cards have light bg (--bg-card), so use dark text inside */
+.service-card                 { color: var(--fg); }
+.service-card__title          { color: var(--fg); }
+.service-card__text           { color: var(--fg-muted); }
+.service-card__arrow          { border-color: var(--border); color: var(--fg); }
+
+/* ── Testimonials section (dark bg) ── */
+.testimonials .section-tag    { color: #f0a93c; }
+.testimonials .section-title  { color: #f5ede0; }
+/* Testimonial cards have light bg — use dark text inside */
+.testimonial                  { color: var(--fg); }
+.testimonial__quote           { color: var(--fg); font-style: italic; }
+.testimonial__author strong   { color: var(--fg); }
+.testimonial__author span     { color: var(--fg-muted); }
+
+/* ── CTA Banner (dark bg) ── */
+.cta-banner__title            { color: #f5ede0; }
+.cta-banner__sub              { color: #9a8a74; }
+
+/* ── Contact section (dark bg) ── */
+.contact .section-tag         { color: #f0a93c; }
+.contact .section-title       { color: #f5ede0; }
+.contact__label               { color: #9a8a74; }
+.contact__value               { color: #f5ede0; }
+a.contact__value:hover        { color: #f0a93c; }
+.social-link                  { color: #9a8a74;
+                                border-color: rgba(240,195,140,0.18); }
+.social-link:hover            { color: #f5ede0; border-color: #f5ede0; }
+/* Form inputs keep light bg from --bg-card, text dark */
+.form-group input,
+.form-group textarea,
+.form-group select            { color: var(--fg);
+                                border-color: rgba(90,68,38,.2); }
+.form-group label             { color: var(--fg-muted); }
+
+/* ── Footer (transparent → white bg) ── */
+.footer__logo                 { color: var(--fg); }
+.footer__tagline              { color: var(--fg-muted); }
+.footer__nav a                { color: var(--fg-muted); }
+.footer__nav a:hover          { color: var(--fg); }
+.footer__bottom               { color: var(--fg-muted); }
