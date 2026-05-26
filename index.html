@@ -65,173 +65,157 @@
     </a>
   </header>
 
-  <!-- Animated Sunset Scene (SVG layers, scroll-controlled, full-page background) -->
+  <!-- Globe + Airplane Background -->
   <div class="hero__scene" id="heroScene">
-    <svg class="hero__scene-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <div class="hero__globe-wrap">
+      <svg class="hero__globe-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" fill="none" aria-hidden="true">
         <defs>
-          <linearGradient id="sceneSky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stop-color="#120c06"/>
-            <stop offset="55%" stop-color="#1a1008"/>
-            <stop offset="100%" stop-color="#22180a"/>
-          </linearGradient>
-          <radialGradient id="sceneSunGlow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0%"  stop-color="#ff6b4a" stop-opacity=".55"/>
-            <stop offset="50%" stop-color="#e64545" stop-opacity=".18"/>
-            <stop offset="100%" stop-color="#e64545" stop-opacity="0"/>
+          <radialGradient id="globeBgGlow" cx="50%" cy="53%" r="50%">
+            <stop offset="0%"   stop-color="#f0a93c" stop-opacity="0.10"/>
+            <stop offset="60%"  stop-color="#e8834a" stop-opacity="0.04"/>
+            <stop offset="100%" stop-color="#e8834a" stop-opacity="0"/>
           </radialGradient>
-          <linearGradient id="sceneSunFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stop-color="#ff8059"/>
-            <stop offset="100%" stop-color="#e64545"/>
-          </linearGradient>
-          <linearGradient id="sceneWater" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stop-color="#1e1408"/>
-            <stop offset="100%" stop-color="#080503"/>
-          </linearGradient>
-          <linearGradient id="sceneTextShade" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"  stop-color="#000" stop-opacity=".5"/>
-            <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-          </linearGradient>
-          <pattern id="sceneHalftone" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
-            <circle cx="3.5" cy="3.5" r="1.4" fill="#e64545"/>
-          </pattern>
-          <pattern id="sceneHalftoneFaint" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
-            <circle cx="3.5" cy="3.5" r="1.1" fill="#c84444"/>
-          </pattern>
-          <!-- Atmospheric warm haze near horizon (vertical fade) -->
-          <linearGradient id="sceneHorizonBandFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#ff7959" stop-opacity="0"/>
-            <stop offset="40%"  stop-color="#ff8159" stop-opacity=".18"/>
-            <stop offset="75%"  stop-color="#f06040" stop-opacity=".48"/>
-            <stop offset="100%" stop-color="#e64545" stop-opacity=".75"/>
-          </linearGradient>
-          <!-- Wide sunset flare radiating from the sun across the sky -->
-          <radialGradient id="sceneHorizonSpreadFill" cx="0.5" cy="1" r="0.7" fx="0.5" fy="1">
-            <stop offset="0%"  stop-color="#ffa470" stop-opacity=".7"/>
-            <stop offset="35%" stop-color="#ee6f4a" stop-opacity=".3"/>
-            <stop offset="75%" stop-color="#e64545" stop-opacity=".08"/>
-            <stop offset="100%" stop-color="#e64545" stop-opacity="0"/>
+          <radialGradient id="globeEdgeFade" cx="50%" cy="50%" r="50%">
+            <stop offset="75%"  stop-color="#0d0a07" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#0d0a07" stop-opacity="0.35"/>
           </radialGradient>
         </defs>
 
-        <!-- Sky -->
-        <rect width="1920" height="1080" fill="url(#sceneSky)"/>
+        <!-- Ambient glow behind globe -->
+        <circle cx="450" cy="480" r="330" fill="url(#globeBgGlow)"/>
 
-        <!-- Stars (fade in as sun sets — dense starfield across full sky) -->
-        <g id="sceneStars" opacity="0">
-          <!-- upper sky -->
-          <circle cx="80"   cy="80"  r="1.3" fill="#fff"/><circle cx="200"  cy="50"  r="1.0" fill="#d8eaff"/>
-          <circle cx="360"  cy="130" r="1.5" fill="#fff"/><circle cx="500"  cy="70"  r="1.1" fill="#fff"/>
-          <circle cx="640"  cy="110" r="1.0" fill="#d8eaff"/><circle cx="780"  cy="55"  r="1.4" fill="#fff"/>
-          <circle cx="920"  cy="90"  r="1.2" fill="#fff"/><circle cx="1060" cy="60"  r="1.3" fill="#d8eaff"/>
-          <circle cx="1200" cy="115" r="1.0" fill="#fff"/><circle cx="1340" cy="75"  r="1.5" fill="#fff"/>
-          <circle cx="1480" cy="105" r="1.1" fill="#d8eaff"/><circle cx="1620" cy="55"  r="1.3" fill="#fff"/>
-          <circle cx="1760" cy="90"  r="1.0" fill="#fff"/><circle cx="1880" cy="130" r="1.4" fill="#d8eaff"/>
-          <!-- mid sky -->
-          <circle cx="140"  cy="220" r="1.1" fill="#fff"/><circle cx="290"  cy="260" r="1.3" fill="#d8eaff"/>
-          <circle cx="450"  cy="200" r="1.0" fill="#fff"/><circle cx="610"  cy="280" r="1.4" fill="#fff"/>
-          <circle cx="770"  cy="230" r="1.2" fill="#d8eaff"/><circle cx="930"  cy="200" r="1.0" fill="#fff"/>
-          <circle cx="1090" cy="260" r="1.3" fill="#fff"/><circle cx="1250" cy="215" r="1.1" fill="#d8eaff"/>
-          <circle cx="1410" cy="275" r="1.4" fill="#fff"/><circle cx="1570" cy="230" r="1.0" fill="#fff"/>
-          <circle cx="1730" cy="205" r="1.2" fill="#d8eaff"/><circle cx="50"   cy="310" r="1.0" fill="#fff"/>
-          <!-- lower sky (closer to horizon — last to appear) -->
-          <circle cx="170"  cy="400" r="1.0" fill="#b8d4f0"/><circle cx="340"  cy="380" r="1.2" fill="#b8d4f0"/>
-          <circle cx="520"  cy="430" r="1.0" fill="#b8d4f0"/><circle cx="700"  cy="395" r="1.1" fill="#b8d4f0"/>
-          <circle cx="880"  cy="440" r="1.0" fill="#b8d4f0"/><circle cx="1060" cy="390" r="1.2" fill="#b8d4f0"/>
-          <circle cx="1240" cy="435" r="1.0" fill="#b8d4f0"/><circle cx="1420" cy="400" r="1.1" fill="#b8d4f0"/>
-          <circle cx="1600" cy="420" r="1.0" fill="#b8d4f0"/><circle cx="1800" cy="385" r="1.2" fill="#b8d4f0"/>
-          <circle cx="260"  cy="510" r="1.0" fill="#b8d4f0"/><circle cx="600"  cy="550" r="1.1" fill="#b8d4f0"/>
-          <circle cx="950"  cy="520" r="1.0" fill="#b8d4f0"/><circle cx="1300" cy="545" r="1.2" fill="#b8d4f0"/>
-          <circle cx="1650" cy="515" r="1.0" fill="#b8d4f0"/>
+        <!-- Globe outline -->
+        <circle cx="450" cy="480" r="295" stroke="#c8a870" stroke-width="1.5" stroke-opacity="0.42"/>
+
+        <!-- ── Latitude lines (perspective ellipses) ── -->
+        <!-- Equator -->
+        <ellipse cx="450" cy="480" rx="295" ry="67"  stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.35"/>
+        <!-- 30 °N -->
+        <ellipse cx="450" cy="333" rx="255" ry="58"  stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.24"/>
+        <!-- 30 °S -->
+        <ellipse cx="450" cy="627" rx="255" ry="58"  stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.24"/>
+        <!-- 60 °N -->
+        <ellipse cx="450" cy="225" rx="148" ry="33"  stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.17"/>
+        <!-- 60 °S -->
+        <ellipse cx="450" cy="735" rx="148" ry="33"  stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.17"/>
+
+        <!-- ── Meridian lines ── -->
+        <line  x1="450" y1="185" x2="450" y2="775"  stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.18"/>
+        <ellipse cx="450" cy="480" rx="148" ry="295" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.18"/>
+        <ellipse cx="450" cy="480" rx="255" ry="295" stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.15"/>
+
+        <!-- ══ CONTINENT OUTLINES ══ -->
+
+        <!-- Greenland -->
+        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.44" stroke-linejoin="round" stroke-linecap="round"
+          d="M 318,186 L 342,176 L 362,180 L 368,196 L 361,213 L 342,217 L 323,208 Z"/>
+
+        <!-- North America -->
+        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
+          d="M 238,232 C 248,206 272,190 298,183 L 322,175 L 345,163 C 362,154 382,156 400,163 L 415,153
+             C 434,146 455,157 462,172 L 466,190 C 470,209 462,228 450,241 L 436,257 C 426,270 420,286 408,299 L 390,313
+             C 371,327 350,333 330,323 L 312,311 C 296,298 280,283 266,269 L 248,250 Z"/>
+
+        <!-- Central America taper -->
+        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.38" stroke-linejoin="round" stroke-linecap="round"
+          d="M 406,299 L 398,320 L 382,340 L 372,355"/>
+
+        <!-- South America -->
+        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
+          d="M 305,336 L 332,323 L 356,331 L 370,349 L 378,376 L 380,407
+             L 376,440 L 370,473 L 356,500 L 340,522 L 322,529 L 306,518
+             L 295,497 L 292,468 L 296,438 L 300,408 L 302,378 Z"/>
+
+        <!-- Europe -->
+        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.47" stroke-linejoin="round" stroke-linecap="round"
+          d="M 450,206 L 472,198 L 497,203 L 516,216 L 520,231 L 512,246
+             L 494,251 L 474,255 L 456,248 L 448,233 L 447,217 Z"/>
+
+        <!-- Iberian Peninsula -->
+        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.38" stroke-linejoin="round"
+          d="M 440,237 L 429,242 L 424,255 L 432,265 L 448,261 L 451,249 L 445,239 Z"/>
+
+        <!-- British Isles -->
+        <ellipse cx="461" cy="213" rx="6"  ry="10" stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.34"/>
+        <ellipse cx="452" cy="215" rx="4"  ry="7"  stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.28"/>
+
+        <!-- Africa -->
+        <path stroke="#c8a870" stroke-width="1.5" stroke-opacity="0.52" stroke-linejoin="round" stroke-linecap="round"
+          d="M 458,271 L 483,263 L 511,271 L 533,287 L 547,314 L 553,350
+             L 553,390 L 549,432 L 541,472 L 527,507 L 509,532 L 489,543
+             L 469,539 L 453,521 L 441,497 L 436,467 L 437,433 L 441,396
+             L 446,358 L 451,322 L 455,291 Z"/>
+
+        <!-- Horn of Africa -->
+        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.42" stroke-linejoin="round"
+          d="M 549,396 L 570,389 L 582,397 L 573,414 L 552,416"/>
+
+        <!-- Madagascar -->
+        <path stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.37" stroke-linejoin="round"
+          d="M 558,451 L 568,445 L 575,453 L 575,470 L 567,481 L 557,474 L 554,462 Z"/>
+
+        <!-- Arabian Peninsula -->
+        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"
+          d="M 536,282 L 560,276 L 580,283 L 588,298 L 586,319 L 570,332
+             L 553,328 L 541,314 L 536,297 Z"/>
+
+        <!-- Asia (main body) -->
+        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.50" stroke-linejoin="round" stroke-linecap="round"
+          d="M 526,172 L 560,160 L 598,156 L 640,163 L 680,177 L 714,195
+             L 737,217 L 742,241 L 732,265 L 711,279 L 685,285 L 660,279
+             L 642,293 L 622,289 L 608,303 L 592,299 L 576,283 L 557,289
+             L 540,277 L 528,259 L 522,235 Z"/>
+
+        <!-- India (peninsula) -->
+        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"
+          d="M 579,286 L 599,293 L 615,309 L 619,332 L 610,354 L 597,362
+             L 581,354 L 571,333 L 571,309 Z"/>
+
+        <!-- SE Asia peninsula -->
+        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.40" stroke-linejoin="round"
+          d="M 652,293 L 666,300 L 672,314 L 665,328 L 651,330 L 642,320 L 643,306 Z"/>
+
+        <!-- Japan (island arc) -->
+        <ellipse cx="720" cy="225" rx="6" ry="15" stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.37"
+          transform="rotate(-22,720,225)"/>
+        <ellipse cx="732" cy="210" rx="4" ry="10" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.30"
+          transform="rotate(-22,732,210)"/>
+
+        <!-- Australia -->
+        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
+          d="M 650,469 L 681,459 L 709,465 L 727,483 L 729,507 L 719,529
+             L 697,541 L 669,543 L 649,529 L 637,511 L 639,489 Z"/>
+
+        <!-- New Zealand -->
+        <ellipse cx="749" cy="540" rx="5" ry="13" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.32"
+          transform="rotate(-10,749,540)"/>
+
+        <!-- ══ FLIGHT PATH ══ -->
+        <!-- Main arc: airplane → right side of globe → under → lower left -->
+        <path d="M 662,150 Q 808,305 800,490 Q 792,688 652,785 Q 508,856 447,779 Q 372,754 296,692"
+              stroke="#e8834a" stroke-width="2.0" stroke-dasharray="10,7" stroke-linecap="round" stroke-opacity="0.72"/>
+        <!-- Fading tail of path -->
+        <path d="M 296,692 Q 250,652 278,622"
+              stroke="#e8834a" stroke-width="1.5" stroke-dasharray="7,7" stroke-linecap="round" stroke-opacity="0.40"/>
+
+        <!-- ══ AIRPLANE ══ -->
+        <g class="hero__plane" transform="translate(663,143) rotate(43)">
+          <!-- Fuselage -->
+          <path d="M 0,-23 C 4,-23 7,-17 7,-9 L 6,15 L 0,18 L -6,15 L -7,-9 C -7,-17 -4,-23 0,-23 Z"
+                fill="#f0a93c"/>
+          <!-- Main wings -->
+          <path d="M -7,-2 L -32,13 L -32,19 L -7,9 L 7,9 L 32,19 L 32,13 L 7,-2 Z"
+                fill="#f0a93c"/>
+          <!-- Horizontal stabilizer -->
+          <path d="M -6,15 L -17,24 L -17,28 L -6,21 L 6,21 L 17,28 L 17,24 L 6,15 Z"
+                fill="#f0a93c"/>
         </g>
 
-        <!-- Moon (fades in after sun sets, upper-right area) -->
-        <g id="sceneMoon" opacity="0">
-          <circle cx="1500" cy="180" r="38" fill="#d4e8f8" opacity=".9"/>
-          <!-- crescent shadow to suggest a moon phase -->
-          <circle cx="1518" cy="175" r="34" fill="#100a04" opacity=".7"/>
-        </g>
-
-        <!-- Warm horizon band (atmospheric scattering during sunset) -->
-        <rect id="sceneHorizonBand" y="380" width="1920" height="350"
-              fill="url(#sceneHorizonBandFill)" opacity="1"/>
-        <!-- Wide sunset flare around the sun -->
-        <rect id="sceneHorizonSpread" y="320" width="1920" height="410"
-              fill="url(#sceneHorizonSpreadFill)" opacity="1"/>
-
-        <!-- Sun glow halo -->
-        <circle id="sceneSunGlowCircle" cx="960" cy="690" r="320" fill="url(#sceneSunGlow)"/>
-
-        <!-- Sun (full circle, half hidden behind water) -->
-        <circle id="sceneSun" cx="960" cy="680" r="120" fill="url(#sceneSunFill)"/>
-
-        <!-- Halftone clouds -->
-        <g id="sceneCloudLeft">
-          <path d="M380,560 q-50,-40 -110,-15 q-30,-30 -75,-15 q-25,-25 -55,5 q-15,15 0,25 q-10,15 10,25 q15,20 50,15 q25,15 60,5 q30,15 65,5 q35,5 55,-15 z"
-                fill="url(#sceneHalftone)" opacity=".85"/>
-          <path d="M450,605 q-40,-25 -90,-10 q-25,-20 -60,-5 q-20,-15 -45,5 q-10,15 5,20 q-5,15 15,20 q25,15 55,5 q25,10 50,0 q30,5 50,-15 q15,-5 20,-20 z"
-                fill="url(#sceneHalftoneFaint)" opacity=".7"/>
-        </g>
-        <g id="sceneCloudRight">
-          <path d="M1530,565 q60,-35 130,-10 q35,-25 80,-10 q30,-20 60,5 q15,15 0,25 q15,15 -5,25 q-20,20 -55,15 q-30,15 -65,5 q-35,15 -70,5 q-40,5 -75,-15 z"
-                fill="url(#sceneHalftone)" opacity=".85"/>
-          <path d="M1480,615 q40,-25 90,-10 q25,-20 60,-5 q20,-15 45,5 q10,15 -5,20 q5,15 -15,20 q-25,15 -55,5 q-25,10 -50,0 q-30,5 -50,-15 q-15,-5 -20,-20 z"
-                fill="url(#sceneHalftoneFaint)" opacity=".7"/>
-        </g>
-
-        <!-- Distant mountains -->
-        <path id="sceneMountains"
-              d="M0,720
-                 L120,690 L220,710 L320,685 L440,705 L540,680 L640,700 L740,685
-                 L860,710 L960,675 L1060,705 L1180,685 L1280,710 L1380,690
-                 L1500,710 L1620,685 L1740,705 L1860,690 L1920,720
-                 L1920,740 L0,740 Z"
-              fill="#160e06"/>
-
-        <!-- Water -->
-        <rect y="730" width="1920" height="350" fill="url(#sceneWater)"/>
-
-        <!-- Sun reflection on water (vertical streak made of horizontal ellipses) -->
-        <g id="sceneReflection" opacity=".6">
-          <ellipse cx="960" cy="745"  rx="95" ry="6"  fill="#e64545" opacity=".7"/>
-          <ellipse cx="960" cy="775"  rx="70" ry="3"  fill="#e64545" opacity=".55"/>
-          <ellipse cx="960" cy="810"  rx="105" ry="3" fill="#e64545" opacity=".4"/>
-          <ellipse cx="960" cy="855"  rx="135" ry="3" fill="#e64545" opacity=".3"/>
-          <ellipse cx="960" cy="905"  rx="170" ry="3" fill="#e64545" opacity=".22"/>
-          <ellipse cx="960" cy="965"  rx="210" ry="3" fill="#e64545" opacity=".16"/>
-          <ellipse cx="960" cy="1030" rx="250" ry="3" fill="#e64545" opacity=".1"/>
-        </g>
-
-        <!-- Pier in perspective -->
-        <g id="scenePier">
-          <!-- Deck (trapezoid narrowing toward horizon) -->
-          <path d="M905,735 L1015,735 L1140,1080 L780,1080 Z"
-                fill="#1a1208" stroke="#2a1e0e" stroke-width="0.8"/>
-          <!-- Plank cross-lines (perspective) -->
-          <line x1="900" y1="755"  x2="1020" y2="755"  stroke="#0c1218" stroke-width=".6"/>
-          <line x1="895" y1="785"  x2="1025" y2="785"  stroke="#0c1218" stroke-width=".7"/>
-          <line x1="888" y1="820"  x2="1032" y2="820"  stroke="#0c1218" stroke-width=".8"/>
-          <line x1="880" y1="860"  x2="1040" y2="860"  stroke="#0c1218" stroke-width=".9"/>
-          <line x1="870" y1="905"  x2="1050" y2="905"  stroke="#0c1218" stroke-width="1"/>
-          <line x1="855" y1="955"  x2="1065" y2="955"  stroke="#0c1218" stroke-width="1.1"/>
-          <line x1="838" y1="1010" x2="1082" y2="1010" stroke="#0c1218" stroke-width="1.3"/>
-          <!-- Side rails / posts -->
-          <rect x="775"  y="1020" width="14" height="60" fill="#120e06"/>
-          <rect x="1131" y="1020" width="14" height="60" fill="#120e06"/>
-          <rect x="820"  y="940"  width="10" height="42" fill="#120e06"/>
-          <rect x="1090" y="940"  width="10" height="42" fill="#120e06"/>
-          <rect x="855"  y="880"  width="8"  height="32" fill="#120e06"/>
-          <rect x="1057" y="880"  width="8"  height="32" fill="#120e06"/>
-          <rect x="880"  y="830"  width="6"  height="24" fill="#120e06"/>
-          <rect x="1034" y="830"  width="6"  height="24" fill="#120e06"/>
-        </g>
-
-        <!-- Night overlay: darkens sky as sun disappears -->
-        <rect id="sceneNightOverlay" width="1920" height="730" fill="#060301" opacity="0"/>
-
-        <!-- Soft text-side darkening for readability -->
-        <rect width="1920" height="1080" fill="url(#sceneTextShade)" pointer-events="none"/>
+        <!-- Edge vignette overlay (subtle, depth) -->
+        <circle cx="450" cy="480" r="295" fill="url(#globeEdgeFade)"/>
       </svg>
     </div>
+  </div>
 
   <!-- Hero -->
   <section class="hero" id="hero">
