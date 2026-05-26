@@ -9,13 +9,6 @@ window.addEventListener('load', () => {
 });
 
 /* ═══════════════════════════════════════════════
-   HERO WORD ANIMATION — apply data-delay as CSS var
-═══════════════════════════════════════════════ */
-document.querySelectorAll('.hero__word').forEach(el => {
-  el.style.setProperty('--delay', el.dataset.delay || 0);
-});
-
-/* ═══════════════════════════════════════════════
    SIDEBAR BURGER + NAVIGATION DRAWER
 ═══════════════════════════════════════════════ */
 const sidebarBurger = document.getElementById('sidebarBurger');
@@ -51,32 +44,6 @@ navDrawer.querySelectorAll('.drawer-link:not(.drawer-link--sub)').forEach(link =
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
 /* ═══════════════════════════════════════════════
-   PARALLAX — hero shapes follow mouse (rAF-throttled)
-═══════════════════════════════════════════════ */
-const shape1 = document.getElementById('shape1');
-const shape2 = document.getElementById('shape2');
-const shape3 = document.getElementById('shape3');
-
-let mouseDX = 0, mouseDY = 0, parallaxTicking = false;
-
-document.addEventListener('mousemove', e => {
-  const cx = window.innerWidth  / 2;
-  const cy = window.innerHeight / 2;
-  mouseDX = (e.clientX - cx) / cx;
-  mouseDY = (e.clientY - cy) / cy;
-
-  if (!parallaxTicking) {
-    requestAnimationFrame(() => {
-      shape1.style.transform = `translate3d(${mouseDX * -25}px, ${mouseDY * -20}px, 0)`;
-      shape2.style.transform = `translate3d(${mouseDX *  15}px, ${mouseDY *  12}px, 0)`;
-      shape3.style.transform = `translate3d(${mouseDX * -10}px, ${mouseDY *  18}px, 0)`;
-      parallaxTicking = false;
-    });
-    parallaxTicking = true;
-  }
-}, { passive: true });
-
-/* ═══════════════════════════════════════════════
    SCROLL REVEAL — IntersectionObserver
 ═══════════════════════════════════════════════ */
 const revealObserver = new IntersectionObserver(entries => {
@@ -91,30 +58,11 @@ const revealObserver = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal-up').forEach(el => revealObserver.observe(el));
 
 /* ═══════════════════════════════════════════════
-   COUNTER ANIMATION
+   COUNTER — show final values immediately
 ═══════════════════════════════════════════════ */
-const counterObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-    const el     = entry.target;
-    const target = +el.dataset.target;
-    const dur    = 1800;
-    const start  = performance.now();
-
-    function tick(now) {
-      const progress = Math.min((now - start) / dur, 1);
-      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      el.textContent = Math.floor(eased * target);
-      if (progress < 1) requestAnimationFrame(tick);
-      else el.textContent = target;
-    }
-
-    requestAnimationFrame(tick);
-    counterObserver.unobserve(el);
-  });
-}, { threshold: 0.5 });
-
-document.querySelectorAll('.stat__number').forEach(el => counterObserver.observe(el));
+document.querySelectorAll('.stat__number').forEach(el => {
+  el.textContent = el.dataset.target;
+});
 
 /* ═══════════════════════════════════════════════
    TESTIMONIALS SLIDER
@@ -144,7 +92,6 @@ function goTo(index) {
 }
 
 updateDots();
-setInterval(() => goTo((currentSlide + 1) % slides.length), 5000);
 
 let touchStartX = 0;
 track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
@@ -174,8 +121,6 @@ document.getElementById('contactForm').addEventListener('submit', e => {
 /* ═══════════════════════════════════════════════
    SUNSET SCENE + NAV SCROLL (combined, rAF-throttled)
 ═══════════════════════════════════════════════ */
-const heroContent    = document.querySelector('.hero__content');
-const heroScrollHint = document.getElementById('scrollHint');
 const sceneSvg       = document.querySelector('.hero__scene-svg');
 const nav            = document.getElementById('nav');
 
@@ -224,11 +169,6 @@ function applyScroll() {
   const nightT = smoothstep(Math.max(0, (t - 0.35) / 0.65));
   const moonT  = smoothstep(Math.max(0, (t - 0.5) / 0.5));
 
-  // Hero content fade
-  heroContent.style.opacity    = Math.max(0, 1 - y / 500);
-  heroContent.style.transform  = `translate3d(0, ${y * 0.15}px, 0)`;
-  heroScrollHint.style.opacity = Math.max(0, 1 - y / 200);
-
   // Sun sinks
   const sunCy = 680 + sunT * 200;
   scn.sun.setAttribute('cy', sunCy);
@@ -272,31 +212,6 @@ function onScroll() {
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', () => { recalcDocSize(); onScroll(); }, { passive: true });
 applyScroll();
-
-/* ═══════════════════════════════════════════════
-   SERVICE CARDS — magnetic hover (rAF-throttled per card)
-═══════════════════════════════════════════════ */
-document.querySelectorAll('.service-card').forEach(card => {
-  let ticking = false, mx = 0, my = 0;
-
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    mx = ((e.clientX - rect.left) / rect.width  - 0.5) * 10;
-    my = ((e.clientY - rect.top)  / rect.height - 0.5) * 10;
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        card.style.transform =
-          `translate3d(${mx * 0.3}px, ${-4 + my * 0.3}px, 0)`;
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-  });
-});
-
 
 /* ═══════════════════════════════════════════════
    WORK MARQUEE — load gallery images from Supabase, shuffle, scroll right→left
