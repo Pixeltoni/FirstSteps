@@ -119,84 +119,15 @@ document.getElementById('contactForm').addEventListener('submit', e => {
 });
 
 /* ═══════════════════════════════════════════════
-   SUNSET SCENE + NAV SCROLL (combined, rAF-throttled)
+   NAV SCROLL
 ═══════════════════════════════════════════════ */
-const nav            = document.getElementById('nav');
-
-const scn = {
-  sun:           document.getElementById('sceneSun'),
-  glow:          document.getElementById('sceneSunGlowCircle'),
-  horizonBand:   document.getElementById('sceneHorizonBand'),
-  horizonSpread: document.getElementById('sceneHorizonSpread'),
-  cloudL:        document.getElementById('sceneCloudLeft'),
-  cloudR:        document.getElementById('sceneCloudRight'),
-  reflection:    document.getElementById('sceneReflection'),
-  stars:         document.getElementById('sceneStars'),
-  moon:          document.getElementById('sceneMoon'),
-  nightOverlay:  document.getElementById('sceneNightOverlay')
-};
-
-const smoothstep = t => t * t * (3 - 2 * t);
-
-// Cache values that only change on resize
-let docScrollable = Math.max(1,
-  document.documentElement.scrollHeight - window.innerHeight);
-
-function recalcDocSize() {
-  docScrollable = Math.max(1,
-    document.documentElement.scrollHeight - window.innerHeight);
-}
-
-let lastT = -1, scrollTicking = false;
+const nav = document.getElementById('nav');
+let scrollTicking = false;
 
 function applyScroll() {
   const y = window.scrollY;
-  const t = Math.min(1, Math.max(0, y / docScrollable));
-
-  // Toggle nav scrolled class (cheap, always do it)
   if (y > 60) nav.classList.add('scrolled');
   else        nav.classList.remove('scrolled');
-
-  // Skip scene work if scroll position barely changed
-  if (Math.abs(t - lastT) < 0.003) {
-    scrollTicking = false;
-    return;
-  }
-  lastT = t;
-
-  const sunT   = smoothstep(Math.min(t / 0.5, 1));
-  const nightT = smoothstep(Math.max(0, (t - 0.35) / 0.65));
-  const moonT  = smoothstep(Math.max(0, (t - 0.5) / 0.5));
-
-  // Sun sinks
-  const sunCy = 680 + sunT * 200;
-  scn.sun.setAttribute('cy', sunCy);
-  scn.glow.setAttribute('cy', sunCy + 10);
-  scn.glow.setAttribute('r',  Math.max(0, 320 - sunT * 280));
-
-  // Horizon glow — style.opacity is GPU-composited, no layout recalc
-  const bandPeak = 1 - Math.abs(sunT - 0.6) / 0.6;
-  const bandOp   = Math.max(0, Math.min(1, 0.55 + bandPeak * 0.45 - Math.max(0, sunT - 0.7) * 3));
-  scn.horizonBand.style.opacity   = bandOp;
-  scn.horizonSpread.style.opacity = Math.max(0, 1 - sunT * 1.15);
-
-  // Clouds fade
-  const cloudOpacity = Math.max(0, 1 - sunT * 1.3);
-  scn.cloudL.style.opacity = cloudOpacity;
-  scn.cloudR.style.opacity = cloudOpacity;
-
-  // Reflection
-  const reflPeak = Math.max(0, 1 - Math.abs(sunT - 0.35) / 0.35);
-  scn.reflection.style.opacity = Math.max(0, 0.6 + reflPeak * 0.5 - sunT * 1.2);
-
-  // Stars + moon + night overlay
-  scn.stars.style.opacity        = nightT * 0.85;
-  scn.moon.style.opacity         = moonT * 0.9;
-  scn.moon.setAttribute('transform', `translate(${(1 - moonT) * 120}, ${(1 - moonT) * 60})`);
-  scn.nightOverlay.style.opacity = nightT * 0.62;
-
-  // (scale-on-scroll removed — performance)
-
   scrollTicking = false;
 }
 
@@ -208,7 +139,7 @@ function onScroll() {
 }
 
 window.addEventListener('scroll', onScroll, { passive: true });
-window.addEventListener('resize', () => { recalcDocSize(); onScroll(); }, { passive: true });
+window.addEventListener('resize', onScroll, { passive: true });
 applyScroll();
 
 /* ═══════════════════════════════════════════════
