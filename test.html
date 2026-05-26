@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TEST — SmartStudio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ── TEST BANNER ── */
+    .test-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 99999;
+      background: repeating-linear-gradient(
+        45deg,
+        #e8c23a,
+        #e8c23a 10px,
+        #1a1600 10px,
+        #1a1600 20px
+      );
+      padding: 6px 0;
+      text-align: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,.6);
+    }
+    /* Schiebt alles nach unten damit Banner nicht überlagert */
+    body { padding-top: 30px; }
+  </style>
+</head>
+<body class="loading">
+
+  <!-- TEST BANNER -->
+  <div class="test-banner">⚠ Testseite — keine Live-Version ⚠</div>
+
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="loader__bar"></div>
+    <span class="loader__text">Loading</span>
+  </div>
+
+  <!-- Sidebar Rail -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="#" class="sidebar__logo-mark" aria-label="SmartStudio">SP</a>
+    </div>
+    <div class="sidebar__mid">
+      <button class="sidebar__burger" id="sidebarBurger" aria-label="Menü öffnen">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="sidebar__bottom">
+      <a href="#" class="sidebar__icon" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" class="sidebar__icon" aria-label="LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- Navigation Drawer -->
+  <nav class="nav-drawer" id="navDrawer" aria-label="Hauptnavigation">
+    <div class="nav-drawer__header">
+      <span class="nav-drawer__title">Menü</span>
+      <button class="nav-drawer__close" id="drawerClose" aria-label="Schließen">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <ul class="nav-drawer__links">
+      <li><a href="upload.html" class="drawer-link"><span class="drawer-link__num">01</span><span class="drawer-link__text">Galerie</span></a></li>
+    </ul>
+    <div class="nav-drawer__footer">
+      <a href="mailto:hallo@smartstudio.at" class="nav-drawer__contact">hallo@smartstudio.at</a>
+      <a href="tel:+431234567" class="nav-drawer__contact">+43 1 234 567</a>
+    </div>
+  </nav>
+
+  <!-- Top Bar (Logo only) -->
+  <header class="nav" id="nav">
+    <a href="#" class="nav__logo">
+      <span class="nav__logo-text">SmartStudio</span>
+    </a>
+  </header>
+
+  <!-- Animated Sunset Scene (SVG layers, scroll-controlled, full-page background) -->
+  <div class="hero__scene" id="heroScene">
+    <svg class="hero__scene-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="sceneSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#120c06"/>
+            <stop offset="55%" stop-color="#1a1008"/>
+            <stop offset="100%" stop-color="#22180a"/>
+          </linearGradient>
+          <radialGradient id="sceneSunGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%"  stop-color="#ff6b4a" stop-opacity=".55"/>
+            <stop offset="50%" stop-color="#e64545" stop-opacity=".18"/>
+            <stop offset="100%" stop-color="#e64545" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="sceneSunFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#ff8059"/>
+            <stop offset="100%" stop-color="#e64545"/>
+          </linearGradient>
+          <linearGradient id="sceneWater" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#1e1408"/>
+            <stop offset="100%" stop-color="#080503"/>
+          </linearGradient>
+          <linearGradient id="sceneTextShade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"  stop-color="#000" stop-opacity=".5"/>
+            <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+          </linearGradient>
+          <pattern id="sceneHalftone" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="1.4" fill="#e64545"/>
+          </pattern>
+          <pattern id="sceneHalftoneFaint" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="1.1" fill="#c84444"/>
+          </pattern>
+          <linearGradient id="sceneHorizonBandFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#ff7959" stop-opacity="0"/>
+            <stop offset="40%"  stop-color="#ff8159" stop-opacity=".18"/>
+            <stop offset="75%"  stop-color="#f06040" stop-opacity=".48"/>
+            <stop offset="100%" stop-color="#e64545" stop-opacity=".75"/>
+          </linearGradient>
+          <radialGradient id="sceneHorizonSpreadFill" cx="0.5" cy="1" r="0.7" fx="0.5" fy="1">
+            <stop offset="0%"  stop-color="#ffa470" stop-opacity=".7"/>
+            <stop offset="35%" stop-color="#ee6f4a" stop-opacity=".3"/>
+            <stop offset="75%" stop-color="#e64545" stop-opacity=".08"/>
+            <stop offset="100%" stop-color="#e64545" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Sky -->
+        <rect width="1920" height="1080" fill="url(#sceneSky)"/>
+
+        <!-- Stars -->
+        <g id="sceneStars" opacity="0">
+          <circle cx="80"   cy="80"  r="1.3" fill="#fff"/><circle cx="200"  cy="50"  r="1.0" fill="#d8eaff"/>
+          <circle cx="360"  cy="130" r="1.5" fill="#fff"/><circle cx="500"  cy="70"  r="1.1" fill="#fff"/>
+          <circle cx="640"  cy="110" r="1.0" fill="#d8eaff"/><circle cx="780"  cy="55"  r="1.4" fill="#fff"/>
+          <circle cx="920"  cy="90"  r="1.2" fill="#fff"/><circle cx="1060" cy="60"  r="1.3" fill="#d8eaff"/>
+          <circle cx="1200" cy="115" r="1.0" fill="#fff"/><circle cx="1340" cy="75"  r="1.5" fill="#fff"/>
+          <circle cx="1480" cy="105" r="1.1" fill="#d8eaff"/><circle cx="1620" cy="55"  r="1.3" fill="#fff"/>
+          <circle cx="1760" cy="90"  r="1.0" fill="#fff"/><circle cx="1880" cy="130" r="1.4" fill="#d8eaff"/>
+          <circle cx="140"  cy="220" r="1.1" fill="#fff"/><circle cx="290"  cy="260" r="1.3" fill="#d8eaff"/>
+          <circle cx="450"  cy="200" r="1.0" fill="#fff"/><circle cx="610"  cy="280" r="1.4" fill="#fff"/>
+          <circle cx="770"  cy="230" r="1.2" fill="#d8eaff"/><circle cx="930"  cy="200" r="1.0" fill="#fff"/>
+          <circle cx="1090" cy="260" r="1.3" fill="#fff"/><circle cx="1250" cy="215" r="1.1" fill="#d8eaff"/>
+          <circle cx="1410" cy="275" r="1.4" fill="#fff"/><circle cx="1570" cy="230" r="1.0" fill="#fff"/>
+          <circle cx="1730" cy="205" r="1.2" fill="#d8eaff"/><circle cx="50"   cy="310" r="1.0" fill="#fff"/>
+          <circle cx="170"  cy="400" r="1.0" fill="#b8d4f0"/><circle cx="340"  cy="380" r="1.2" fill="#b8d4f0"/>
+          <circle cx="520"  cy="430" r="1.0" fill="#b8d4f0"/><circle cx="700"  cy="395" r="1.1" fill="#b8d4f0"/>
+          <circle cx="880"  cy="440" r="1.0" fill="#b8d4f0"/><circle cx="1060" cy="390" r="1.2" fill="#b8d4f0"/>
+          <circle cx="1240" cy="435" r="1.0" fill="#b8d4f0"/><circle cx="1420" cy="400" r="1.1" fill="#b8d4f0"/>
+          <circle cx="1600" cy="420" r="1.0" fill="#b8d4f0"/><circle cx="1800" cy="385" r="1.2" fill="#b8d4f0"/>
+          <circle cx="260"  cy="510" r="1.0" fill="#b8d4f0"/><circle cx="600"  cy="550" r="1.1" fill="#b8d4f0"/>
+          <circle cx="950"  cy="520" r="1.0" fill="#b8d4f0"/><circle cx="1300" cy="545" r="1.2" fill="#b8d4f0"/>
+          <circle cx="1650" cy="515" r="1.0" fill="#b8d4f0"/>
+        </g>
+
+        <!-- Moon -->
+        <g id="sceneMoon" opacity="0">
+          <circle cx="1500" cy="180" r="38" fill="#d4e8f8" opacity=".9"/>
+          <circle cx="1518" cy="175" r="34" fill="#100a04" opacity=".7"/>
+        </g>
+
+        <!-- Horizon band -->
+        <rect id="sceneHorizonBand" y="380" width="1920" height="350"
+              fill="url(#sceneHorizonBandFill)" opacity="1"/>
+        <rect id="sceneHorizonSpread" y="320" width="1920" height="410"
+              fill="url(#sceneHorizonSpreadFill)" opacity="1"/>
+
+        <!-- Sun -->
+        <circle id="sceneSunGlowCircle" cx="960" cy="690" r="320" fill="url(#sceneSunGlow)"/>
+        <circle id="sceneSun" cx="960" cy="680" r="120" fill="url(#sceneSunFill)"/>
+
+        <!-- Clouds -->
+        <g id="sceneCloudLeft">
+          <path d="M380,560 q-50,-40 -110,-15 q-30,-30 -75,-15 q-25,-25 -55,5 q-15,15 0,25 q-10,15 10,25 q15,20 50,15 q25,15 60,5 q30,15 65,5 q35,5 55,-15 z"
+                fill="url(#sceneHalftone)" opacity=".85"/>
+          <path d="M450,605 q-40,-25 -90,-10 q-25,-20 -60,-5 q-20,-15 -45,5 q-10,15 5,20 q-5,15 15,20 q25,15 55,5 q25,10 50,0 q30,5 50,-15 q15,-5 20,-20 z"
+                fill="url(#sceneHalftoneFaint)" opacity=".7"/>
+        </g>
+        <g id="sceneCloudRight">
+          <path d="M1530,565 q60,-35 130,-10 q35,-25 80,-10 q30,-20 60,5 q15,15 0,25 q15,15 -5,25 q-20,20 -55,15 q-30,15 -65,5 q-35,15 -70,5 q-40,5 -75,-15 z"
+                fill="url(#sceneHalftone)" opacity=".85"/>
+          <path d="M1480,615 q40,-25 90,-10 q25,-20 60,-5 q20,-15 45,5 q10,15 -5,20 q5,15 -15,20 q-25,15 -55,5 q-25,10 -50,0 q-30,5 -50,-15 q-15,-5 -20,-20 z"
+                fill="url(#sceneHalftoneFaint)" opacity=".7"/>
+        </g>
+
+        <!-- Mountains -->
+        <path id="sceneMountains"
+              d="M0,720
+                 L120,690 L220,710 L320,685 L440,705 L540,680 L640,700 L740,685
+                 L860,710 L960,675 L1060,705 L1180,685 L1280,710 L1380,690
+                 L1500,710 L1620,685 L1740,705 L1860,690 L1920,720
+                 L1920,740 L0,740 Z"
+              fill="#160e06"/>
+
+        <!-- Water -->
+        <rect y="730" width="1920" height="350" fill="url(#sceneWater)"/>
+
+        <!-- Sun reflection -->
+        <g id="sceneReflection" opacity=".6">
+          <ellipse cx="960" cy="745"  rx="95" ry="6"  fill="#e64545" opacity=".7"/>
+          <ellipse cx="960" cy="775"  rx="70" ry="3"  fill="#e64545" opacity=".55"/>
+          <ellipse cx="960" cy="810"  rx="105" ry="3" fill="#e64545" opacity=".4"/>
+          <ellipse cx="960" cy="855"  rx="135" ry="3" fill="#e64545" opacity=".3"/>
+          <ellipse cx="960" cy="905"  rx="170" ry="3" fill="#e64545" opacity=".22"/>
+          <ellipse cx="960" cy="965"  rx="210" ry="3" fill="#e64545" opacity=".16"/>
+          <ellipse cx="960" cy="1030" rx="250" ry="3" fill="#e64545" opacity=".1"/>
+        </g>
+
+        <!-- Pier -->
+        <g id="scenePier">
+          <path d="M905,735 L1015,735 L1140,1080 L780,1080 Z"
+                fill="#1a1208" stroke="#2a1e0e" stroke-width="0.8"/>
+          <line x1="900" y1="755"  x2="1020" y2="755"  stroke="#0c1218" stroke-width=".6"/>
+          <line x1="895" y1="785"  x2="1025" y2="785"  stroke="#0c1218" stroke-width=".7"/>
+          <line x1="888" y1="820"  x2="1032" y2="820"  stroke="#0c1218" stroke-width=".8"/>
+          <line x1="880" y1="860"  x2="1040" y2="860"  stroke="#0c1218" stroke-width=".9"/>
+          <line x1="870" y1="905"  x2="1050" y2="905"  stroke="#0c1218" stroke-width="1"/>
+          <line x1="855" y1="955"  x2="1065" y2="955"  stroke="#0c1218" stroke-width="1.1"/>
+          <line x1="838" y1="1010" x2="1082" y2="1010" stroke="#0c1218" stroke-width="1.3"/>
+          <rect x="775"  y="1020" width="14" height="60" fill="#120e06"/>
+          <rect x="1131" y="1020" width="14" height="60" fill="#120e06"/>
+          <rect x="820"  y="940"  width="10" height="42" fill="#120e06"/>
+          <rect x="1090" y="940"  width="10" height="42" fill="#120e06"/>
+          <rect x="855"  y="880"  width="8"  height="32" fill="#120e06"/>
+          <rect x="1057" y="880"  width="8"  height="32" fill="#120e06"/>
+          <rect x="880"  y="830"  width="6"  height="24" fill="#120e06"/>
+          <rect x="1034" y="830"  width="6"  height="24" fill="#120e06"/>
+        </g>
+
+        <!-- Night overlay -->
+        <rect id="sceneNightOverlay" width="1920" height="730" fill="#060301" opacity="0"/>
+
+        <!-- Text shade -->
+        <rect width="1920" height="1080" fill="url(#sceneTextShade)" pointer-events="none"/>
+      </svg>
+    </div>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero__content">
+      <div class="hero__eyebrow reveal-up">✦ Digital Agency aus Wien</div>
+      <h1 class="hero__title">
+        <span class="hero__word" data-delay="0">Wir</span>
+        <span class="hero__word" data-delay="80">erschaffen</span>
+        <span class="hero__word hero__word--outline" data-delay="160">digitale</span>
+        <span class="hero__word" data-delay="240">Erlebnisse.</span>
+      </h1>
+      <p class="hero__sub reveal-up" style="--d:0.5s">
+        Mit Herz &amp; Expertise — von der Idee bis zum fertigen Produkt.
+      </p>
+      <div class="hero__actions reveal-up" style="--d:0.7s">
+        <a href="#work" class="btn btn--primary">Unsere Arbeiten ↓</a>
+        <a href="#contact" class="btn btn--ghost">Projekt starten</a>
+      </div>
+    </div>
+    <div class="hero__scroll-hint" id="scrollHint">
+      <span>Scroll</span>
+      <div class="hero__scroll-line"></div>
+    </div>
+    <!-- Floating shapes -->
+    <div class="shape shape--1" id="shape1"></div>
+    <div class="shape shape--2" id="shape2"></div>
+    <div class="shape shape--3" id="shape3"></div>
+  </section>
+
+  <!-- Marquee / ticker -->
+  <div class="marquee">
+    <div class="marquee__track">
+      <span>Web Design</span><span class="marquee__dot">✦</span>
+      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
+      <span>Branding</span><span class="marquee__dot">✦</span>
+      <span>E-Commerce</span><span class="marquee__dot">✦</span>
+      <span>SEO &amp; Performance</span><span class="marquee__dot">✦</span>
+      <span>Motion Design</span><span class="marquee__dot">✦</span>
+      <span>Webentwicklung</span><span class="marquee__dot">✦</span>
+      <span>Strategie &amp; Konzept</span><span class="marquee__dot">✦</span>
+      <span>Web Design</span><span class="marquee__dot">✦</span>
+      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
+      <span>Branding</span><span class="marquee__dot">✦</span>
+      <span>E-Commerce</span><span class="marquee__dot">✦</span>
+      <span>SEO &amp; Performance</span><span class="marquee__dot">✦</span>
+      <span>Motion Design</span><span class="marquee__dot">✦</span>
+      <span>Webentwicklung</span><span class="marquee__dot">✦</span>
+      <span>Strategie &amp; Konzept</span><span class="marquee__dot">✦</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stats__grid">
+      <div class="stat reveal-up">
+        <span class="stat__number" data-target="120">0</span>
+        <span class="stat__suffix">+</span>
+        <p class="stat__label">Projekte abgeschlossen</p>
+      </div>
+      <div class="stat reveal-up" style="--d:0.1s">
+        <span class="stat__number" data-target="8">0</span>
+        <span class="stat__suffix">+</span>
+        <p class="stat__label">Jahre Erfahrung</p>
+      </div>
+      <div class="stat reveal-up" style="--d:0.2s">
+        <span class="stat__number" data-target="40">0</span>
+        <span class="stat__suffix">+</span>
+        <p class="stat__label">Zufriedene Kunden</p>
+      </div>
+      <div class="stat reveal-up" style="--d:0.3s">
+        <span class="stat__number" data-target="99">0</span>
+        <span class="stat__suffix">%</span>
+        <p class="stat__label">Positive Bewertungen</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="work" id="work">
+    <div class="section-header reveal-up">
+      <p class="section-tag">Aus der Galerie</p>
+      <h2 class="section-title">Unsere <em>Bilder</em></h2>
+    </div>
+    <div class="work-marquee" id="workMarquee">
+      <div class="work-marquee__track" id="workTrack">
+        <p class="work-marquee__empty" id="workEmpty">Noch keine Bilder hochgeladen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="services">
+    <div class="section-header reveal-up">
+      <p class="section-tag">Was wir bieten</p>
+      <h2 class="section-title">Unsere <em>Leistungen</em></h2>
+    </div>
+    <div class="services__grid">
+      <div class="service-card reveal-up" style="--d:0s">
+        <div class="service-card__icon">⬡</div>
+        <h3 class="service-card__title">Strategie & Konzept</h3>
+        <p class="service-card__text">Wir analysieren Ihren Markt und entwickeln eine maßgeschneiderte digitale Strategie, die Ihre Ziele erreicht.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.1s">
+        <div class="service-card__icon">◈</div>
+        <h3 class="service-card__title">UI/UX Design</h3>
+        <p class="service-card__text">Interfaces, die Nutzer begeistern — von der ersten Skizze bis zum finalen Pixel-perfect Design.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.2s">
+        <div class="service-card__icon">⬖</div>
+        <h3 class="service-card__title">Web Development</h3>
+        <p class="service-card__text">Schnelle, skalierbare Websites und Webanwendungen mit modernsten Technologien.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.3s">
+        <div class="service-card__icon">◉</div>
+        <h3 class="service-card__title">Motion & Animation</h3>
+        <p class="service-card__text">Lebendige Animationen und Motion Design, die Ihre Marke zum Strahlen bringen.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.4s">
+        <div class="service-card__icon">⬟</div>
+        <h3 class="service-card__title">E-Commerce</h3>
+        <p class="service-card__text">Shops, die verkaufen — optimierte Conversion-Flows und nahtlose Kauferlebnisse.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+      <div class="service-card reveal-up" style="--d:0.5s">
+        <div class="service-card__icon">◬</div>
+        <h3 class="service-card__title">SEO & Performance</h3>
+        <p class="service-card__text">Mehr Sichtbarkeit, bessere Core Web Vitals und nachhaltiges organisches Wachstum.</p>
+        <span class="service-card__arrow">→</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- About / Philosophy -->
+  <section class="about" id="about">
+    <div class="about__grid">
+      <div class="about__visual reveal-up">
+        <div class="about__blob"></div>
+        <div class="about__img-frame">
+          <div class="about__img-placeholder"></div>
+        </div>
+        <div class="about__badge">
+          <span>Seit</span>
+          <strong>2016</strong>
+        </div>
+      </div>
+      <div class="about__text">
+        <p class="section-tag reveal-up">Über uns</p>
+        <h2 class="section-title reveal-up">Wir glauben an <em>Qualität</em> statt Quantität.</h2>
+        <p class="about__body reveal-up" style="--d:0.2s">
+          Wir sind ein kleines, schlagkräftiges Team aus Wien. Kein Bullshit,
+          keine endlosen Meetings — nur echte Arbeit, die Ergebnisse liefert.
+          Jedes Projekt behandeln wir wie unser eigenes.
+        </p>
+        <ul class="about__list reveal-up" style="--d:0.3s">
+          <li>Transparente Kommunikation</li>
+          <li>Faire Preise, klare Angebote</li>
+          <li>Lieferung on time, every time</li>
+          <li>Langfristige Partnerschaften</li>
+        </ul>
+        <a href="#contact" class="btn btn--primary reveal-up" style="--d:0.4s">Lern uns kennen</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <div class="section-header reveal-up">
+      <p class="section-tag">Kundenstimmen</p>
+      <h2 class="section-title">Was unsere <em>Kunden</em> sagen</h2>
+    </div>
+    <div class="testimonials__track" id="testimonialsTrack">
+      <div class="testimonial">
+        <p class="testimonial__quote">"Das Team hat unsere Erwartungen bei weitem übertroffen. Die Website läuft schnell, sieht großartig aus und konvertiert viel besser als die alte."</p>
+        <div class="testimonial__author">
+          <div class="testimonial__avatar">MK</div>
+          <div>
+            <strong>Maria K.</strong>
+            <span>CEO, NovaBrand GmbH</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p class="testimonial__quote">"Professionell, kreativ und immer erreichbar. Wir würden jederzeit wieder zusammenarbeiten."</p>
+        <div class="testimonial__author">
+          <div class="testimonial__avatar">TW</div>
+          <div>
+            <strong>Thomas W.</strong>
+            <span>Marketing Director, ShopFlow</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p class="testimonial__quote">"Von der Strategie bis zur Umsetzung — ein nahtloser Prozess. Das Endergebnis spricht für sich."</p>
+        <div class="testimonial__author">
+          <div class="testimonial__avatar">SB</div>
+          <div>
+            <strong>Sophie B.</strong>
+            <span>Founder, Arktis Studio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonials__dots" id="testimonialsDots"></div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="cta-banner reveal-up">
+    <div class="cta-banner__content">
+      <h2 class="cta-banner__title">Bereit für Ihr nächstes Projekt?</h2>
+      <p class="cta-banner__sub">Lass uns gemeinsam etwas Großartiges erschaffen.</p>
+      <a href="#contact" class="btn btn--white">Jetzt starten ↗</a>
+    </div>
+    <div class="cta-banner__bg"></div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact" id="contact">
+    <div class="section-header reveal-up">
+      <p class="section-tag">Kontakt</p>
+      <h2 class="section-title">Schreib <em>uns</em> an.</h2>
+    </div>
+    <div class="contact__grid">
+      <div class="contact__info reveal-up">
+        <div class="contact__detail">
+          <span class="contact__label">E-Mail</span>
+          <a href="mailto:hallo@smartstudio.at" class="contact__value">hallo@smartstudio.at</a>
+        </div>
+        <div class="contact__detail">
+          <span class="contact__label">Telefon</span>
+          <a href="tel:+431234567" class="contact__value">+43 1 234 567</a>
+        </div>
+        <div class="contact__detail">
+          <span class="contact__label">Adresse</span>
+          <p class="contact__value">Mariahilfer Str. 1<br>1060 Wien, Österreich</p>
+        </div>
+        <div class="contact__social">
+          <a href="#" class="social-link">Instagram</a>
+          <a href="#" class="social-link">LinkedIn</a>
+          <a href="#" class="social-link">Behance</a>
+        </div>
+      </div>
+      <form class="contact__form reveal-up" style="--d:0.2s" id="contactForm">
+        <div class="form-group">
+          <input type="text" id="name" name="name" autocomplete="name" required placeholder=" " />
+          <label for="name">Ihr Name</label>
+        </div>
+        <div class="form-group">
+          <input type="email" id="email" name="email" autocomplete="email" required placeholder=" " />
+          <label for="email">E-Mail Adresse</label>
+        </div>
+        <div class="form-group">
+          <select id="service" name="service" autocomplete="off">
+            <option value="">Leistung auswählen</option>
+            <option>Web Design</option>
+            <option>E-Commerce</option>
+            <option>Branding</option>
+            <option>SEO</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <textarea id="message" name="message" autocomplete="off" rows="4" required placeholder=" "></textarea>
+          <label for="message">Ihre Nachricht</label>
+        </div>
+        <button type="submit" class="btn btn--primary btn--full">
+          <span class="btn__text">Nachricht senden</span>
+          <span class="btn__icon">→</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <span class="footer__logo">SmartStudio</span>
+        <p class="footer__tagline">Digitale Erlebnisse, die bewegen.</p>
+      </div>
+      <nav class="footer__nav">
+        <a href="#work">Arbeiten</a>
+        <a href="#services">Leistungen</a>
+        <a href="#about">Über uns</a>
+        <a href="#contact">Kontakt</a>
+      </nav>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 SmartStudio GmbH. Alle Rechte vorbehalten.</span>
+      <span>Wien, Österreich</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
