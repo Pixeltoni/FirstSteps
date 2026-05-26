@@ -359,8 +359,6 @@ select { cursor: pointer; }
 .hero__scene-svg {
   width: 100%; height: 100%;
   display: block;
-  transform-origin: 50% 60%;
-  will-change: transform;
 }
 
 /* Existing decorative blobs become subtle atmospheric overlays */
@@ -525,8 +523,7 @@ select { cursor: pointer; }
   border-bottom: 1px solid var(--border);
   padding: 1.1rem 0;
   overflow: hidden;
-  background: rgba(13,10,7,.55);
-  backdrop-filter: blur(4px);
+  background: rgba(13,10,7,.85);
 }
 
 .marquee__track {
@@ -716,12 +713,24 @@ select { cursor: pointer; }
 }
 
 /* ═══════════════════════════════════════════════
+   PERFORMANCE — content-visibility for off-screen sections
+═══════════════════════════════════════════════ */
+.services,
+.about,
+.testimonials,
+.cta-banner,
+.contact,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* ═══════════════════════════════════════════════
    SERVICES
 ═══════════════════════════════════════════════ */
 .services {
   padding: 6rem 3rem;
-  background: rgba(13,10,7,.5);
-  backdrop-filter: blur(4px);
+  background: rgba(13,10,7,.92);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -893,8 +902,7 @@ select { cursor: pointer; }
 ═══════════════════════════════════════════════ */
 .testimonials {
   padding: 6rem 3rem;
-  background: rgba(13,10,7,.5);
-  backdrop-filter: blur(4px);
+  background: rgba(13,10,7,.92);
   border-top: 1px solid var(--border);
   overflow: hidden;
 }
@@ -976,8 +984,7 @@ select { cursor: pointer; }
   position: absolute; inset: 0;
   background:
     radial-gradient(ellipse 80% 80% at 50% 50%, rgba(232,131,74,.25), transparent 70%),
-    rgba(13,10,7,.45);
-  backdrop-filter: blur(4px);
+    rgba(13,10,7,.88);
   pointer-events: none;
 }
 
@@ -1001,8 +1008,7 @@ select { cursor: pointer; }
 ═══════════════════════════════════════════════ */
 .contact {
   padding: 6rem 3rem;
-  background: rgba(13,10,7,.55);
-  backdrop-filter: blur(4px);
+  background: rgba(13,10,7,.92);
   border-top: 1px solid var(--border);
 }
 

@@ -121,7 +121,6 @@ document.getElementById('contactForm').addEventListener('submit', e => {
 /* ═══════════════════════════════════════════════
    SUNSET SCENE + NAV SCROLL (combined, rAF-throttled)
 ═══════════════════════════════════════════════ */
-const sceneSvg       = document.querySelector('.hero__scene-svg');
 const nav            = document.getElementById('nav');
 
 const scn = {
@@ -196,8 +195,7 @@ function applyScroll() {
   scn.moon.setAttribute('transform', `translate(${(1 - moonT) * 120}, ${(1 - moonT) * 60})`);
   scn.nightOverlay.setAttribute('opacity', nightT * 0.62);
 
-  // Whole-scene slow zoom
-  sceneSvg.style.transform = `scale(${1 + t * 0.04})`;
+  // (scale-on-scroll removed — performance)
 
   scrollTicking = false;
 }
