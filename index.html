@@ -69,150 +69,123 @@
   <div class="hero__scene" id="heroScene">
     <div class="hero__globe-wrap">
       <svg class="hero__globe-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" fill="none" aria-hidden="true">
-        <defs>
-          <radialGradient id="globeBgGlow" cx="50%" cy="53%" r="50%">
-            <stop offset="0%"   stop-color="#f0a93c" stop-opacity="0.10"/>
-            <stop offset="60%"  stop-color="#e8834a" stop-opacity="0.04"/>
-            <stop offset="100%" stop-color="#e8834a" stop-opacity="0"/>
-          </radialGradient>
-          <radialGradient id="globeEdgeFade" cx="50%" cy="50%" r="50%">
-            <stop offset="75%"  stop-color="#0d0a07" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#0d0a07" stop-opacity="0.35"/>
-          </radialGradient>
-        </defs>
-
-        <!-- Ambient glow behind globe -->
-        <circle cx="450" cy="480" r="330" fill="url(#globeBgGlow)"/>
 
         <!-- Globe outline -->
-        <circle cx="450" cy="480" r="295" stroke="#c8a870" stroke-width="1.5" stroke-opacity="0.42"/>
+        <circle cx="450" cy="480" r="295" stroke="#b8b8b8" stroke-width="1.5"/>
 
-        <!-- ── Latitude lines (perspective ellipses) ── -->
-        <!-- Equator -->
-        <ellipse cx="450" cy="480" rx="295" ry="67"  stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.35"/>
-        <!-- 30 °N -->
-        <ellipse cx="450" cy="333" rx="255" ry="58"  stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.24"/>
-        <!-- 30 °S -->
-        <ellipse cx="450" cy="627" rx="255" ry="58"  stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.24"/>
-        <!-- 60 °N -->
-        <ellipse cx="450" cy="225" rx="148" ry="33"  stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.17"/>
-        <!-- 60 °S -->
-        <ellipse cx="450" cy="735" rx="148" ry="33"  stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.17"/>
+        <!-- Latitude lines -->
+        <ellipse cx="450" cy="480" rx="295" ry="67"  stroke="#c4c4c4" stroke-width="1.2"/>
+        <ellipse cx="450" cy="333" rx="255" ry="58"  stroke="#cecece" stroke-width="0.9"/>
+        <ellipse cx="450" cy="627" rx="255" ry="58"  stroke="#cecece" stroke-width="0.9"/>
+        <ellipse cx="450" cy="225" rx="148" ry="33"  stroke="#d8d8d8" stroke-width="0.7"/>
+        <ellipse cx="450" cy="735" rx="148" ry="33"  stroke="#d8d8d8" stroke-width="0.7"/>
 
-        <!-- ── Meridian lines ── -->
-        <line  x1="450" y1="185" x2="450" y2="775"  stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.18"/>
-        <ellipse cx="450" cy="480" rx="148" ry="295" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.18"/>
-        <ellipse cx="450" cy="480" rx="255" ry="295" stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.15"/>
+        <!-- Meridian lines -->
+        <line  x1="450" y1="185" x2="450" y2="775"  stroke="#d0d0d0" stroke-width="0.8"/>
+        <ellipse cx="450" cy="480" rx="148" ry="295" stroke="#d0d0d0" stroke-width="0.8"/>
+        <ellipse cx="450" cy="480" rx="255" ry="295" stroke="#d4d4d4" stroke-width="0.7"/>
 
-        <!-- ══ CONTINENT OUTLINES ══ -->
+        <!-- CONTINENT OUTLINES -->
 
         <!-- Greenland -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.44" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"
           d="M 318,186 L 342,176 L 362,180 L 368,196 L 361,213 L 342,217 L 323,208 Z"/>
 
         <!-- North America -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"
           d="M 238,232 C 248,206 272,190 298,183 L 322,175 L 345,163 C 362,154 382,156 400,163 L 415,153
              C 434,146 455,157 462,172 L 466,190 C 470,209 462,228 450,241 L 436,257 C 426,270 420,286 408,299 L 390,313
              C 371,327 350,333 330,323 L 312,311 C 296,298 280,283 266,269 L 248,250 Z"/>
 
         <!-- Central America taper -->
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.38" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a8a8a8" stroke-width="1.0" stroke-linejoin="round" stroke-linecap="round"
           d="M 406,299 L 398,320 L 382,340 L 372,355"/>
 
         <!-- South America -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"
           d="M 305,336 L 332,323 L 356,331 L 370,349 L 378,376 L 380,407
              L 376,440 L 370,473 L 356,500 L 340,522 L 322,529 L 306,518
              L 295,497 L 292,468 L 296,438 L 300,408 L 302,378 Z"/>
 
         <!-- Europe -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.47" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"
           d="M 450,206 L 472,198 L 497,203 L 516,216 L 520,231 L 512,246
              L 494,251 L 474,255 L 456,248 L 448,233 L 447,217 Z"/>
 
         <!-- Iberian Peninsula -->
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.38" stroke-linejoin="round"
+        <path stroke="#a8a8a8" stroke-width="1.0" stroke-linejoin="round"
           d="M 440,237 L 429,242 L 424,255 L 432,265 L 448,261 L 451,249 L 445,239 Z"/>
 
         <!-- British Isles -->
-        <ellipse cx="461" cy="213" rx="6"  ry="10" stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.34"/>
-        <ellipse cx="452" cy="215" rx="4"  ry="7"  stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.28"/>
+        <ellipse cx="461" cy="213" rx="6"  ry="10" stroke="#a8a8a8" stroke-width="1.0"/>
+        <ellipse cx="452" cy="215" rx="4"  ry="7"  stroke="#b0b0b0" stroke-width="0.8"/>
 
         <!-- Africa -->
-        <path stroke="#c8a870" stroke-width="1.5" stroke-opacity="0.52" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"
           d="M 458,271 L 483,263 L 511,271 L 533,287 L 547,314 L 553,350
              L 553,390 L 549,432 L 541,472 L 527,507 L 509,532 L 489,543
              L 469,539 L 453,521 L 441,497 L 436,467 L 437,433 L 441,396
              L 446,358 L 451,322 L 455,291 Z"/>
 
         <!-- Horn of Africa -->
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.42" stroke-linejoin="round"
+        <path stroke="#a8a8a8" stroke-width="1.0" stroke-linejoin="round"
           d="M 549,396 L 570,389 L 582,397 L 573,414 L 552,416"/>
 
         <!-- Madagascar -->
-        <path stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.37" stroke-linejoin="round"
+        <path stroke="#a8a8a8" stroke-width="0.9" stroke-linejoin="round"
           d="M 558,451 L 568,445 L 575,453 L 575,470 L 567,481 L 557,474 L 554,462 Z"/>
 
         <!-- Arabian Peninsula -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"
           d="M 536,282 L 560,276 L 580,283 L 588,298 L 586,319 L 570,332
              L 553,328 L 541,314 L 536,297 Z"/>
 
         <!-- Asia (main body) -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.50" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"
           d="M 526,172 L 560,160 L 598,156 L 640,163 L 680,177 L 714,195
              L 737,217 L 742,241 L 732,265 L 711,279 L 685,285 L 660,279
              L 642,293 L 622,289 L 608,303 L 592,299 L 576,283 L 557,289
              L 540,277 L 528,259 L 522,235 Z"/>
 
         <!-- India (peninsula) -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"
           d="M 579,286 L 599,293 L 615,309 L 619,332 L 610,354 L 597,362
              L 581,354 L 571,333 L 571,309 Z"/>
 
         <!-- SE Asia peninsula -->
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.40" stroke-linejoin="round"
+        <path stroke="#a8a8a8" stroke-width="1.0" stroke-linejoin="round"
           d="M 652,293 L 666,300 L 672,314 L 665,328 L 651,330 L 642,320 L 643,306 Z"/>
 
         <!-- Japan (island arc) -->
-        <ellipse cx="720" cy="225" rx="6" ry="15" stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.37"
+        <ellipse cx="720" cy="225" rx="6" ry="15" stroke="#a8a8a8" stroke-width="0.9"
           transform="rotate(-22,720,225)"/>
-        <ellipse cx="732" cy="210" rx="4" ry="10" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.30"
+        <ellipse cx="732" cy="210" rx="4" ry="10" stroke="#b0b0b0" stroke-width="0.8"
           transform="rotate(-22,732,210)"/>
 
         <!-- Australia -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
+        <path stroke="#a0a0a0" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"
           d="M 650,469 L 681,459 L 709,465 L 727,483 L 729,507 L 719,529
              L 697,541 L 669,543 L 649,529 L 637,511 L 639,489 Z"/>
 
         <!-- New Zealand -->
-        <ellipse cx="749" cy="540" rx="5" ry="13" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.32"
+        <ellipse cx="749" cy="540" rx="5" ry="13" stroke="#b0b0b0" stroke-width="0.8"
           transform="rotate(-10,749,540)"/>
 
-        <!-- ══ FLIGHT PATH ══ -->
-        <!-- Main arc: airplane → right side of globe → under → lower left -->
+        <!-- FLIGHT PATH -->
         <path d="M 662,150 Q 808,305 800,490 Q 792,688 652,785 Q 508,856 447,779 Q 372,754 296,692"
-              stroke="#e8834a" stroke-width="2.0" stroke-dasharray="10,7" stroke-linecap="round" stroke-opacity="0.72"/>
-        <!-- Fading tail of path -->
+              stroke="#707070" stroke-width="1.5" stroke-dasharray="10,7" stroke-linecap="round"/>
         <path d="M 296,692 Q 250,652 278,622"
-              stroke="#e8834a" stroke-width="1.5" stroke-dasharray="7,7" stroke-linecap="round" stroke-opacity="0.40"/>
+              stroke="#b0b0b0" stroke-width="1.2" stroke-dasharray="7,7" stroke-linecap="round"/>
 
-        <!-- ══ AIRPLANE ══ -->
-        <g class="hero__plane" transform="translate(663,143) rotate(43)">
-          <!-- Fuselage -->
+        <!-- AIRPLANE -->
+        <g transform="translate(663,143) rotate(43)">
           <path d="M 0,-23 C 4,-23 7,-17 7,-9 L 6,15 L 0,18 L -6,15 L -7,-9 C -7,-17 -4,-23 0,-23 Z"
-                fill="#f0a93c"/>
-          <!-- Main wings -->
+                fill="#111111"/>
           <path d="M -7,-2 L -32,13 L -32,19 L -7,9 L 7,9 L 32,19 L 32,13 L 7,-2 Z"
-                fill="#f0a93c"/>
-          <!-- Horizontal stabilizer -->
+                fill="#111111"/>
           <path d="M -6,15 L -17,24 L -17,28 L -6,21 L 6,21 L 17,28 L 17,24 L 6,15 Z"
-                fill="#f0a93c"/>
+                fill="#111111"/>
         </g>
-
-        <!-- Edge vignette overlay (subtle, depth) -->
-        <circle cx="450" cy="480" r="295" fill="url(#globeEdgeFade)"/>
       </svg>
     </div>
   </div>
