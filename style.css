@@ -620,6 +620,13 @@ select { cursor: pointer; }
   align-items: center;
   height: 100%;
   width: max-content;
+  animation: workMarqueeScroll 180s linear infinite;
+  will-change: transform;
+}
+
+@keyframes workMarqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 .work-marquee__track > .work-marquee__item {

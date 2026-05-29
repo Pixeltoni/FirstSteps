@@ -29,8 +29,7 @@
       border: 1px solid var(--border);
       border-radius: 2rem;
       padding: .45rem 1rem;
-      background: rgba(8,8,8,.6);
-      backdrop-filter: blur(8px);
+      background: var(--bg);
       z-index: 10;
       transition: color .25s, border-color .25s;
     }
@@ -45,10 +44,9 @@
       gap: 1.25rem;
       width: min(440px, 88vw);
       aspect-ratio: 1;
-      border: 2px dashed rgba(255,255,255,.18);
+      border: 2px dashed var(--border);
       border-radius: 28px;
-      background: rgba(8,8,8,.45);
-      backdrop-filter: blur(12px);
+      background: var(--bg-card);
       cursor: pointer;
       transition: border-color .3s, background .3s, transform .3s var(--ease), box-shadow .3s;
       outline: none;
@@ -56,12 +54,12 @@
     }
     .upload-btn:hover {
       border-color: var(--accent);
-      background: rgba(123,94,167,.12);
+      background: rgba(232,131,74,.06);
       transform: scale(1.02);
-      box-shadow: 0 0 60px rgba(123,94,167,.22);
+      box-shadow: 0 0 60px rgba(232,131,74,.18);
     }
     .upload-btn__icon {
-      color: rgba(255,255,255,.35);
+      color: var(--fg-muted);
       transition: color .3s, transform .4s var(--ease);
     }
     .upload-btn:hover .upload-btn__icon { color: var(--accent-2); transform: translateY(-8px); }
@@ -121,12 +119,12 @@
     }
     .modal__close {
       width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(255,255,255,.08); border: 1px solid var(--border);
-      color: #fff; font-size: 1rem;
+      background: rgba(0,0,0,.06); border: 1px solid var(--border);
+      color: var(--fg-muted); font-size: 1rem;
       display: grid; place-items: center; cursor: pointer;
       transition: background .2s;
     }
-    .modal__close:hover { background: rgba(255,255,255,.18); }
+    .modal__close:hover { background: rgba(0,0,0,.12); }
 
     .field { margin-bottom: 1.1rem; }
     .field__label {
@@ -140,7 +138,7 @@
     .field input[type="text"],
     .field input[type="date"] {
       width: 100%;
-      background: rgba(255,255,255,.04);
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: .75rem 1rem;
@@ -152,11 +150,11 @@
     .field input:focus {
       outline: none;
       border-color: var(--accent);
-      background: rgba(255,255,255,.07);
+      background: rgba(232,131,74,.05);
     }
 
     .file-drop {
-      border: 2px dashed rgba(255,255,255,.18);
+      border: 2px dashed var(--border);
       border-radius: 12px;
       padding: 1.6rem 1rem;
       text-align: center;
@@ -165,7 +163,7 @@
     }
     .file-drop:hover, .file-drop.drag-over {
       border-color: var(--accent);
-      background: rgba(123,94,167,.08);
+      background: rgba(232,131,74,.06);
     }
     .file-drop__hint {
       font-size: .85rem;
@@ -213,7 +211,7 @@
     .progress-bar {
       width: 100%;
       height: 6px;
-      background: rgba(255,255,255,.08);
+      background: var(--border);
       border-radius: 3px;
       overflow: hidden;
       margin-top: 1rem;
@@ -243,7 +241,7 @@
       display: flex; align-items: center; gap: .75rem;
     }
     .gallery-section__back-album {
-      background: rgba(255,255,255,.06);
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: .35rem .7rem;
@@ -295,7 +293,7 @@
     }
     .folder-card__cover {
       aspect-ratio: 4/3;
-      background: #111;
+      background: var(--bg-card);
       position: relative;
       overflow: hidden;
     }
@@ -308,7 +306,7 @@
     .folder-card__cover-placeholder {
       width: 100%; height: 100%;
       display: grid; place-items: center;
-      color: rgba(255,255,255,.2);
+      color: var(--fg-muted);
       font-size: 2.6rem;
     }
     .folder-card__count-badge {
@@ -415,7 +413,7 @@
     /* ── Password Screen ── */
     #pwScreen {
       position: fixed; inset: 0; z-index: 9999;
-      background: #07080d;
+      background: var(--bg);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 1.5rem;
@@ -440,7 +438,7 @@
     }
     .pw-box__input {
       width: 100%;
-      background: rgba(255,255,255,.05);
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: .8rem 1rem;
@@ -507,7 +505,7 @@
       cursor: pointer;
       transition: background .2s, border-color .2s, color .2s;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,.06);
+      background: var(--bg-card);
       color: var(--fg-muted);
     }
     .btn-gallery-action:hover { color: var(--fg); border-color: var(--fg-muted); }
@@ -528,53 +526,15 @@
       transition: background .2s;
       border: 1px solid transparent;
     }
-    .move-album-item:hover { background: rgba(255,255,255,.06); border-color: var(--border); }
+    .move-album-item:hover { background: rgba(0,0,0,.04); border-color: var(--border); }
     .move-album-item__thumb {
       width: 48px; height: 48px; border-radius: 8px;
-      object-fit: cover; background: #111; flex-shrink: 0;
+      object-fit: cover; background: var(--bg-card); flex-shrink: 0;
     }
     .move-album-item__name { font-size: .92rem; font-weight: 600; }
   </style>
 </head>
 <body>
-
-  <!-- Night sky background -->
-  <div class="hero__scene">
-    <svg class="hero__scene-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="uSky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"  stop-color="#0d1620"/>
-          <stop offset="100%" stop-color="#1a2733"/>
-        </linearGradient>
-        <linearGradient id="uWater" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"  stop-color="#1a2733"/>
-          <stop offset="100%" stop-color="#060e16"/>
-        </linearGradient>
-      </defs>
-      <rect width="1920" height="1080" fill="url(#uSky)"/>
-      <g opacity=".75">
-        <circle cx="80"   cy="80"  r="1.3" fill="#fff"/><circle cx="240"  cy="50"  r="1.0" fill="#d8eaff"/>
-        <circle cx="420"  cy="130" r="1.4" fill="#fff"/><circle cx="600"  cy="70"  r="1.1" fill="#fff"/>
-        <circle cx="800"  cy="110" r="1.0" fill="#d8eaff"/><circle cx="960"  cy="55"  r="1.4" fill="#fff"/>
-        <circle cx="1140" cy="90"  r="1.2" fill="#fff"/><circle cx="1320" cy="60"  r="1.3" fill="#d8eaff"/>
-        <circle cx="1500" cy="115" r="1.0" fill="#fff"/><circle cx="1680" cy="75"  r="1.5" fill="#fff"/>
-        <circle cx="1860" cy="100" r="1.1" fill="#d8eaff"/><circle cx="150"  cy="220" r="1.1" fill="#fff"/>
-        <circle cx="350"  cy="260" r="1.3" fill="#d8eaff"/><circle cx="750"  cy="280" r="1.4" fill="#fff"/>
-        <circle cx="1050" cy="230" r="1.2" fill="#d8eaff"/><circle cx="1450" cy="275" r="1.4" fill="#fff"/>
-        <circle cx="1650" cy="230" r="1.0" fill="#fff"/><circle cx="1850" cy="200" r="1.2" fill="#d8eaff"/>
-        <circle cx="1500" cy="180" r="38"  fill="#d4e8f8" opacity=".85"/>
-        <circle cx="1518" cy="175" r="34"  fill="#19303e" opacity=".7"/>
-      </g>
-      <path d="M0,720 L120,690 L220,710 L320,685 L440,705 L540,680 L640,700 L740,685
-               L860,710 L960,675 L1060,705 L1180,685 L1280,710 L1380,690
-               L1500,710 L1620,685 L1740,705 L1860,690 L1920,720 L1920,740 L0,740 Z"
-            fill="#19222e"/>
-      <rect y="730" width="1920" height="350" fill="url(#uWater)"/>
-      <path d="M905,735 L1015,735 L1140,1080 L780,1080 Z" fill="#1a232f"/>
-      <line x1="870" y1="905"  x2="1050" y2="905"  stroke="#0c1218" stroke-width="1"/>
-      <line x1="838" y1="1010" x2="1082" y2="1010" stroke="#0c1218" stroke-width="1.3"/>
-    </svg>
-  </div>
 
   <a href="index.html" class="upload-page__back">
     <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -931,7 +891,7 @@
         el.className = 'move-album-item';
         el.innerHTML = cover
           ? `<img class="move-album-item__thumb" src="${cover}" alt="" loading="lazy"><span class="move-album-item__name">${name}</span>`
-          : `<div class="move-album-item__thumb" style="background:#1a1a2e"></div><span class="move-album-item__name">${name}</span>`;
+          : `<div class="move-album-item__thumb"></div><span class="move-album-item__name">${name}</span>`;
         el.addEventListener('click', () => doMoveImages(folder));
         moveAlbumList.appendChild(el);
       });
