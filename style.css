@@ -63,13 +63,8 @@ select { cursor: pointer; }
   content: '';
   display: block;
   height: 100%;
+  width: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  animation: loadBar 1.4s var(--ease) forwards;
-}
-
-@keyframes loadBar {
-  from { width: 0; }
-  to   { width: 100%; }
 }
 
 .loader__text {
@@ -268,19 +263,6 @@ select { cursor: pointer; }
   background-clip: text;
 }
 
-/* Staggered entrance animation for drawer links */
-.nav-drawer.open .drawer-link {
-  animation: drawerLinkIn .4s var(--ease) both;
-}
-.nav-drawer.open .nav-drawer__links li:nth-child(1) .drawer-link { animation-delay: .1s; }
-.nav-drawer.open .nav-drawer__links li:nth-child(2) .drawer-link { animation-delay: .17s; }
-.nav-drawer.open .nav-drawer__links li:nth-child(3) .drawer-link { animation-delay: .24s; }
-.nav-drawer.open .nav-drawer__links li:nth-child(4) .drawer-link { animation-delay: .31s; }
-
-@keyframes drawerLinkIn {
-  from { opacity: 0; transform: translateX(-16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
 
 .nav-drawer__footer {
   border-top: 1px solid var(--border);
@@ -365,7 +347,6 @@ select { cursor: pointer; }
   transform: translate(-50%, -50%);
   width: min(92vmin, 900px);
   pointer-events: none;
-  animation: globeFloat 10s ease-in-out infinite;
 }
 
 .hero__globe-svg {
@@ -374,21 +355,6 @@ select { cursor: pointer; }
   display: block;
 }
 
-/* Subtle floating up/down (centered transform) */
-@keyframes globeFloat {
-  0%, 100% { transform: translate(-50%, -50%); }
-  50%       { transform: translate(-50%, calc(-50% - 18px)); }
-}
-
-/* Airplane glow pulse */
-@keyframes planePulse {
-  0%, 100% { filter: drop-shadow(0 0 3px rgba(240,169,60,0)); }
-  50%       { filter: drop-shadow(0 0 10px rgba(240,169,60,0.55)); }
-}
-
-.hero__plane {
-  animation: planePulse 3.5s ease-in-out infinite;
-}
 
 /* Blobs: multiply blend so they tint white background warmly */
 .hero .shape { opacity: 0.06; mix-blend-mode: multiply; }
@@ -670,22 +636,12 @@ select { cursor: pointer; }
   align-items: center;
   height: 100%;
   width: max-content;
-  animation: workMarqueeScroll 180s linear infinite;
-  will-change: transform;
 }
 
 .work-marquee__track > .work-marquee__item {
   margin-right: 1.5rem;
 }
 
-.work-marquee:hover .work-marquee__track {
-  animation-play-state: paused;
-}
-
-@keyframes workMarqueeScroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
 
 .work-marquee__item {
   flex: 0 0 auto;
@@ -738,9 +694,6 @@ select { cursor: pointer; }
   letter-spacing: .08em;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .work-marquee__track { animation: none; }
-}
 
 /* ═══════════════════════════════════════════════
    PERFORMANCE — content-visibility for off-screen sections
