@@ -305,6 +305,18 @@ select { cursor: pointer; }
 
 .nav__logo-text { color: var(--fg); }
 
+.nav__version {
+  margin-left: auto;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  color: var(--fg-muted);
+}
+
+.nav.scrolled .nav__version {
+  color: rgba(245, 237, 224, 0.55);
+}
+
 /* ═══════════════════════════════════════════════
    REVEAL ANIMATIONS (disabled — elements visible by default)
 ═══════════════════════════════════════════════ */
