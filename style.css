@@ -23,7 +23,6 @@ body {
   background: var(--bg);
   color: var(--fg);
   overflow-x: hidden;
-  padding-left: 64px;
 }
 
 body.loading { overflow: hidden; }
@@ -282,7 +281,7 @@ select { cursor: pointer; }
    NAVIGATION (top bar — logo only)
 ═══════════════════════════════════════════════ */
 .nav {
-  position: fixed; top: 0; left: 64px; right: 0;
+  position: fixed; top: 0; left: 0; right: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -604,10 +603,10 @@ select { cursor: pointer; }
 
 /* ── Work marquee ── */
 .work-marquee {
-  --row-height: clamp(320px, 42vw, 560px);
   position: relative;
   width: 100%;
-  height: var(--row-height);
+  height: calc(100vh - 72px);
+  margin-top: 72px;
   overflow: hidden;
   padding: 0;
   contain: layout style paint;
