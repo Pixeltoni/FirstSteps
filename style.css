@@ -305,6 +305,18 @@ select { cursor: pointer; }
 
 .nav__logo-text { color: var(--fg); }
 
+.nav__version {
+  margin-left: auto;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  color: var(--fg-muted);
+}
+
+.nav.scrolled .nav__version {
+  color: rgba(245, 237, 224, 0.55);
+}
+
 /* ═══════════════════════════════════════════════
    REVEAL ANIMATIONS (disabled — elements visible by default)
 ═══════════════════════════════════════════════ */
@@ -330,36 +342,8 @@ select { cursor: pointer; }
   overflow: hidden;
 }
 
-/* Globe illustration as fixed full-page background */
-.hero__scene {
-  position: fixed; inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  background: #ffffff;
-}
-
-/* Globe wrapper — centered, fills viewport like the reference image */
-.hero__globe-wrap {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(92vmin, 900px);
-  pointer-events: none;
-}
-
-.hero__globe-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
 
 
-/* Blobs: multiply blend so they tint white background warmly */
-.hero .shape { opacity: 0.06; mix-blend-mode: multiply; }
-
-/* All page sections sit ABOVE the fixed scene */
 .hero,
 .marquee,
 .stats,
