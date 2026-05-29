@@ -23,6 +23,7 @@ body {
   background: var(--bg);
   color: var(--fg);
   overflow-x: hidden;
+  padding-left: 64px;
 }
 
 body.loading { overflow: hidden; }
@@ -281,7 +282,7 @@ select { cursor: pointer; }
    NAVIGATION (top bar — logo only)
 ═══════════════════════════════════════════════ */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0;
+  position: fixed; top: 0; left: 64px; right: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
