@@ -117,14 +117,14 @@ applyScroll();
 
     const shuffled = shuffle(paths);
     const seq = shuffled.concat(shuffled);
-    const sizeVariants = ['sm', 'md', 'lg', 'xl', 'wide', 'sq'];
-    const posVariants  = ['top', 'mid-h', 'mid-l', 'bottom'];
+    const sizeVariants = ['sm', 'md', 'lg', 'xl', 'wide', 'sq', 'xs', 'tall'];
+    const posVariants  = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8'];
 
     track.innerHTML = '';
     seq.forEach((path, i) => {
       const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path);
-      const size = sizeVariants[(i * 3 + 1) % sizeVariants.length];
-      const pos  = posVariants[(i * 5 + 2)  % posVariants.length];
+      const size = sizeVariants[(i * 5 + 3) % sizeVariants.length];
+      const pos  = posVariants[(i * 7 + 1)  % posVariants.length];
       const item = document.createElement('div');
       item.className = `work-marquee__item work-marquee__item--${size} work-marquee__item--${pos}`;
       item.innerHTML = `<img src="${urlData.publicUrl}" alt="" loading="lazy" decoding="async">`;
