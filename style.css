@@ -325,8 +325,10 @@ select { cursor: pointer; }
   min-height: 100vh;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 8rem 3rem 4rem;
   overflow: hidden;
+  text-align: center;
 }
 
 
@@ -360,12 +362,12 @@ select { cursor: pointer; }
 }
 
 .hero__title {
-  font-size: clamp(3rem, 9vw, 8rem);
-  font-weight: 800;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(5rem, 18vw, 18rem);
+  font-weight: 700;
   line-height: 1.0;
-  letter-spacing: -.03em;
-  margin-bottom: 2rem;
-  display: flex; flex-wrap: wrap; gap: .3em;
+  letter-spacing: .02em;
+  margin-bottom: 0;
 }
 
 .hero__word {
