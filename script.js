@@ -117,9 +117,6 @@ applyScroll();
 
     const shuffled = shuffle(paths);
     const seq = shuffled.concat(shuffled);
-    const dur = Math.max(60, Math.min(360, shuffled.length * 14));
-    track.style.animationDuration = dur + 's';
-
     const sizeVariants = ['sm', 'md', 'lg', 'xl', 'wide', 'sq'];
     const posVariants  = ['top', 'mid-h', 'mid-l', 'bottom'];
 
