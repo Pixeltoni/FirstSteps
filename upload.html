@@ -645,8 +645,16 @@
         <button class="modal__close" id="moveClose" aria-label="Schließen">✕</button>
       </div>
       <div id="moveAlbumList"></div>
+
+      <!-- Neues Album inline -->
+      <div id="newAlbumRow" style="margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;display:none;flex-direction:column;gap:.5rem;">
+        <input type="text" id="newAlbumNameInput" class="pw-box__input" placeholder="Albumname" autocomplete="off" style="font-size:.9rem;padding:.65rem .9rem;" />
+        <button type="button" class="btn-modal btn-modal--primary" id="newAlbumConfirm">Album erstellen &amp; verschieben</button>
+      </div>
+
       <div class="modal__actions">
         <button type="button" class="btn-modal btn-modal--secondary" id="moveCancel">Abbrechen</button>
+        <button type="button" class="btn-modal btn-modal--primary" id="moveNewAlbumBtn">+ Neues Album</button>
       </div>
     </div>
   </div>
@@ -904,9 +912,51 @@
     function closeMoveModal() {
       moveModal.classList.remove('open');
       moveModal.setAttribute('aria-hidden', 'true');
+      document.getElementById('newAlbumRow').style.display = 'none';
+      document.getElementById('newAlbumNameInput').value = '';
     }
     moveCancel.addEventListener('click', closeMoveModal);
     moveClose.addEventListener('click', closeMoveModal);
+
+    // ── Neues Album erstellen & verschieben ──
+    document.getElementById('moveNewAlbumBtn').addEventListener('click', () => {
+      const row = document.getElementById('newAlbumRow');
+      row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+      if (row.style.display === 'flex') {
+        setTimeout(() => document.getElementById('newAlbumNameInput').focus(), 50);
+      }
+    });
+
+    document.getElementById('newAlbumConfirm').addEventListener('click', async () => {
+      const name = document.getElementById('newAlbumNameInput').value.trim();
+      if (!name) { document.getElementById('newAlbumNameInput').focus(); return; }
+
+      const btn = document.getElementById('newAlbumConfirm');
+      btn.disabled = true;
+      btn.textContent = 'Erstelle Album…';
+
+      const folderId = `${slugify(name)}-${Date.now()}`;
+      const meta = { name, date: new Date().toISOString().slice(0, 10), location: '', created_at: new Date().toISOString() };
+      const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+
+      const { error: metaErr } = await db.storage
+        .from(BUCKET)
+        .upload(`${folderId}/_meta.json`, metaBlob, { contentType: 'application/json', upsert: true });
+
+      if (metaErr) {
+        setStatus('Fehler beim Erstellen: ' + metaErr.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Album erstellen & verschieben';
+        return;
+      }
+
+      closeMoveModal();
+      await doMoveImages(folderId);
+    });
+
+    document.getElementById('newAlbumNameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('newAlbumConfirm').click();
+    });
     moveModal.addEventListener('click', e => { if (e.target === moveModal) closeMoveModal(); });
 
     // ── Upload Modal ──
