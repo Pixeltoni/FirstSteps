@@ -553,6 +553,7 @@
           <span class="gallery-section__count" id="galleryCount"></span>
           <div class="gallery-section__actions" id="albumActions" hidden>
             <button class="btn-gallery-action btn-gallery-action--primary" id="addImagesBtn" type="button">+ Bilder hinzufügen</button>
+            <button class="btn-gallery-action" id="editAlbumBtn" type="button">✎ Bearbeiten</button>
             <button class="btn-gallery-action" id="selectModeBtn" type="button">Auswählen</button>
           </div>
         </div>
@@ -643,6 +644,40 @@
       <div class="modal__actions">
         <button type="button" class="btn-modal btn-modal--secondary" id="confirmCancel">Abbrechen</button>
         <button type="button" class="btn-modal btn-modal--danger" id="confirmOk">Löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Edit Album Modal ── -->
+  <div class="modal" id="editAlbumModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title">Album bearbeiten</h2>
+        <button class="modal__close" id="editAlbumClose" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="editAlbumName">Name</label>
+        <input type="text" id="editAlbumName" placeholder="z.B. Wien Wochenende" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label class="field__label">Datum</label>
+        <div style="display:flex;gap:.6rem;align-items:center;">
+          <input type="date" id="editAlbumDateFrom" autocomplete="off" style="flex:1;" />
+          <span style="font-size:.8rem;color:var(--fg-muted);flex-shrink:0;">bis</span>
+          <input type="date" id="editAlbumDateTo" autocomplete="off" style="flex:1;" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="editAlbumLocation">Ort</label>
+        <input type="text" id="editAlbumLocation" placeholder="z.B. Wien, Österreich" autocomplete="off" />
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn-modal btn-modal--secondary" id="editAlbumCancel">Abbrechen</button>
+        <button type="button" class="btn-modal btn-modal--primary" id="editAlbumSave">Speichern</button>
       </div>
     </div>
   </div>
@@ -969,6 +1004,82 @@
       if (e.key === 'Enter') document.getElementById('newAlbumConfirm').click();
     });
     moveModal.addEventListener('click', e => { if (e.target === moveModal) closeMoveModal(); });
+
+    // ── Edit Album ──
+    const editAlbumModal  = document.getElementById('editAlbumModal');
+    const editAlbumClose  = document.getElementById('editAlbumClose');
+    const editAlbumCancel = document.getElementById('editAlbumCancel');
+    const editAlbumSave   = document.getElementById('editAlbumSave');
+
+    function closeEditAlbumModal() {
+      editAlbumModal.classList.remove('open');
+      editAlbumModal.setAttribute('aria-hidden', 'true');
+    }
+    editAlbumClose.addEventListener('click', closeEditAlbumModal);
+    editAlbumCancel.addEventListener('click', closeEditAlbumModal);
+    editAlbumModal.addEventListener('click', e => { if (e.target === editAlbumModal) closeEditAlbumModal(); });
+
+    document.getElementById('editAlbumBtn').addEventListener('click', async () => {
+      if (!currentFolder) return;
+      // Load current meta
+      let meta = { name: currentFolder, dateFrom: '', dateTo: '', date: '', location: '' };
+      try {
+        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${currentFolder}/_meta.json`);
+        const r = await fetch(mu.publicUrl + '?t=' + Date.now());
+        if (r.ok) meta = { ...meta, ...(await r.json()) };
+      } catch (e) {}
+
+      document.getElementById('editAlbumName').value     = meta.name || '';
+      document.getElementById('editAlbumDateFrom').value = meta.dateFrom || meta.date || '';
+      document.getElementById('editAlbumDateTo').value   = meta.dateTo || '';
+      document.getElementById('editAlbumLocation').value = meta.location || '';
+
+      editAlbumModal.classList.add('open');
+      editAlbumModal.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('editAlbumName').focus(), 150);
+    });
+
+    editAlbumSave.addEventListener('click', async () => {
+      const name     = document.getElementById('editAlbumName').value.trim();
+      const dateFrom = document.getElementById('editAlbumDateFrom').value;
+      const dateTo   = document.getElementById('editAlbumDateTo').value;
+      const location = document.getElementById('editAlbumLocation').value.trim();
+
+      if (!name) { document.getElementById('editAlbumName').focus(); return; }
+
+      editAlbumSave.disabled = true;
+      editAlbumSave.textContent = 'Speichert…';
+
+      // Load existing meta to preserve created_at etc.
+      let existing = {};
+      try {
+        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${currentFolder}/_meta.json`);
+        const r = await fetch(mu.publicUrl + '?t=' + Date.now());
+        if (r.ok) existing = await r.json();
+      } catch (e) {}
+
+      const meta = { ...existing, name, dateFrom, dateTo, location };
+      const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+
+      const { error } = await db.storage
+        .from(BUCKET)
+        .upload(`${currentFolder}/_meta.json`, metaBlob, { contentType: 'application/json', upsert: true });
+
+      editAlbumSave.disabled = false;
+      editAlbumSave.textContent = 'Speichern';
+
+      if (error) { setStatus('Fehler: ' + error.message, 'error'); return; }
+
+      closeEditAlbumModal();
+      setStatus('Album aktualisiert ✓', 'ok');
+
+      // Update header display immediately
+      document.getElementById('gallerySectionTitle').textContent = name;
+      const parts = [];
+      if (dateFrom) parts.push(formatDate(dateFrom) + (dateTo ? ' – ' + formatDate(dateTo) : ''));
+      if (location) parts.push(location);
+      document.getElementById('gallerySectionSub').textContent = parts.join(' · ') || 'Album';
+    });
 
     // ── Upload Modal ──
     function openModal() {
