@@ -6,9 +6,453 @@
   <title>Erinnerungen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Cormorant+Garamond:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+
+    /* ── DESIGN OVERRIDE: B&W minimal ── */
+    :root {
+      --sw-black:  #0f0f0f;
+      --sw-white:  #ffffff;
+      --sw-gray:   #f5f5f5;
+      --sw-border: #e0e0e0;
+      --sw-muted:  #888888;
+    }
+
+    body {
+      background: var(--sw-white);
+      color: var(--sw-black);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    /* Hide existing top bar */
+    .nav { display: none !important; }
+
+    /* ── PAGE HEADER (fixed) ── */
+    .sw-header {
+      position: fixed;
+      top: 0; left: 64px; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid transparent;
+    }
+    .sw-header.scrolled {
+      border-color: var(--sw-border);
+    }
+    .sw-header__logo {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .82rem; font-weight: 700;
+      letter-spacing: .02em; color: var(--sw-black);
+      cursor: default;
+    }
+    .sw-header__logo-box {
+      width: 26px; height: 26px;
+      border: 2px solid var(--sw-black);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; font-weight: 900; line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* ── HERO ── */
+    .sw-hero {
+      display: grid;
+      grid-template-columns: 55fr 45fr;
+      min-height: 100vh;
+      padding-top: 64px;
+    }
+    .sw-hero__left {
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 3rem 3rem 3.5rem;
+    }
+    .sw-hero__label {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+      margin-bottom: 1.25rem;
+    }
+    .sw-hero__title {
+      font-size: clamp(1.9rem, 3.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.035em;
+      margin-bottom: .85rem;
+      max-width: 480px;
+    }
+    .sw-hero__sub {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      margin-bottom: 1.5rem;
+      max-width: 340px;
+    }
+    .sw-hero__cta {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--sw-black);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .sw-hero__cta:hover { text-decoration-thickness: 2px; }
+
+    .sw-hero__right {
+      background: var(--sw-black);
+      position: relative;
+      overflow: hidden;
+    }
+    .sw-hero__imgs {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sw-hero__img-main {
+      width: 50%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+    .sw-hero__img-side {
+      position: absolute;
+      width: 36%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+      top: 7%; right: 5%;
+      z-index: 1;
+      opacity: .8;
+    }
+    .sw-hero__loading {
+      color: #555;
+      font-size: .75rem;
+      letter-spacing: .1em;
+    }
+
+    /* ── NAV ROW ── */
+    .sw-nav-row {
+      border-top: 1px solid var(--sw-border);
+      border-bottom: 1px solid var(--sw-border);
+      padding: .9rem 3rem;
+      display: flex;
+      gap: 2.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .sw-nav-row::-webkit-scrollbar { display: none; }
+    .sw-nav-row a {
+      font-size: .78rem;
+      color: var(--sw-muted);
+      text-decoration: none;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+    .sw-nav-row a:hover { color: var(--sw-black); }
+
+    /* ── SIGNATURE / CAROUSEL SECTION ── */
+    .sw-signature {
+      padding: 5rem 3rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 4rem;
+      align-items: start;
+      position: relative;
+    }
+    .sw-signature::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--sw-black);
+    }
+    .sw-signature__title {
+      font-size: clamp(1.8rem, 2.8vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .sw-signature__body {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      line-height: 1.75;
+    }
+
+    .sw-cards-wrap { position: relative; }
+    .sw-cards {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-snap-type: x mandatory;
+      padding-bottom: .5rem;
+    }
+    .sw-cards::-webkit-scrollbar { display: none; }
+
+    .sw-card {
+      flex-shrink: 0;
+      width: 190px;
+      scroll-snap-align: start;
+      background: var(--sw-black);
+      color: #fff;
+      overflow: hidden;
+    }
+    .sw-card__img {
+      aspect-ratio: 3/4;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+      background: #1a1a1a;
+    }
+    .sw-card__body { padding: .9rem 1rem 1.1rem; }
+    .sw-card__name {
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: .3rem;
+    }
+    .sw-card__desc {
+      font-size: .7rem;
+      color: rgba(255,255,255,.5);
+      margin-bottom: .7rem;
+    }
+    .sw-card__dots { display: flex; gap: 3px; }
+    .sw-card__dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.25);
+    }
+    .sw-card__dot.on { background: #fff; }
+
+    .sw-cards-nav {
+      display: flex;
+      justify-content: flex-end;
+      gap: .5rem;
+      margin-top: .8rem;
+    }
+    .sw-cards-nav button {
+      width: 30px; height: 30px;
+      border: 1px solid var(--sw-border);
+      background: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--sw-black);
+      line-height: 1;
+    }
+    .sw-cards-nav button:hover {
+      background: var(--sw-black);
+      color: #fff;
+      border-color: var(--sw-black);
+    }
+
+    /* ── FEATURE SECTIONS ── */
+    .sw-feature {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--sw-border);
+    }
+    .sw-feature--strip {
+      position: relative;
+    }
+    .sw-feature--strip::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--sw-black);
+      z-index: 2;
+    }
+
+    .sw-feature__text {
+      padding: 5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .sw-feature__title {
+      font-size: clamp(1.8rem, 2.8vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      margin-bottom: 1.5rem;
+    }
+    .sw-feature__body {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      line-height: 1.85;
+      margin-bottom: 1.1rem;
+    }
+    .sw-feature__link {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--sw-black);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      margin-top: .5rem;
+    }
+    .sw-feature__link:hover { text-decoration-thickness: 2px; }
+
+    .sw-feature__visual {
+      position: relative;
+      min-height: 480px;
+      overflow: hidden;
+      background: #ddd;
+    }
+    .sw-feature__img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .sw-feature__overlay {
+      position: absolute;
+      bottom: 2rem; left: 2rem;
+      background: rgba(255,255,255,.93);
+      border: 1px solid rgba(0,0,0,.1);
+      padding: 1.1rem 1.4rem;
+      min-width: 180px;
+    }
+    .sw-feature__overlay-name {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: .75rem;
+    }
+    .sw-feature__overlay-row { margin-bottom: .45rem; }
+    .sw-feature__overlay-label {
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+    }
+    .sw-feature__overlay-value {
+      font-size: .82rem;
+      font-weight: 500;
+    }
+
+    /* Feature 2: visual on left, text on right */
+    .sw-feature--flip .sw-feature__visual { order: -1; }
+    .sw-feature--flip .sw-feature__overlay {
+      left: auto; right: 2rem;
+    }
+
+    /* ── NEWSLETTER ── */
+    .sw-newsletter {
+      border-top: 1px solid var(--sw-border);
+      padding: 5rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .sw-newsletter__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      margin-bottom: .75rem;
+    }
+    .sw-newsletter__sub {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      line-height: 1.7;
+    }
+    .sw-newsletter__form {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    .sw-newsletter__input {
+      border: 1px solid var(--sw-border);
+      border-radius: 0;
+      padding: .8rem 1rem;
+      font-family: inherit;
+      font-size: .875rem;
+      outline: none;
+      background: transparent;
+      width: 100%;
+    }
+    .sw-newsletter__input:focus { border-color: var(--sw-black); }
+    .sw-newsletter__row {
+      display: flex;
+      gap: 0;
+    }
+    .sw-newsletter__row .sw-newsletter__input { flex: 1; }
+    .sw-newsletter__btn {
+      padding: .8rem 1.75rem;
+      background: var(--sw-black);
+      color: #fff;
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sw-newsletter__btn:hover { background: #333; }
+
+    /* ── FOOTER ── */
+    .sw-footer {
+      border-top: 1px solid var(--sw-border);
+      padding: 1.4rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--sw-muted);
+    }
+    .sw-footer__nav {
+      display: flex;
+      gap: 1.75rem;
+    }
+    .sw-footer__nav a {
+      color: var(--sw-muted);
+      text-decoration: none;
+      font-size: .75rem;
+    }
+    .sw-footer__nav a:hover { color: var(--sw-black); }
+    .sw-footer__social {
+      display: flex;
+      gap: .85rem;
+      align-items: center;
+    }
+    .sw-footer__social a {
+      color: var(--sw-muted);
+      display: flex;
+      align-items: center;
+    }
+    .sw-footer__social a:hover { color: var(--sw-black); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .sw-hero { grid-template-columns: 1fr; }
+      .sw-hero__right { min-height: 65vw; }
+      .sw-signature { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+      .sw-signature::before { display: none; }
+      .sw-feature { grid-template-columns: 1fr; }
+      .sw-feature--flip .sw-feature__visual { order: 0; }
+      .sw-feature__text { padding: 3rem 1.5rem; }
+      .sw-feature__visual { min-height: 65vw; }
+      .sw-newsletter { grid-template-columns: 1fr; gap: 2.5rem; padding: 3rem 1.5rem; }
+      .sw-nav-row { padding: .9rem 1.5rem; gap: 1.5rem; }
+      .sw-footer { flex-direction: column; gap: 1rem; text-align: center; padding: 1.4rem 1.5rem; }
+      .sw-header { padding: 1rem 1.5rem; }
+      .sw-hero__left { padding: 2rem 1.5rem; }
+    }
+
+    @media (max-width: 600px) {
+      .sw-newsletter__row { flex-direction: column; }
+      .sw-newsletter__btn { width: 100%; }
+    }
+  </style>
 </head>
 <body>
 
@@ -48,23 +492,264 @@
     </ul>
     <div class="nav-drawer__footer">
       <a href="mailto:hallo@smartstudio.at" class="nav-drawer__contact">hallo@smartstudio.at</a>
-      <a href="tel:+431234567" class="nav-drawer__contact">+43 1 234 567</a>
     </div>
   </nav>
 
-  <!-- Top Bar -->
-  <header class="nav" id="nav">
-    <a href="#" class="nav__logo">
-      <span class="nav__logo-text">Erinnerungen</span>
-    </a>
-    <span class="nav__version">v1.6</span>
+  <!-- Page Header -->
+  <header class="sw-header" id="swHeader">
+    <div class="sw-header__logo">
+      <div class="sw-header__logo-box">E</div>
+      <span>Erinnerungen</span>
+    </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1 class="hero__title">Erinnerungen</h1>
+  <!-- ── HERO ── -->
+  <section class="sw-hero">
+    <div class="sw-hero__left">
+      <p class="sw-hero__label">Gute Zeiten schaffen gute</p>
+      <h1 class="sw-hero__title">Erinnerungen</h1>
+      <p class="sw-hero__sub">Wir dürfen nicht vergessen</p>
+      <a href="upload.html" class="sw-hero__cta">Zur Galerie</a>
+    </div>
+    <div class="sw-hero__right">
+      <div class="sw-hero__imgs" id="heroImgs">
+        <span class="sw-hero__loading">Lade Bilder…</span>
+      </div>
+    </div>
   </section>
 
-<script src="script.js"></script>
+  <!-- ── NAV ROW ── -->
+  <nav class="sw-nav-row">
+    <a href="#">Platzhalter</a>
+    <a href="#">Platzhalter</a>
+    <a href="#">Platzhalter</a>
+    <a href="#">Platzhalter</a>
+    <a href="upload.html">Galerie</a>
+  </nav>
+
+  <!-- ── SIGNATURE / CAROUSEL ── -->
+  <section class="sw-signature">
+    <div>
+      <h2 class="sw-signature__title">Erinnerungen.</h2>
+      <p class="sw-signature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+    </div>
+    <div class="sw-cards-wrap">
+      <div class="sw-cards" id="swCards">
+        <!-- Filled by JS -->
+      </div>
+      <div class="sw-cards-nav">
+        <button id="swCardsPrev" aria-label="Zurück">&#8249;</button>
+        <button id="swCardsNext" aria-label="Weiter">&#8250;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURE 1: Text left · Image right ── -->
+  <section class="sw-feature">
+    <div class="sw-feature__text">
+      <h2 class="sw-feature__title">Erinnerungen.</h2>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <a href="upload.html" class="sw-feature__link">Platzhalter</a>
+    </div>
+    <div class="sw-feature__visual" id="featureVisual1">
+      <img class="sw-feature__img" id="featureImg1" src="" alt="" style="opacity:0">
+      <div class="sw-feature__overlay">
+        <div class="sw-feature__overlay-name">Platzhalter</div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">Platzhalter</div>
+        </div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">● ● ● ●</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURE 2: Image left · Text right ── -->
+  <section class="sw-feature sw-feature--flip sw-feature--strip">
+    <div class="sw-feature__text">
+      <h2 class="sw-feature__title">Erinnerungen.</h2>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <a href="upload.html" class="sw-feature__link">Platzhalter</a>
+    </div>
+    <div class="sw-feature__visual" id="featureVisual2">
+      <img class="sw-feature__img" id="featureImg2" src="" alt="" style="opacity:0">
+      <div class="sw-feature__overlay">
+        <div class="sw-feature__overlay-name">Platzhalter</div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">Platzhalter</div>
+        </div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">● ● ● ●</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── NEWSLETTER ── -->
+  <section class="sw-newsletter">
+    <div>
+      <h2 class="sw-newsletter__title">Newsletter</h2>
+      <p class="sw-newsletter__sub">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+    </div>
+    <div class="sw-newsletter__form">
+      <input class="sw-newsletter__input" type="email" placeholder="E-Mail" />
+      <div class="sw-newsletter__row">
+        <input class="sw-newsletter__input" type="text" placeholder="Platzhalter" />
+        <button class="sw-newsletter__btn" type="button">Senden</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="sw-footer">
+    <span>© Platzhalter · 2026</span>
+    <nav class="sw-footer__nav">
+      <a href="#">Platzhalter</a>
+      <a href="#">Platzhalter</a>
+      <a href="#">Platzhalter</a>
+      <a href="upload.html">Galerie</a>
+      <a href="#">Platzhalter</a>
+    </nav>
+    <div class="sw-footer__social">
+      <a href="#" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a href="#" aria-label="Pinterest">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.236 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.598-.299-1.482c0-1.388.806-2.428 1.808-2.428.853 0 1.267.641 1.267 1.408 0 .858-.546 2.141-.828 3.33-.236.995.499 1.806 1.476 1.806 1.772 0 3.137-1.868 3.137-4.561 0-2.386-1.716-4.054-4.165-4.054-2.837 0-4.5 2.127-4.5 4.328 0 .857.33 1.776.741 2.278a.3.3 0 01.069.285c-.075.314-.244.995-.277 1.134-.044.183-.146.222-.337.134-1.249-.581-2.03-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.966-.527-2.292-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+      </a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    /* ── Supabase image loader ── */
+    const SUPABASE_URL = 'https://rtzvvthcdxklwayhsuha.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0enZ2dGhjZHhrbHdheWhzdWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzUxMzEsImV4cCI6MjA5Mzc1MTEzMX0.8nGc1tqVq2PL1QK2EArexbXpX01-OK8-9MfLUI4Wnfw';
+    const BUCKET = 'galerie';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadGalleryImages() {
+      try {
+        const { data: entries, error: listErr } = await db.storage.from(BUCKET).list('', { limit: 200 });
+        if (listErr) { console.error('Bucket list error:', listErr); return; }
+
+        const allUrls = [];
+
+        /* Folder entries (id === null) */
+        const albumFolders = (entries || [])
+          .filter(e => e && e.name && e.id === null)
+          .map(e => e.name);
+
+        for (const folder of albumFolders) {
+          const { data: files } = await db.storage.from(BUCKET).list(folder, { limit: 50 });
+          const photos = (files || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
+          for (const p of photos) {
+            const { data } = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`);
+            allUrls.push(data.publicUrl);
+          }
+          if (allUrls.length >= 20) break;
+        }
+
+        /* Fallback: root-level image files (legacy uploads) */
+        if (!allUrls.length) {
+          const rootFiles = (entries || []).filter(e => e && e.id && e.name && e.name !== '.emptyFolderPlaceholder');
+          for (const f of rootFiles) {
+            const { data } = db.storage.from(BUCKET).getPublicUrl(f.name);
+            allUrls.push(data.publicUrl);
+          }
+        }
+
+        console.log(`Galerie: ${albumFolders.length} Alben, ${allUrls.length} Bilder gefunden`);
+        if (!allUrls.length) { console.warn('Keine Bilder in der Galerie.'); return; }
+        allUrls.sort(() => Math.random() - 0.5);
+
+        /* Hero images */
+        const heroImgs = document.getElementById('heroImgs');
+        heroImgs.innerHTML = '';
+        if (allUrls[0]) {
+          const main = new Image();
+          main.className = 'sw-hero__img-main';
+          main.src = allUrls[0];
+          main.alt = '';
+          heroImgs.appendChild(main);
+        }
+        if (allUrls[1]) {
+          const side = new Image();
+          side.className = 'sw-hero__img-side';
+          side.src = allUrls[1];
+          side.alt = '';
+          heroImgs.appendChild(side);
+        }
+
+        /* Cards */
+        const cardsEl = document.getElementById('swCards');
+        cardsEl.innerHTML = '';
+        allUrls.slice(2, 8).forEach(url => {
+          const card = document.createElement('div');
+          card.className = 'sw-card';
+          card.innerHTML = `
+            <img class="sw-card__img" src="${url}" alt="" loading="lazy">
+            <div class="sw-card__body">
+              <div class="sw-card__name">Platzhalter</div>
+              <div class="sw-card__desc">Platzhalter</div>
+              <div class="sw-card__dots">
+                <div class="sw-card__dot on"></div>
+                <div class="sw-card__dot on"></div>
+                <div class="sw-card__dot on"></div>
+                <div class="sw-card__dot"></div>
+              </div>
+            </div>`;
+          cardsEl.appendChild(card);
+        });
+
+        /* Feature image 1 */
+        const img1 = document.getElementById('featureImg1');
+        if (allUrls[8] && img1) {
+          img1.src = allUrls[8];
+          img1.style.opacity = '1';
+          document.getElementById('featureVisual1').style.background = '#1a1a1a';
+        }
+
+        /* Feature image 2 */
+        const img2 = document.getElementById('featureImg2');
+        if (allUrls[9] && img2) {
+          img2.src = allUrls[9];
+          img2.style.opacity = '1';
+          document.getElementById('featureVisual2').style.background = '#1a1a1a';
+        }
+
+      } catch (e) {
+        console.error('Galerie konnte nicht geladen werden:', e);
+      }
+    }
+
+    loadGalleryImages();
+
+    /* Card carousel arrows */
+    const swCardsEl = document.getElementById('swCards');
+    document.getElementById('swCardsPrev').addEventListener('click', () => {
+      swCardsEl.scrollBy({ left: -200, behavior: 'smooth' });
+    });
+    document.getElementById('swCardsNext').addEventListener('click', () => {
+      swCardsEl.scrollBy({ left: 200, behavior: 'smooth' });
+    });
+
+    /* Header scroll shadow */
+    const swHeader = document.getElementById('swHeader');
+    window.addEventListener('scroll', () => {
+      swHeader.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+  </script>
 </body>
 </html>
