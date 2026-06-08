@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TEST — SmartStudio</title>
+  <title>Erinnerungen — Test</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -15,13 +15,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 99999;
-      background: repeating-linear-gradient(
-        45deg,
-        #e8c23a,
-        #e8c23a 10px,
-        #1a1600 10px,
-        #1a1600 20px
-      );
+      background: repeating-linear-gradient(45deg, #e8c23a, #e8c23a 10px, #1a1600 10px, #1a1600 20px);
       padding: 6px 0;
       text-align: center;
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -32,25 +26,460 @@
       color: #fff;
       text-shadow: 0 1px 3px rgba(0,0,0,.6);
     }
-    /* Schiebt alles nach unten damit Banner nicht überlagert */
     body { padding-top: 30px; }
+
+    /* ── DESIGN OVERRIDE: B&W minimal ── */
+    :root {
+      --sw-black:  #0f0f0f;
+      --sw-white:  #ffffff;
+      --sw-gray:   #f5f5f5;
+      --sw-border: #e0e0e0;
+      --sw-muted:  #888888;
+    }
+
+    body {
+      background: var(--sw-white);
+      color: var(--sw-black);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    /* Hide existing top bar */
+    .nav { display: none !important; }
+
+    /* ── PAGE HEADER (fixed) ── */
+    .sw-header {
+      position: fixed;
+      top: 30px; left: 64px; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid transparent;
+    }
+    .sw-header.scrolled {
+      border-color: var(--sw-border);
+    }
+    .sw-header__logo {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .82rem; font-weight: 700;
+      letter-spacing: .02em; color: var(--sw-black);
+      text-decoration: none;
+    }
+    .sw-header__logo-box {
+      width: 26px; height: 26px;
+      border: 2px solid var(--sw-black);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; font-weight: 900; line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* ── HERO ── */
+    .sw-hero {
+      display: grid;
+      grid-template-columns: 55fr 45fr;
+      min-height: calc(100vh - 30px);
+      padding-top: 64px;
+    }
+    .sw-hero__left {
+      display: flex; flex-direction: column;
+      justify-content: flex-end;
+      padding: 3rem 3rem 3.5rem;
+    }
+    .sw-hero__label {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+      margin-bottom: 1.25rem;
+    }
+    .sw-hero__title {
+      font-size: clamp(1.9rem, 3.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.035em;
+      margin-bottom: .85rem;
+      max-width: 480px;
+    }
+    .sw-hero__sub {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      margin-bottom: 1.5rem;
+      max-width: 340px;
+    }
+    .sw-hero__cta {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--sw-black);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .sw-hero__cta:hover { text-decoration-thickness: 2px; }
+
+    .sw-hero__right {
+      background: var(--sw-black);
+      position: relative;
+      overflow: hidden;
+    }
+    .sw-hero__imgs {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sw-hero__img-main {
+      width: 50%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+    }
+    .sw-hero__img-side {
+      position: absolute;
+      width: 36%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+      top: 7%; right: 5%;
+      z-index: 1;
+      opacity: .8;
+    }
+    .sw-hero__loading {
+      color: #555;
+      font-size: .75rem;
+      letter-spacing: .1em;
+    }
+
+    /* ── NAV ROW ── */
+    .sw-nav-row {
+      border-top: 1px solid var(--sw-border);
+      border-bottom: 1px solid var(--sw-border);
+      padding: .9rem 3rem;
+      display: flex;
+      gap: 2.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .sw-nav-row::-webkit-scrollbar { display: none; }
+    .sw-nav-row a {
+      font-size: .78rem;
+      color: var(--sw-muted);
+      text-decoration: none;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+    .sw-nav-row a:hover { color: var(--sw-black); }
+
+    /* ── SIGNATURE / CAROUSEL SECTION ── */
+    .sw-signature {
+      padding: 5rem 3rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 4rem;
+      align-items: start;
+      position: relative;
+    }
+    .sw-signature::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--sw-black);
+    }
+    .sw-signature__title {
+      font-size: clamp(1.8rem, 2.8vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .sw-signature__body {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      line-height: 1.75;
+    }
+
+    .sw-cards-wrap { position: relative; }
+    .sw-cards {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-snap-type: x mandatory;
+      padding-bottom: .5rem;
+    }
+    .sw-cards::-webkit-scrollbar { display: none; }
+
+    .sw-card {
+      flex-shrink: 0;
+      width: 190px;
+      scroll-snap-align: start;
+      background: var(--sw-black);
+      color: #fff;
+      overflow: hidden;
+    }
+    .sw-card__img {
+      aspect-ratio: 3/4;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+      background: #1a1a1a;
+    }
+    .sw-card__body { padding: .9rem 1rem 1.1rem; }
+    .sw-card__name {
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: .3rem;
+    }
+    .sw-card__desc {
+      font-size: .7rem;
+      color: rgba(255,255,255,.5);
+      margin-bottom: .7rem;
+    }
+    .sw-card__dots { display: flex; gap: 3px; }
+    .sw-card__dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.25);
+    }
+    .sw-card__dot.on { background: #fff; }
+
+    .sw-cards-nav {
+      display: flex;
+      justify-content: flex-end;
+      gap: .5rem;
+      margin-top: .8rem;
+    }
+    .sw-cards-nav button {
+      width: 30px; height: 30px;
+      border: 1px solid var(--sw-border);
+      background: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--sw-black);
+      line-height: 1;
+    }
+    .sw-cards-nav button:hover {
+      background: var(--sw-black);
+      color: #fff;
+      border-color: var(--sw-black);
+    }
+
+    /* ── FEATURE SECTIONS ── */
+    .sw-feature {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--sw-border);
+    }
+    .sw-feature--strip {
+      position: relative;
+    }
+    .sw-feature--strip::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--sw-black);
+      z-index: 2;
+    }
+
+    .sw-feature__text {
+      padding: 5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .sw-feature__title {
+      font-size: clamp(1.8rem, 2.8vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -.035em;
+      margin-bottom: 1.5rem;
+    }
+    .sw-feature__body {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      line-height: 1.85;
+      margin-bottom: 1.1rem;
+    }
+    .sw-feature__link {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--sw-black);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      margin-top: .5rem;
+    }
+    .sw-feature__link:hover { text-decoration-thickness: 2px; }
+
+    .sw-feature__visual {
+      position: relative;
+      min-height: 480px;
+      overflow: hidden;
+      background: #ddd;
+    }
+    .sw-feature__img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .sw-feature__overlay {
+      position: absolute;
+      bottom: 2rem; left: 2rem;
+      background: rgba(255,255,255,.93);
+      border: 1px solid rgba(0,0,0,.1);
+      padding: 1.1rem 1.4rem;
+      min-width: 180px;
+    }
+    .sw-feature__overlay-name {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: .75rem;
+    }
+    .sw-feature__overlay-row { margin-bottom: .45rem; }
+    .sw-feature__overlay-label {
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+    }
+    .sw-feature__overlay-value {
+      font-size: .82rem;
+      font-weight: 500;
+    }
+
+    /* Feature 2: visual on left, text on right */
+    .sw-feature--flip .sw-feature__visual { order: -1; }
+    .sw-feature--flip .sw-feature__overlay {
+      left: auto; right: 2rem;
+    }
+
+    /* ── NEWSLETTER ── */
+    .sw-newsletter {
+      border-top: 1px solid var(--sw-border);
+      padding: 5rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .sw-newsletter__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      margin-bottom: .75rem;
+    }
+    .sw-newsletter__sub {
+      font-size: .875rem;
+      color: var(--sw-muted);
+      line-height: 1.7;
+    }
+    .sw-newsletter__form {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    .sw-newsletter__input {
+      border: 1px solid var(--sw-border);
+      border-radius: 0;
+      padding: .8rem 1rem;
+      font-family: inherit;
+      font-size: .875rem;
+      outline: none;
+      background: transparent;
+      width: 100%;
+    }
+    .sw-newsletter__input:focus { border-color: var(--sw-black); }
+    .sw-newsletter__row {
+      display: flex;
+      gap: 0;
+    }
+    .sw-newsletter__row .sw-newsletter__input { flex: 1; }
+    .sw-newsletter__btn {
+      padding: .8rem 1.75rem;
+      background: var(--sw-black);
+      color: #fff;
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sw-newsletter__btn:hover { background: #333; }
+
+    /* ── FOOTER ── */
+    .sw-footer {
+      border-top: 1px solid var(--sw-border);
+      padding: 1.4rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--sw-muted);
+    }
+    .sw-footer__nav {
+      display: flex;
+      gap: 1.75rem;
+    }
+    .sw-footer__nav a {
+      color: var(--sw-muted);
+      text-decoration: none;
+      font-size: .75rem;
+    }
+    .sw-footer__nav a:hover { color: var(--sw-black); }
+    .sw-footer__social {
+      display: flex;
+      gap: .85rem;
+      align-items: center;
+    }
+    .sw-footer__social a {
+      color: var(--sw-muted);
+      display: flex;
+      align-items: center;
+    }
+    .sw-footer__social a:hover { color: var(--sw-black); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .sw-hero { grid-template-columns: 1fr; }
+      .sw-hero__right { min-height: 65vw; }
+      .sw-signature { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+      .sw-signature::before { display: none; }
+      .sw-feature { grid-template-columns: 1fr; }
+      .sw-feature--flip .sw-feature__visual { order: 0; }
+      .sw-feature__text { padding: 3rem 1.5rem; }
+      .sw-feature__visual { min-height: 65vw; }
+      .sw-newsletter { grid-template-columns: 1fr; gap: 2.5rem; padding: 3rem 1.5rem; }
+      .sw-nav-row { padding: .9rem 1.5rem; gap: 1.5rem; }
+      .sw-footer { flex-direction: column; gap: 1rem; text-align: center; padding: 1.4rem 1.5rem; }
+      .sw-header { padding: 1rem 1.5rem; }
+      .sw-hero__left { padding: 2rem 1.5rem; }
+    }
+
+    @media (max-width: 600px) {
+      .sw-newsletter__row { flex-direction: column; }
+      .sw-newsletter__btn { width: 100%; }
+    }
   </style>
 </head>
-<body class="loading">
+<body>
 
   <!-- TEST BANNER -->
   <div class="test-banner">⚠ Testseite — keine Live-Version ⚠</div>
 
-  <!-- Loader -->
-  <div class="loader" id="loader">
-    <div class="loader__bar"></div>
-    <span class="loader__text">Loading</span>
-  </div>
-
   <!-- Sidebar Rail -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar__top">
-      <a href="#" class="sidebar__logo-mark" aria-label="SmartStudio">SP</a>
+      <a href="#" class="sidebar__logo-mark" aria-label="Erinnerungen">SP</a>
     </div>
     <div class="sidebar__mid">
       <button class="sidebar__burger" id="sidebarBurger" aria-label="Menü öffnen">
@@ -83,425 +512,250 @@
     </ul>
     <div class="nav-drawer__footer">
       <a href="mailto:hallo@smartstudio.at" class="nav-drawer__contact">hallo@smartstudio.at</a>
-      <a href="tel:+431234567" class="nav-drawer__contact">+43 1 234 567</a>
     </div>
   </nav>
 
-  <!-- Top Bar (Logo only) -->
-  <header class="nav" id="nav">
-    <a href="#" class="nav__logo">
-      <span class="nav__logo-text">SmartStudio</span>
+  <!-- Page Header -->
+  <header class="sw-header" id="swHeader">
+    <a href="index.html" class="sw-header__logo">
+      <div class="sw-header__logo-box">E</div>
+      <span>Erinnerungen</span>
     </a>
   </header>
 
-  <!-- Globe + Airplane Background -->
-  <div class="hero__scene" id="heroScene">
-    <div class="hero__globe-wrap">
-      <svg class="hero__globe-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" fill="none" aria-hidden="true">
-        <defs>
-          <radialGradient id="globeBgGlowT" cx="50%" cy="53%" r="50%">
-            <stop offset="0%"   stop-color="#f0a93c" stop-opacity="0.10"/>
-            <stop offset="60%"  stop-color="#e8834a" stop-opacity="0.04"/>
-            <stop offset="100%" stop-color="#e8834a" stop-opacity="0"/>
-          </radialGradient>
-          <radialGradient id="globeEdgeFadeT" cx="50%" cy="50%" r="50%">
-            <stop offset="75%"  stop-color="#0d0a07" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#0d0a07" stop-opacity="0.35"/>
-          </radialGradient>
-        </defs>
-
-        <circle cx="450" cy="480" r="330" fill="url(#globeBgGlowT)"/>
-        <circle cx="450" cy="480" r="295" stroke="#c8a870" stroke-width="1.5" stroke-opacity="0.42"/>
-
-        <!-- Latitude lines -->
-        <ellipse cx="450" cy="480" rx="295" ry="67"  stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.35"/>
-        <ellipse cx="450" cy="333" rx="255" ry="58"  stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.24"/>
-        <ellipse cx="450" cy="627" rx="255" ry="58"  stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.24"/>
-        <ellipse cx="450" cy="225" rx="148" ry="33"  stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.17"/>
-        <ellipse cx="450" cy="735" rx="148" ry="33"  stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.17"/>
-
-        <!-- Meridian lines -->
-        <line  x1="450" y1="185" x2="450" y2="775"  stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.18"/>
-        <ellipse cx="450" cy="480" rx="148" ry="295" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.18"/>
-        <ellipse cx="450" cy="480" rx="255" ry="295" stroke="#c8a870" stroke-width="0.7" stroke-opacity="0.15"/>
-
-        <!-- Greenland -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.44" stroke-linejoin="round" stroke-linecap="round"
-          d="M 318,186 L 342,176 L 362,180 L 368,196 L 361,213 L 342,217 L 323,208 Z"/>
-
-        <!-- North America -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
-          d="M 238,232 C 248,206 272,190 298,183 L 322,175 L 345,163 C 362,154 382,156 400,163 L 415,153
-             C 434,146 455,157 462,172 L 466,190 C 470,209 462,228 450,241 L 436,257 C 426,270 420,286 408,299 L 390,313
-             C 371,327 350,333 330,323 L 312,311 C 296,298 280,283 266,269 L 248,250 Z"/>
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.38" stroke-linejoin="round" stroke-linecap="round"
-          d="M 406,299 L 398,320 L 382,340 L 372,355"/>
-
-        <!-- South America -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
-          d="M 305,336 L 332,323 L 356,331 L 370,349 L 378,376 L 380,407
-             L 376,440 L 370,473 L 356,500 L 340,522 L 322,529 L 306,518
-             L 295,497 L 292,468 L 296,438 L 300,408 L 302,378 Z"/>
-
-        <!-- Europe -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.47" stroke-linejoin="round" stroke-linecap="round"
-          d="M 450,206 L 472,198 L 497,203 L 516,216 L 520,231 L 512,246
-             L 494,251 L 474,255 L 456,248 L 448,233 L 447,217 Z"/>
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.38" stroke-linejoin="round"
-          d="M 440,237 L 429,242 L 424,255 L 432,265 L 448,261 L 451,249 L 445,239 Z"/>
-        <ellipse cx="461" cy="213" rx="6"  ry="10" stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.34"/>
-
-        <!-- Africa -->
-        <path stroke="#c8a870" stroke-width="1.5" stroke-opacity="0.52" stroke-linejoin="round" stroke-linecap="round"
-          d="M 458,271 L 483,263 L 511,271 L 533,287 L 547,314 L 553,350
-             L 553,390 L 549,432 L 541,472 L 527,507 L 509,532 L 489,543
-             L 469,539 L 453,521 L 441,497 L 436,467 L 437,433 L 441,396
-             L 446,358 L 451,322 L 455,291 Z"/>
-        <path stroke="#c8a870" stroke-width="1.0" stroke-opacity="0.42" stroke-linejoin="round"
-          d="M 549,396 L 570,389 L 582,397 L 573,414 L 552,416"/>
-        <path stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.37" stroke-linejoin="round"
-          d="M 558,451 L 568,445 L 575,453 L 575,470 L 567,481 L 557,474 L 554,462 Z"/>
-
-        <!-- Arabian Peninsula -->
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"
-          d="M 536,282 L 560,276 L 580,283 L 588,298 L 586,319 L 570,332
-             L 553,328 L 541,314 L 536,297 Z"/>
-
-        <!-- Asia -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.50" stroke-linejoin="round" stroke-linecap="round"
-          d="M 526,172 L 560,160 L 598,156 L 640,163 L 680,177 L 714,195
-             L 737,217 L 742,241 L 732,265 L 711,279 L 685,285 L 660,279
-             L 642,293 L 622,289 L 608,303 L 592,299 L 576,283 L 557,289
-             L 540,277 L 528,259 L 522,235 Z"/>
-        <path stroke="#c8a870" stroke-width="1.2" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"
-          d="M 579,286 L 599,293 L 615,309 L 619,332 L 610,354 L 597,362
-             L 581,354 L 571,333 L 571,309 Z"/>
-        <ellipse cx="720" cy="225" rx="6" ry="15" stroke="#c8a870" stroke-width="0.9" stroke-opacity="0.37"
-          transform="rotate(-22,720,225)"/>
-
-        <!-- Australia -->
-        <path stroke="#c8a870" stroke-width="1.4" stroke-opacity="0.48" stroke-linejoin="round" stroke-linecap="round"
-          d="M 650,469 L 681,459 L 709,465 L 727,483 L 729,507 L 719,529
-             L 697,541 L 669,543 L 649,529 L 637,511 L 639,489 Z"/>
-        <ellipse cx="749" cy="540" rx="5" ry="13" stroke="#c8a870" stroke-width="0.8" stroke-opacity="0.32"
-          transform="rotate(-10,749,540)"/>
-
-        <!-- Flight path -->
-        <path d="M 662,150 Q 808,305 800,490 Q 792,688 652,785 Q 508,856 447,779 Q 372,754 296,692"
-              stroke="#e8834a" stroke-width="2.0" stroke-dasharray="10,7" stroke-linecap="round" stroke-opacity="0.72"/>
-        <path d="M 296,692 Q 250,652 278,622"
-              stroke="#e8834a" stroke-width="1.5" stroke-dasharray="7,7" stroke-linecap="round" stroke-opacity="0.40"/>
-
-        <!-- Airplane -->
-        <g class="hero__plane" transform="translate(663,143) rotate(43)">
-          <path d="M 0,-23 C 4,-23 7,-17 7,-9 L 6,15 L 0,18 L -6,15 L -7,-9 C -7,-17 -4,-23 0,-23 Z"
-                fill="#f0a93c"/>
-          <path d="M -7,-2 L -32,13 L -32,19 L -7,9 L 7,9 L 32,19 L 32,13 L 7,-2 Z"
-                fill="#f0a93c"/>
-          <path d="M -6,15 L -17,24 L -17,28 L -6,21 L 6,21 L 17,28 L 17,24 L 6,15 Z"
-                fill="#f0a93c"/>
-        </g>
-
-        <circle cx="450" cy="480" r="295" fill="url(#globeEdgeFadeT)"/>
-      </svg>
+  <!-- ── HERO ── -->
+  <section class="sw-hero">
+    <div class="sw-hero__left">
+      <p class="sw-hero__label">Platzhalter</p>
+      <h1 class="sw-hero__title">Erinnerungen, Platzhalter?</h1>
+      <p class="sw-hero__sub">Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <a href="upload.html" class="sw-hero__cta">Zur Galerie</a>
     </div>
-  </div>
-
-  <!-- Hero -->
-  <section class="hero" id="hero">
-    <div class="hero__content">
-      <div class="hero__eyebrow reveal-up">✦ Digital Agency aus Wien</div>
-      <h1 class="hero__title">
-        <span class="hero__word" data-delay="0">Wir</span>
-        <span class="hero__word" data-delay="80">erschaffen</span>
-        <span class="hero__word hero__word--outline" data-delay="160">digitale</span>
-        <span class="hero__word" data-delay="240">Erlebnisse.</span>
-      </h1>
-      <p class="hero__sub reveal-up" style="--d:0.5s">
-        Mit Herz &amp; Expertise — von der Idee bis zum fertigen Produkt.
-      </p>
-      <div class="hero__actions reveal-up" style="--d:0.7s">
-        <a href="#work" class="btn btn--primary">Unsere Arbeiten ↓</a>
-        <a href="#contact" class="btn btn--ghost">Projekt starten</a>
-      </div>
-    </div>
-    <div class="hero__scroll-hint" id="scrollHint">
-      <span>Scroll</span>
-      <div class="hero__scroll-line"></div>
-    </div>
-    <!-- Floating shapes -->
-    <div class="shape shape--1" id="shape1"></div>
-    <div class="shape shape--2" id="shape2"></div>
-    <div class="shape shape--3" id="shape3"></div>
-  </section>
-
-  <!-- Marquee / ticker -->
-  <div class="marquee">
-    <div class="marquee__track">
-      <span>Web Design</span><span class="marquee__dot">✦</span>
-      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
-      <span>Branding</span><span class="marquee__dot">✦</span>
-      <span>E-Commerce</span><span class="marquee__dot">✦</span>
-      <span>SEO &amp; Performance</span><span class="marquee__dot">✦</span>
-      <span>Motion Design</span><span class="marquee__dot">✦</span>
-      <span>Webentwicklung</span><span class="marquee__dot">✦</span>
-      <span>Strategie &amp; Konzept</span><span class="marquee__dot">✦</span>
-      <span>Web Design</span><span class="marquee__dot">✦</span>
-      <span>UI/UX Design</span><span class="marquee__dot">✦</span>
-      <span>Branding</span><span class="marquee__dot">✦</span>
-      <span>E-Commerce</span><span class="marquee__dot">✦</span>
-      <span>SEO &amp; Performance</span><span class="marquee__dot">✦</span>
-      <span>Motion Design</span><span class="marquee__dot">✦</span>
-      <span>Webentwicklung</span><span class="marquee__dot">✦</span>
-      <span>Strategie &amp; Konzept</span><span class="marquee__dot">✦</span>
-    </div>
-  </div>
-
-  <!-- Stats -->
-  <section class="stats">
-    <div class="stats__grid">
-      <div class="stat reveal-up">
-        <span class="stat__number" data-target="120">0</span>
-        <span class="stat__suffix">+</span>
-        <p class="stat__label">Projekte abgeschlossen</p>
-      </div>
-      <div class="stat reveal-up" style="--d:0.1s">
-        <span class="stat__number" data-target="8">0</span>
-        <span class="stat__suffix">+</span>
-        <p class="stat__label">Jahre Erfahrung</p>
-      </div>
-      <div class="stat reveal-up" style="--d:0.2s">
-        <span class="stat__number" data-target="40">0</span>
-        <span class="stat__suffix">+</span>
-        <p class="stat__label">Zufriedene Kunden</p>
-      </div>
-      <div class="stat reveal-up" style="--d:0.3s">
-        <span class="stat__number" data-target="99">0</span>
-        <span class="stat__suffix">%</span>
-        <p class="stat__label">Positive Bewertungen</p>
+    <div class="sw-hero__right">
+      <div class="sw-hero__imgs" id="heroImgs">
+        <span class="sw-hero__loading">Lade Bilder…</span>
       </div>
     </div>
   </section>
 
-  <!-- Work -->
-  <section class="work" id="work">
-    <div class="section-header reveal-up">
-      <p class="section-tag">Aus der Galerie</p>
-      <h2 class="section-title">Unsere <em>Bilder</em></h2>
+  <!-- ── NAV ROW ── -->
+  <nav class="sw-nav-row">
+    <a href="#">Platzhalter</a>
+    <a href="#">Platzhalter</a>
+    <a href="#">Platzhalter</a>
+    <a href="#">Platzhalter</a>
+    <a href="upload.html">Galerie</a>
+  </nav>
+
+  <!-- ── SIGNATURE / CAROUSEL ── -->
+  <section class="sw-signature">
+    <div>
+      <h2 class="sw-signature__title">Erinnerungen.</h2>
+      <p class="sw-signature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
     </div>
-    <div class="work-marquee" id="workMarquee">
-      <div class="work-marquee__track" id="workTrack">
-        <p class="work-marquee__empty" id="workEmpty">Noch keine Bilder hochgeladen.</p>
+    <div class="sw-cards-wrap">
+      <div class="sw-cards" id="swCards">
+        <!-- Filled by JS -->
+      </div>
+      <div class="sw-cards-nav">
+        <button id="swCardsPrev" aria-label="Zurück">&#8249;</button>
+        <button id="swCardsNext" aria-label="Weiter">&#8250;</button>
       </div>
     </div>
   </section>
 
-  <!-- Services -->
-  <section class="services" id="services">
-    <div class="section-header reveal-up">
-      <p class="section-tag">Was wir bieten</p>
-      <h2 class="section-title">Unsere <em>Leistungen</em></h2>
+  <!-- ── FEATURE 1: Text left · Image right ── -->
+  <section class="sw-feature">
+    <div class="sw-feature__text">
+      <h2 class="sw-feature__title">Erinnerungen.</h2>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <a href="upload.html" class="sw-feature__link">Platzhalter</a>
     </div>
-    <div class="services__grid">
-      <div class="service-card reveal-up" style="--d:0s">
-        <div class="service-card__icon">⬡</div>
-        <h3 class="service-card__title">Strategie & Konzept</h3>
-        <p class="service-card__text">Wir analysieren Ihren Markt und entwickeln eine maßgeschneiderte digitale Strategie, die Ihre Ziele erreicht.</p>
-        <span class="service-card__arrow">→</span>
-      </div>
-      <div class="service-card reveal-up" style="--d:0.1s">
-        <div class="service-card__icon">◈</div>
-        <h3 class="service-card__title">UI/UX Design</h3>
-        <p class="service-card__text">Interfaces, die Nutzer begeistern — von der ersten Skizze bis zum finalen Pixel-perfect Design.</p>
-        <span class="service-card__arrow">→</span>
-      </div>
-      <div class="service-card reveal-up" style="--d:0.2s">
-        <div class="service-card__icon">⬖</div>
-        <h3 class="service-card__title">Web Development</h3>
-        <p class="service-card__text">Schnelle, skalierbare Websites und Webanwendungen mit modernsten Technologien.</p>
-        <span class="service-card__arrow">→</span>
-      </div>
-      <div class="service-card reveal-up" style="--d:0.3s">
-        <div class="service-card__icon">◉</div>
-        <h3 class="service-card__title">Motion & Animation</h3>
-        <p class="service-card__text">Lebendige Animationen und Motion Design, die Ihre Marke zum Strahlen bringen.</p>
-        <span class="service-card__arrow">→</span>
-      </div>
-      <div class="service-card reveal-up" style="--d:0.4s">
-        <div class="service-card__icon">⬟</div>
-        <h3 class="service-card__title">E-Commerce</h3>
-        <p class="service-card__text">Shops, die verkaufen — optimierte Conversion-Flows und nahtlose Kauferlebnisse.</p>
-        <span class="service-card__arrow">→</span>
-      </div>
-      <div class="service-card reveal-up" style="--d:0.5s">
-        <div class="service-card__icon">◬</div>
-        <h3 class="service-card__title">SEO & Performance</h3>
-        <p class="service-card__text">Mehr Sichtbarkeit, bessere Core Web Vitals und nachhaltiges organisches Wachstum.</p>
-        <span class="service-card__arrow">→</span>
+    <div class="sw-feature__visual" id="featureVisual1">
+      <img class="sw-feature__img" id="featureImg1" src="" alt="" style="opacity:0">
+      <div class="sw-feature__overlay">
+        <div class="sw-feature__overlay-name">Platzhalter</div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">Platzhalter</div>
+        </div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">● ● ● ●</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- About / Philosophy -->
-  <section class="about" id="about">
-    <div class="about__grid">
-      <div class="about__visual reveal-up">
-        <div class="about__blob"></div>
-        <div class="about__img-frame">
-          <div class="about__img-placeholder"></div>
+  <!-- ── FEATURE 2: Image left · Text right ── -->
+  <section class="sw-feature sw-feature--flip sw-feature--strip">
+    <div class="sw-feature__text">
+      <h2 class="sw-feature__title">Erinnerungen.</h2>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <p class="sw-feature__body">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
+      <a href="upload.html" class="sw-feature__link">Platzhalter</a>
+    </div>
+    <div class="sw-feature__visual" id="featureVisual2">
+      <img class="sw-feature__img" id="featureImg2" src="" alt="" style="opacity:0">
+      <div class="sw-feature__overlay">
+        <div class="sw-feature__overlay-name">Platzhalter</div>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">Platzhalter</div>
         </div>
-        <div class="about__badge">
-          <span>Seit</span>
-          <strong>2016</strong>
+        <div class="sw-feature__overlay-row">
+          <div class="sw-feature__overlay-label">Platzhalter</div>
+          <div class="sw-feature__overlay-value">● ● ● ●</div>
         </div>
-      </div>
-      <div class="about__text">
-        <p class="section-tag reveal-up">Über uns</p>
-        <h2 class="section-title reveal-up">Wir glauben an <em>Qualität</em> statt Quantität.</h2>
-        <p class="about__body reveal-up" style="--d:0.2s">
-          Wir sind ein kleines, schlagkräftiges Team aus Wien. Kein Bullshit,
-          keine endlosen Meetings — nur echte Arbeit, die Ergebnisse liefert.
-          Jedes Projekt behandeln wir wie unser eigenes.
-        </p>
-        <ul class="about__list reveal-up" style="--d:0.3s">
-          <li>Transparente Kommunikation</li>
-          <li>Faire Preise, klare Angebote</li>
-          <li>Lieferung on time, every time</li>
-          <li>Langfristige Partnerschaften</li>
-        </ul>
-        <a href="#contact" class="btn btn--primary reveal-up" style="--d:0.4s">Lern uns kennen</a>
       </div>
     </div>
   </section>
 
-  <!-- Testimonials -->
-  <section class="testimonials">
-    <div class="section-header reveal-up">
-      <p class="section-tag">Kundenstimmen</p>
-      <h2 class="section-title">Was unsere <em>Kunden</em> sagen</h2>
+  <!-- ── NEWSLETTER ── -->
+  <section class="sw-newsletter">
+    <div>
+      <h2 class="sw-newsletter__title">Newsletter</h2>
+      <p class="sw-newsletter__sub">Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter Platzhalter.</p>
     </div>
-    <div class="testimonials__track" id="testimonialsTrack">
-      <div class="testimonial">
-        <p class="testimonial__quote">"Das Team hat unsere Erwartungen bei weitem übertroffen. Die Website läuft schnell, sieht großartig aus und konvertiert viel besser als die alte."</p>
-        <div class="testimonial__author">
-          <div class="testimonial__avatar">MK</div>
-          <div>
-            <strong>Maria K.</strong>
-            <span>CEO, NovaBrand GmbH</span>
-          </div>
-        </div>
+    <div class="sw-newsletter__form">
+      <input class="sw-newsletter__input" type="email" placeholder="E-Mail" />
+      <div class="sw-newsletter__row">
+        <input class="sw-newsletter__input" type="text" placeholder="Platzhalter" />
+        <button class="sw-newsletter__btn" type="button">Senden</button>
       </div>
-      <div class="testimonial">
-        <p class="testimonial__quote">"Professionell, kreativ und immer erreichbar. Wir würden jederzeit wieder zusammenarbeiten."</p>
-        <div class="testimonial__author">
-          <div class="testimonial__avatar">TW</div>
-          <div>
-            <strong>Thomas W.</strong>
-            <span>Marketing Director, ShopFlow</span>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial">
-        <p class="testimonial__quote">"Von der Strategie bis zur Umsetzung — ein nahtloser Prozess. Das Endergebnis spricht für sich."</p>
-        <div class="testimonial__author">
-          <div class="testimonial__avatar">SB</div>
-          <div>
-            <strong>Sophie B.</strong>
-            <span>Founder, Arktis Studio</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonials__dots" id="testimonialsDots"></div>
-  </section>
-
-  <!-- CTA Banner -->
-  <section class="cta-banner reveal-up">
-    <div class="cta-banner__content">
-      <h2 class="cta-banner__title">Bereit für Ihr nächstes Projekt?</h2>
-      <p class="cta-banner__sub">Lass uns gemeinsam etwas Großartiges erschaffen.</p>
-      <a href="#contact" class="btn btn--white">Jetzt starten ↗</a>
-    </div>
-    <div class="cta-banner__bg"></div>
-  </section>
-
-  <!-- Contact -->
-  <section class="contact" id="contact">
-    <div class="section-header reveal-up">
-      <p class="section-tag">Kontakt</p>
-      <h2 class="section-title">Schreib <em>uns</em> an.</h2>
-    </div>
-    <div class="contact__grid">
-      <div class="contact__info reveal-up">
-        <div class="contact__detail">
-          <span class="contact__label">E-Mail</span>
-          <a href="mailto:hallo@smartstudio.at" class="contact__value">hallo@smartstudio.at</a>
-        </div>
-        <div class="contact__detail">
-          <span class="contact__label">Telefon</span>
-          <a href="tel:+431234567" class="contact__value">+43 1 234 567</a>
-        </div>
-        <div class="contact__detail">
-          <span class="contact__label">Adresse</span>
-          <p class="contact__value">Mariahilfer Str. 1<br>1060 Wien, Österreich</p>
-        </div>
-        <div class="contact__social">
-          <a href="#" class="social-link">Instagram</a>
-          <a href="#" class="social-link">LinkedIn</a>
-          <a href="#" class="social-link">Behance</a>
-        </div>
-      </div>
-      <form class="contact__form reveal-up" style="--d:0.2s" id="contactForm">
-        <div class="form-group">
-          <input type="text" id="name" name="name" autocomplete="name" required placeholder=" " />
-          <label for="name">Ihr Name</label>
-        </div>
-        <div class="form-group">
-          <input type="email" id="email" name="email" autocomplete="email" required placeholder=" " />
-          <label for="email">E-Mail Adresse</label>
-        </div>
-        <div class="form-group">
-          <select id="service" name="service" autocomplete="off">
-            <option value="">Leistung auswählen</option>
-            <option>Web Design</option>
-            <option>E-Commerce</option>
-            <option>Branding</option>
-            <option>SEO</option>
-            <option>Sonstiges</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <textarea id="message" name="message" autocomplete="off" rows="4" required placeholder=" "></textarea>
-          <label for="message">Ihre Nachricht</label>
-        </div>
-        <button type="submit" class="btn btn--primary btn--full">
-          <span class="btn__text">Nachricht senden</span>
-          <span class="btn__icon">→</span>
-        </button>
-      </form>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer__top">
-      <div class="footer__brand">
-        <span class="footer__logo">SmartStudio</span>
-        <p class="footer__tagline">Digitale Erlebnisse, die bewegen.</p>
-      </div>
-      <nav class="footer__nav">
-        <a href="#work">Arbeiten</a>
-        <a href="#services">Leistungen</a>
-        <a href="#about">Über uns</a>
-        <a href="#contact">Kontakt</a>
-      </nav>
-    </div>
-    <div class="footer__bottom">
-      <span>&copy; 2026 SmartStudio GmbH. Alle Rechte vorbehalten.</span>
-      <span>Wien, Österreich</span>
+  <!-- ── FOOTER ── -->
+  <footer class="sw-footer">
+    <span>© Platzhalter · 2026</span>
+    <nav class="sw-footer__nav">
+      <a href="#">Platzhalter</a>
+      <a href="#">Platzhalter</a>
+      <a href="#">Platzhalter</a>
+      <a href="upload.html">Galerie</a>
+      <a href="#">Platzhalter</a>
+    </nav>
+    <div class="sw-footer__social">
+      <a href="#" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a href="#" aria-label="Pinterest">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.236 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.598-.299-1.482c0-1.388.806-2.428 1.808-2.428.853 0 1.267.641 1.267 1.408 0 .858-.546 2.141-.828 3.33-.236.995.499 1.806 1.476 1.806 1.772 0 3.137-1.868 3.137-4.561 0-2.386-1.716-4.054-4.165-4.054-2.837 0-4.5 2.127-4.5 4.328 0 .857.33 1.776.741 2.278a.3.3 0 01.069.285c-.075.314-.244.995-.277 1.134-.044.183-.146.222-.337.134-1.249-.581-2.03-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.966-.527-2.292-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+      </a>
     </div>
   </footer>
 
   <script src="script.js"></script>
+  <script>
+    /* ── Supabase image loader ── */
+    const SUPABASE_URL = 'https://rtzvvthcdxklwayhsuha.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0enZ2dGhjZHhrbHdheWhzdWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzUxMzEsImV4cCI6MjA5Mzc1MTEzMX0.8nGc1tqVq2PL1QK2EArexbXpX01-OK8-9MfLUI4Wnfw';
+    const BUCKET = 'galerie';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadGalleryImages() {
+      try {
+        const { data: entries } = await db.storage.from(BUCKET).list('', { limit: 200 });
+        const albumFolders = (entries || [])
+          .filter(e => e && e.name && e.id === null)
+          .map(e => e.name);
+
+        const allUrls = [];
+        for (const folder of albumFolders) {
+          const { data: files } = await db.storage.from(BUCKET).list(folder, { limit: 30 });
+          const photos = (files || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
+          for (const p of photos) {
+            const { data } = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`);
+            allUrls.push(data.publicUrl);
+          }
+          if (allUrls.length >= 20) break;
+        }
+
+        if (!allUrls.length) return;
+        allUrls.sort(() => Math.random() - 0.5);
+
+        /* Hero images */
+        const heroImgs = document.getElementById('heroImgs');
+        heroImgs.innerHTML = '';
+        if (allUrls[0]) {
+          const main = new Image();
+          main.className = 'sw-hero__img-main';
+          main.src = allUrls[0];
+          main.alt = '';
+          heroImgs.appendChild(main);
+        }
+        if (allUrls[1]) {
+          const side = new Image();
+          side.className = 'sw-hero__img-side';
+          side.src = allUrls[1];
+          side.alt = '';
+          heroImgs.appendChild(side);
+        }
+
+        /* Cards */
+        const cardsEl = document.getElementById('swCards');
+        cardsEl.innerHTML = '';
+        allUrls.slice(2, 8).forEach(url => {
+          const card = document.createElement('div');
+          card.className = 'sw-card';
+          card.innerHTML = `
+            <img class="sw-card__img" src="${url}" alt="" loading="lazy">
+            <div class="sw-card__body">
+              <div class="sw-card__name">Platzhalter</div>
+              <div class="sw-card__desc">Platzhalter</div>
+              <div class="sw-card__dots">
+                <div class="sw-card__dot on"></div>
+                <div class="sw-card__dot on"></div>
+                <div class="sw-card__dot on"></div>
+                <div class="sw-card__dot"></div>
+              </div>
+            </div>`;
+          cardsEl.appendChild(card);
+        });
+
+        /* Feature image 1 */
+        const img1 = document.getElementById('featureImg1');
+        if (allUrls[8] && img1) {
+          img1.src = allUrls[8];
+          img1.style.opacity = '1';
+          document.getElementById('featureVisual1').style.background = '#1a1a1a';
+        }
+
+        /* Feature image 2 */
+        const img2 = document.getElementById('featureImg2');
+        if (allUrls[9] && img2) {
+          img2.src = allUrls[9];
+          img2.style.opacity = '1';
+          document.getElementById('featureVisual2').style.background = '#1a1a1a';
+        }
+
+      } catch (e) {
+        console.error('Galerie konnte nicht geladen werden:', e);
+      }
+    }
+
+    loadGalleryImages();
+
+    /* Card carousel arrows */
+    const swCardsEl = document.getElementById('swCards');
+    document.getElementById('swCardsPrev').addEventListener('click', () => {
+      swCardsEl.scrollBy({ left: -200, behavior: 'smooth' });
+    });
+    document.getElementById('swCardsNext').addEventListener('click', () => {
+      swCardsEl.scrollBy({ left: 200, behavior: 'smooth' });
+    });
+
+    /* Header scroll shadow */
+    const swHeader = document.getElementById('swHeader');
+    window.addEventListener('scroll', () => {
+      swHeader.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+  </script>
 </body>
 </html>
