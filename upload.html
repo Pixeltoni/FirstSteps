@@ -146,6 +146,7 @@
     }
 
     .file-drop {
+      display: block;
       border: 2px dashed var(--border);
       border-radius: 12px;
       padding: 1.6rem 1rem;
@@ -587,8 +588,12 @@
       </div>
 
       <div class="field">
-        <label class="field__label" for="albumDate">Datum</label>
-        <input type="date" id="albumDate" autocomplete="off" />
+        <label class="field__label">Datum</label>
+        <div style="display:flex;gap:.6rem;align-items:center;">
+          <input type="date" id="albumDateFrom" autocomplete="off" style="flex:1;" />
+          <span style="font-size:.8rem;color:var(--fg-muted);flex-shrink:0;">bis</span>
+          <input type="date" id="albumDateTo" autocomplete="off" style="flex:1;" />
+        </div>
       </div>
 
       <div class="field">
@@ -691,7 +696,8 @@
     const modalCancel = document.getElementById('modalCancel');
     const modalSave   = document.getElementById('modalSave');
     const fAlbumName  = document.getElementById('albumName');
-    const fAlbumDate  = document.getElementById('albumDate');
+    const fAlbumDateFrom = document.getElementById('albumDateFrom');
+    const fAlbumDateTo   = document.getElementById('albumDateTo');
     const fAlbumLoc   = document.getElementById('albumLocation');
     const fAlbumFiles = document.getElementById('albumFiles');
     const fileDrop    = document.getElementById('fileDrop');
@@ -969,7 +975,8 @@
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       fAlbumName.value = '';
-      fAlbumDate.value = new Date().toISOString().slice(0, 10);
+      fAlbumDateFrom.value = new Date().toISOString().slice(0, 10);
+      fAlbumDateTo.value   = '';
       fAlbumLoc.value  = '';
       fAlbumFiles.value = '';
       pendingFiles = [];
@@ -1011,8 +1018,9 @@
     // Save album
     modalSave.addEventListener('click', async () => {
       const name = fAlbumName.value.trim();
-      const date = fAlbumDate.value;
-      const loc  = fAlbumLoc.value.trim();
+      const dateFrom = fAlbumDateFrom.value;
+      const dateTo   = fAlbumDateTo.value;
+      const loc      = fAlbumLoc.value.trim();
 
       if (!name) { fAlbumName.focus(); return; }
       if (!pendingFiles.length) { fileDrop.click(); return; }
@@ -1022,7 +1030,7 @@
       progressBar.hidden = false;
 
       const folderId = `${slugify(name)}-${Date.now()}`;
-      const meta = { name, date, location: loc, created_at: new Date().toISOString() };
+      const meta = { name, dateFrom, dateTo, location: loc, created_at: new Date().toISOString() };
 
       // Upload meta
       const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
@@ -1130,7 +1138,7 @@
           <div class="folder-card__body">
             <div class="folder-card__title">${c.meta.name || c.folder}</div>
             <div class="folder-card__meta">
-              ${c.meta.date     ? `<span>${formatDate(c.meta.date)}</span>` : ''}
+              ${c.meta.dateFrom ? `<span>${formatDate(c.meta.dateFrom)}${c.meta.dateTo ? ' – ' + formatDate(c.meta.dateTo) : ''}</span>` : (c.meta.date ? `<span>${formatDate(c.meta.date)}</span>` : '')}
               ${c.meta.location ? `<span>${c.meta.location}</span>` : ''}
             </div>
           </div>
@@ -1188,7 +1196,8 @@
             const meta = await r.json();
             sectionTitle.textContent = meta.name || folder;
             const parts = [];
-            if (meta.date) parts.push(formatDate(meta.date));
+            if (meta.dateFrom) parts.push(formatDate(meta.dateFrom) + (meta.dateTo ? ' – ' + formatDate(meta.dateTo) : ''));
+            else if (meta.date) parts.push(formatDate(meta.date));
             if (meta.location) parts.push(meta.location);
             metaText = parts.join(' · ');
           } else {
