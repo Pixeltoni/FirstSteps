@@ -661,14 +661,18 @@
 
     async function loadGalleryImages() {
       try {
-        const { data: entries } = await db.storage.from(BUCKET).list('', { limit: 200 });
+        const { data: entries, error: listErr } = await db.storage.from(BUCKET).list('', { limit: 200 });
+        if (listErr) { console.error('Bucket list error:', listErr); return; }
+
+        const allUrls = [];
+
+        /* Folder entries (id === null) */
         const albumFolders = (entries || [])
           .filter(e => e && e.name && e.id === null)
           .map(e => e.name);
 
-        const allUrls = [];
         for (const folder of albumFolders) {
-          const { data: files } = await db.storage.from(BUCKET).list(folder, { limit: 30 });
+          const { data: files } = await db.storage.from(BUCKET).list(folder, { limit: 50 });
           const photos = (files || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
           for (const p of photos) {
             const { data } = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`);
@@ -677,7 +681,17 @@
           if (allUrls.length >= 20) break;
         }
 
-        if (!allUrls.length) return;
+        /* Fallback: root-level image files (legacy uploads) */
+        if (!allUrls.length) {
+          const rootFiles = (entries || []).filter(e => e && e.id && e.name && e.name !== '.emptyFolderPlaceholder');
+          for (const f of rootFiles) {
+            const { data } = db.storage.from(BUCKET).getPublicUrl(f.name);
+            allUrls.push(data.publicUrl);
+          }
+        }
+
+        console.log(`Galerie: ${albumFolders.length} Alben, ${allUrls.length} Bilder gefunden`);
+        if (!allUrls.length) { console.warn('Keine Bilder in der Galerie.'); return; }
         allUrls.sort(() => Math.random() - 0.5);
 
         /* Hero images */
