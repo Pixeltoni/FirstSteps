@@ -114,42 +114,15 @@
       position: absolute;
       object-fit: cover;
     }
-    .sw-hero__img:nth-child(1) {
-      width: 58%; height: 58%;
-      top: -4%; left: -4%;
-      transform: rotate(-3deg);
-      z-index: 1;
-    }
-    .sw-hero__img:nth-child(2) {
-      width: 54%; height: 56%;
-      top: -3%; right: -4%;
-      transform: rotate(2.5deg);
-      z-index: 2;
-    }
-    .sw-hero__img:nth-child(3) {
-      width: 56%; height: 56%;
-      top: 28%; left: 5%;
-      transform: rotate(1.5deg);
-      z-index: 3;
-    }
-    .sw-hero__img:nth-child(4) {
-      width: 52%; height: 54%;
-      top: 24%; right: 3%;
-      transform: rotate(-2deg);
-      z-index: 2;
-    }
-    .sw-hero__img:nth-child(5) {
-      width: 58%; height: 58%;
-      bottom: -4%; left: -3%;
-      transform: rotate(-1.5deg);
-      z-index: 1;
-    }
-    .sw-hero__img:nth-child(6) {
-      width: 54%; height: 56%;
-      bottom: -3%; right: -4%;
-      transform: rotate(3deg);
-      z-index: 2;
-    }
+    .sw-hero__img:nth-child(1)  { width:40%; height:42%; top:-3%;  left:-3%;  transform:rotate(-3deg);   z-index:1; }
+    .sw-hero__img:nth-child(2)  { width:38%; height:40%; top:-2%;  left:33%;  transform:rotate(2deg);    z-index:2; }
+    .sw-hero__img:nth-child(3)  { width:40%; height:42%; top:-3%;  right:-3%; transform:rotate(-1.5deg); z-index:1; }
+    .sw-hero__img:nth-child(4)  { width:38%; height:40%; top:30%;  left:-2%;  transform:rotate(2.5deg);  z-index:3; }
+    .sw-hero__img:nth-child(5)  { width:40%; height:42%; top:28%;  left:31%;  transform:rotate(-2deg);   z-index:2; }
+    .sw-hero__img:nth-child(6)  { width:38%; height:40%; top:29%;  right:-2%; transform:rotate(1.5deg);  z-index:3; }
+    .sw-hero__img:nth-child(7)  { width:40%; height:42%; bottom:-3%; left:-3%;  transform:rotate(2deg);  z-index:1; }
+    .sw-hero__img:nth-child(8)  { width:38%; height:40%; bottom:-2%; left:32%;  transform:rotate(-3deg); z-index:2; }
+    .sw-hero__img:nth-child(9)  { width:40%; height:42%; bottom:-3%; right:-3%; transform:rotate(1deg);  z-index:1; }
     .sw-hero__loading {
       color: #555;
       font-size: .75rem;
@@ -697,7 +670,7 @@
         /* Hero images — 6 overlapping images to cover the full area */
         const heroImgs = document.getElementById('heroImgs');
         heroImgs.innerHTML = '';
-        allUrls.slice(0, 6).forEach(url => {
+        allUrls.slice(0, 9).forEach(url => {
           const img = new Image();
           img.className = 'sw-hero__img';
           img.src = url;
