@@ -215,7 +215,7 @@
       color: rgba(255,255,255,.5);
       margin-bottom: .7rem;
     }
-    .sw-card__dots { display: flex; gap: 3px; }
+    .sw-card__dots { font-size: .7rem; color: rgba(255,255,255,.45); margin-top: .35rem; }
     .sw-card__dot {
       width: 7px; height: 7px;
       border-radius: 50%;
@@ -637,7 +637,7 @@
         const { data: entries, error: listErr } = await db.storage.from(BUCKET).list('', { limit: 200 });
         if (listErr) { console.error('Bucket list error:', listErr); return; }
 
-        const allUrls = [];
+        const allPhotos = []; // { url, albumName, location, date }
 
         /* Folder entries (id === null) */
         const albumFolders = (entries || [])
@@ -646,22 +646,38 @@
 
         for (const folder of albumFolders) {
           const { data: files } = await db.storage.from(BUCKET).list(folder, { limit: 50 });
+
+          /* Load album metadata */
+          let meta = { name: folder, location: '', date: '' };
+          try {
+            const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
+            const r = await fetch(mu.publicUrl + '?t=' + Date.now());
+            if (r.ok) {
+              const m = await r.json();
+              meta.name     = m.name     || folder;
+              meta.location = m.location || '';
+              meta.date     = m.dateFrom || m.date || '';
+            }
+          } catch (e) {}
+
           const photos = (files || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
           for (const p of photos) {
             const { data } = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`);
-            allUrls.push(data.publicUrl);
+            allPhotos.push({ url: data.publicUrl, albumName: meta.name, location: meta.location, date: meta.date });
           }
-          if (allUrls.length >= 20) break;
+          if (allPhotos.length >= 20) break;
         }
 
         /* Fallback: root-level image files (legacy uploads) */
-        if (!allUrls.length) {
+        if (!allPhotos.length) {
           const rootFiles = (entries || []).filter(e => e && e.id && e.name && e.name !== '.emptyFolderPlaceholder');
           for (const f of rootFiles) {
             const { data } = db.storage.from(BUCKET).getPublicUrl(f.name);
-            allUrls.push(data.publicUrl);
+            allPhotos.push({ url: data.publicUrl, albumName: '—', location: '', date: '' });
           }
         }
+
+        const allUrls = allPhotos.map(p => p.url);
 
         console.log(`Galerie: ${albumFolders.length} Alben, ${allUrls.length} Bilder gefunden`);
         if (!allUrls.length) { console.warn('Keine Bilder in der Galerie.'); return; }
@@ -681,20 +697,15 @@
         /* Cards */
         const cardsEl = document.getElementById('swCards');
         cardsEl.innerHTML = '';
-        allUrls.slice(2, 8).forEach(url => {
+        allPhotos.slice(2, 8).forEach(({ url, albumName, location, date }) => {
           const card = document.createElement('div');
           card.className = 'sw-card';
           card.innerHTML = `
             <img class="sw-card__img" src="${url}" alt="" loading="lazy">
             <div class="sw-card__body">
-              <div class="sw-card__name">Platzhalter</div>
-              <div class="sw-card__desc">Platzhalter</div>
-              <div class="sw-card__dots">
-                <div class="sw-card__dot on"></div>
-                <div class="sw-card__dot on"></div>
-                <div class="sw-card__dot on"></div>
-                <div class="sw-card__dot"></div>
-              </div>
+              <div class="sw-card__name">${albumName}</div>
+              <div class="sw-card__desc">${location || '—'}</div>
+              <div class="sw-card__dots">${date || '—'}</div>
             </div>`;
           cardsEl.appendChild(card);
         });
