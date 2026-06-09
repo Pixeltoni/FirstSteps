@@ -1071,25 +1071,45 @@
       editAlbumSave.disabled = true;
       editAlbumSave.textContent = 'Speichert…';
 
-      // Load existing meta to preserve created_at etc., then overwrite in place.
+      console.log('[Album bearbeiten] Schreibe Metadaten in bestehenden Ordner:', folder, '→', `${folder}/_meta.json`);
+
+      // Safety: confirm the target folder already exists in storage. This makes it
+      // impossible for an edit to silently land in a brand-new folder.
+      const { data: existingItems, error: listErr } = await db.storage.from(BUCKET).list(folder, { limit: 1 });
+      if (listErr || !existingItems || existingItems.length === 0) {
+        editAlbumSave.disabled = false;
+        editAlbumSave.textContent = 'Speichern';
+        setStatus('Album-Ordner nicht gefunden – Abbruch (es wird kein neues Album erstellt).', 'error');
+        console.error('[Album bearbeiten] Zielordner existiert nicht:', folder, listErr);
+        return;
+      }
+
+      // Load existing meta to preserve created_at etc., then overwrite IN PLACE.
       const existing = (await loadAlbumMeta(folder)) || {};
       const meta = { ...existing, name, dateFrom, dateTo, location };
-      const { error } = await saveAlbumMeta(folder, meta);
+
+      // Overwrite the same _meta.json: try update() (existing object), then upsert upload().
+      const blob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+      let { error } = await db.storage
+        .from(BUCKET)
+        .update(`${folder}/_meta.json`, blob, { contentType: 'application/json', cacheControl: '0', upsert: true });
+      if (error) {
+        const up = await db.storage
+          .from(BUCKET)
+          .upload(`${folder}/_meta.json`, blob, { contentType: 'application/json', cacheControl: '0', upsert: true });
+        error = up.error;
+      }
 
       editAlbumSave.disabled = false;
       editAlbumSave.textContent = 'Speichern';
 
-      if (error) { setStatus('Fehler: ' + error.message, 'error'); return; }
+      if (error) { setStatus('Fehler: ' + error.message, 'error'); console.error(error); return; }
 
       closeEditAlbumModal();
       setStatus('Album aktualisiert ✓', 'ok');
 
-      // Update header directly from saved values — avoid CDN re-fetch which may return stale data
-      sectionTitle.textContent = name;
-      const parts = [];
-      if (dateFrom) parts.push(formatDate(dateFrom) + (dateTo ? ' – ' + formatDate(dateTo) : ''));
-      if (location) parts.push(location);
-      sectionSub.textContent = parts.join(' · ') || 'Album';
+      // Refresh the open album view from storage so the change is visibly applied.
+      await openAlbum(folder);
     });
 
     // ── Upload Modal ──
