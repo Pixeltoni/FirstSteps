@@ -1283,6 +1283,7 @@
       galleryGrid.style.display = '';
       backBtn.hidden = false;
       albumActions.hidden = false;
+      document.getElementById('editAlbumBtn').hidden = (folder === '__legacy__');
       galleryGrid.innerHTML = '<p class="gallery-empty">Lade Bilder…</p>';
 
       let files, metaText = '';
