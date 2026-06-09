@@ -479,7 +479,7 @@
     .gallery-section__actions {
       display: flex; align-items: center; gap: .5rem;
     }
-    .gallery-section__actions[hidden] { display: none; }
+    .gallery-section__actions[hidden] { display: none !important; }
     .btn-gallery-action {
       padding: .4rem .9rem;
       border-radius: 8px;
@@ -552,6 +552,10 @@
         </div>
         <div style="display:flex;align-items:center;gap:.75rem">
           <span class="gallery-section__count" id="galleryCount"></span>
+          <div class="gallery-section__actions" id="folderActions">
+            <button class="btn-gallery-action btn-gallery-action--primary" id="newAlbumBtn" type="button">+ Neues Album</button>
+            <button class="btn-gallery-action" id="selectFolderModeBtn" type="button">Auswählen</button>
+          </div>
           <div class="gallery-section__actions" id="albumActions" hidden>
             <button class="btn-gallery-action btn-gallery-action--primary" id="addImagesBtn" type="button">+ Bilder hinzufügen</button>
             <button class="btn-gallery-action" id="editAlbumBtn" type="button">✎ Bearbeiten</button>
@@ -749,6 +753,7 @@
     let isSelectMode  = false;
 
     // ── New DOM refs ──
+    const folderActions    = document.getElementById('folderActions');
     const albumActions     = document.getElementById('albumActions');
     const addImagesBtn     = document.getElementById('addImagesBtn');
     const addImagesInput   = document.getElementById('addImagesInput');
@@ -1105,6 +1110,12 @@
     }
 
     uploadBtn.addEventListener('click', openModal);
+    document.getElementById('newAlbumBtn').addEventListener('click', openModal);
+    document.getElementById('selectFolderModeBtn').addEventListener('click', () => {
+      folderGrid.classList.toggle('selection-mode');
+      const active = folderGrid.classList.contains('selection-mode');
+      document.getElementById('selectFolderModeBtn').textContent = active ? 'Abbrechen' : 'Auswählen';
+    });
     modalClose.addEventListener('click', closeModal);
     modalCancel.addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
@@ -1181,6 +1192,7 @@
     async function loadFolders() {
       currentFolder = null;
       exitSelectMode();
+      folderActions.hidden = false;
       albumActions.hidden = true;
       backBtn.hidden = true;
       sectionTitle.textContent = 'Alben';
@@ -1283,6 +1295,7 @@
       folderGrid.style.display = 'none';
       galleryGrid.style.display = '';
       backBtn.hidden = false;
+      folderActions.hidden = true;
       albumActions.hidden = false;
       galleryGrid.innerHTML = '<p class="gallery-empty">Lade Bilder…</p>';
 
