@@ -1046,12 +1046,13 @@
     });
 
     editAlbumSave.addEventListener('click', async () => {
+      const folder   = currentFolder; // capture immediately — currentFolder must not change during async ops
       const name     = document.getElementById('editAlbumName').value.trim();
       const dateFrom = document.getElementById('editAlbumDateFrom').value;
       const dateTo   = document.getElementById('editAlbumDateTo').value;
       const location = document.getElementById('editAlbumLocation').value.trim();
 
-      if (!name) { document.getElementById('editAlbumName').focus(); return; }
+      if (!name || !folder) { document.getElementById('editAlbumName').focus(); return; }
 
       editAlbumSave.disabled = true;
       editAlbumSave.textContent = 'Speichert…';
@@ -1059,17 +1060,26 @@
       // Load existing meta to preserve created_at etc.
       let existing = {};
       try {
-        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${currentFolder}/_meta.json`);
+        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
         const r = await fetch(mu.publicUrl + '?t=' + Date.now());
         if (r.ok) existing = await r.json();
       } catch (e) {}
 
       const meta = { ...existing, name, dateFrom, dateTo, location };
       const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+      const metaPath = `${folder}/_meta.json`;
 
-      const { error } = await db.storage
+      // Use update() for existing files; fall back to upload() if not yet created
+      let { error } = await db.storage
         .from(BUCKET)
-        .upload(`${currentFolder}/_meta.json`, metaBlob, { contentType: 'application/json', upsert: true });
+        .update(metaPath, metaBlob, { contentType: 'application/json', cacheControl: '0', upsert: true });
+
+      if (error) {
+        const up = await db.storage
+          .from(BUCKET)
+          .upload(metaPath, metaBlob, { contentType: 'application/json', cacheControl: '0', upsert: true });
+        error = up.error;
+      }
 
       editAlbumSave.disabled = false;
       editAlbumSave.textContent = 'Speichern';
@@ -1078,13 +1088,7 @@
 
       closeEditAlbumModal();
       setStatus('Album aktualisiert ✓', 'ok');
-
-      // Update header display immediately
-      document.getElementById('gallerySectionTitle').textContent = name;
-      const parts = [];
-      if (dateFrom) parts.push(formatDate(dateFrom) + (dateTo ? ' – ' + formatDate(dateTo) : ''));
-      if (location) parts.push(location);
-      document.getElementById('gallerySectionSub').textContent = parts.join(' · ') || 'Album';
+      await openAlbum(folder); // refresh view with updated metadata
     });
 
     // ── Upload Modal ──
