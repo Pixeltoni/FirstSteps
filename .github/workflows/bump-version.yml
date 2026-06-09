@@ -20,8 +20,13 @@ jobs:
 
       - name: Increment version
         run: |
-          # Read current version from index.html (e.g. v1.0 or v1.05)
-          CURRENT=$(grep -oP 'nav__version">v\K[0-9]+\.[0-9]+' index.html)
+          # Read current version from index.html (e.g. v1.0 or v1.05).
+          # Tolerate a missing version element so the job still updates build-info.json.
+          CURRENT=$(grep -oP 'nav__version">v\K[0-9]+\.[0-9]+' index.html || true)
+          if [ -z "$CURRENT" ]; then
+            echo "No nav__version element found — skipping version bump."
+            exit 0
+          fi
           echo "Current version: $CURRENT"
 
           MAJOR=$(echo "$CURRENT" | cut -d. -f1)
