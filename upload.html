@@ -698,8 +698,23 @@
 
       <!-- Neues Album inline -->
       <div id="newAlbumRow" style="margin-top:.75rem;border-top:1px solid var(--border);padding-top:.75rem;display:none;flex-direction:column;gap:.5rem;">
-        <input type="text" id="newAlbumNameInput" class="pw-box__input" placeholder="Albumname" autocomplete="off" style="font-size:.9rem;padding:.65rem .9rem;" />
-        <button type="button" class="btn-modal btn-modal--primary" id="newAlbumConfirm">Album erstellen &amp; verschieben</button>
+        <div class="field" style="margin-bottom:0">
+          <label class="field__label" for="newAlbumNameInput">Name</label>
+          <input type="text" id="newAlbumNameInput" placeholder="z.B. Wien Wochenende" autocomplete="off" style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--fg);font-size:.95rem;font-family:inherit;" />
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="field__label">Datum</label>
+          <div style="display:flex;gap:.6rem;align-items:center;">
+            <input type="date" id="newAlbumDateFrom" autocomplete="off" style="flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--fg);font-size:.95rem;font-family:inherit;" />
+            <span style="font-size:.8rem;color:var(--fg-muted);flex-shrink:0;">bis</span>
+            <input type="date" id="newAlbumDateTo" autocomplete="off" style="flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--fg);font-size:.95rem;font-family:inherit;" />
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="field__label" for="newAlbumLocationInput">Ort</label>
+          <input type="text" id="newAlbumLocationInput" placeholder="z.B. Wien, Österreich" autocomplete="off" style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--fg);font-size:.95rem;font-family:inherit;" />
+        </div>
+        <button type="button" class="btn-modal btn-modal--primary" id="newAlbumConfirm" style="margin-top:.25rem">Album erstellen &amp; verschieben</button>
       </div>
 
       <div class="modal__actions">
@@ -961,16 +976,15 @@
 
       for (const srcPath of paths) {
         const fileName = srcPath.split('/').pop();
-        const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(srcPath);
+        const { data: dlData, error: dlErr } = await db.storage.from(BUCKET).download(srcPath);
+        if (dlErr || !dlData) { fail++; console.error('Download fehlgeschlagen', srcPath, dlErr); continue; }
         try {
-          const resp = await fetch(urlData.publicUrl);
-          if (!resp.ok) throw new Error('Download fehlgeschlagen');
-          const blob = await resp.blob();
           const { error: upErr } = await db.storage
             .from(BUCKET)
-            .upload(`${targetFolder}/${fileName}`, blob, { contentType: blob.type, upsert: false });
-          if (upErr) { fail++; continue; }
-          await db.storage.from(BUCKET).remove([srcPath]);
+            .upload(`${targetFolder}/${fileName}`, dlData, { contentType: dlData.type, upsert: true });
+          if (upErr) { fail++; console.error('Upload fehlgeschlagen', upErr); continue; }
+          const { error: rmErr } = await db.storage.from(BUCKET).remove([srcPath]);
+          if (rmErr) console.error('Löschen aus Quellalbum fehlgeschlagen', srcPath, rmErr);
           ok++;
         } catch (e) { fail++; console.error(e); }
       }
@@ -986,6 +1000,9 @@
       moveModal.setAttribute('aria-hidden', 'true');
       document.getElementById('newAlbumRow').style.display = 'none';
       document.getElementById('newAlbumNameInput').value = '';
+      document.getElementById('newAlbumDateFrom').value = '';
+      document.getElementById('newAlbumDateTo').value = '';
+      document.getElementById('newAlbumLocationInput').value = '';
     }
     moveCancel.addEventListener('click', closeMoveModal);
     moveClose.addEventListener('click', closeMoveModal);
@@ -1000,7 +1017,10 @@
     });
 
     document.getElementById('newAlbumConfirm').addEventListener('click', async () => {
-      const name = document.getElementById('newAlbumNameInput').value.trim();
+      const name     = document.getElementById('newAlbumNameInput').value.trim();
+      const dateFrom = document.getElementById('newAlbumDateFrom').value;
+      const dateTo   = document.getElementById('newAlbumDateTo').value;
+      const location = document.getElementById('newAlbumLocationInput').value.trim();
       if (!name) { document.getElementById('newAlbumNameInput').focus(); return; }
 
       const btn = document.getElementById('newAlbumConfirm');
@@ -1008,7 +1028,7 @@
       btn.textContent = 'Erstelle Album…';
 
       const folderId = `${slugify(name)}-${Date.now()}`;
-      const meta = { name, date: new Date().toISOString().slice(0, 10), location: '', created_at: new Date().toISOString() };
+      const meta = { name, dateFrom, dateTo, location, created_at: new Date().toISOString() };
 
       const { error: metaErr } = await saveAlbumMeta(folderId, meta);
 
@@ -1021,10 +1041,6 @@
 
       closeMoveModal();
       await doMoveImages(folderId);
-    });
-
-    document.getElementById('newAlbumNameInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('newAlbumConfirm').click();
     });
     moveModal.addEventListener('click', e => { if (e.target === moveModal) closeMoveModal(); });
 
