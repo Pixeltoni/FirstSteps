@@ -1088,7 +1088,13 @@
 
       closeEditAlbumModal();
       setStatus('Album aktualisiert ✓', 'ok');
-      await openAlbum(folder); // refresh view with updated metadata
+
+      // Update header directly from saved values — avoid CDN re-fetch which may return stale data
+      sectionTitle.textContent = name;
+      const parts = [];
+      if (dateFrom) parts.push(formatDate(dateFrom) + (dateTo ? ' – ' + formatDate(dateTo) : ''));
+      if (location) parts.push(location);
+      sectionSub.textContent = parts.join(' · ') || 'Album';
     });
 
     // ── Upload Modal ──
