@@ -821,6 +821,22 @@
       return null;
     }
 
+    // List every entry in a folder, paginating past the 100/1000-per-request
+    // limits so large albums (e.g. 500+ photos) are counted/loaded in full.
+    async function listAllInFolder(folder) {
+      const all = [];
+      const pageSize = 1000;
+      let offset = 0;
+      while (true) {
+        const { data, error } = await db.storage.from(BUCKET).list(folder, { limit: pageSize, offset });
+        if (error || !data || !data.length) break;
+        all.push(...data);
+        if (data.length < pageSize) break;
+        offset += pageSize;
+      }
+      return all;
+    }
+
     // Write an album's _meta.json with no-cache so reads stay fresh.
     async function saveAlbumMeta(folder, meta) {
       const blob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
@@ -1265,13 +1281,13 @@
 
       // Fetch meta + first image per folder
       const cards = await Promise.all(folderNames.map(async folder => {
-        const { data: items } = await db.storage.from(BUCKET).list(folder, { limit: 100 });
-        const photos = (items || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
+        const items = await listAllInFolder(folder);
+        const photos = items.filter(f => f.name && f.name !== '_meta.json' && f.id);
+        // Always load meta directly — _meta.json may sort past the first page
+        // of a large album's listing, so we must not gate on it appearing there.
         let meta = { name: folder, date: '', location: '' };
-        if ((items || []).some(f => f.name === '_meta.json')) {
-          const m = await loadAlbumMeta(folder);
-          if (m) meta = { ...meta, ...m };
-        }
+        const m = await loadAlbumMeta(folder);
+        if (m) meta = { ...meta, ...m };
         const cover = photos[0]
           ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
           : null;
@@ -1342,7 +1358,7 @@
         sectionTitle.textContent = 'Ohne Album';
         sectionSub.textContent = 'Ältere Uploads';
       } else {
-        const { data } = await db.storage.from(BUCKET).list(folder, { limit: 500 });
+        const data = await listAllInFolder(folder);
         files = (data || [])
           .filter(f => f.name && f.name !== '_meta.json' && f.id)
           .map(f => ({ name: f.name, fullPath: `${folder}/${f.name}` }));
