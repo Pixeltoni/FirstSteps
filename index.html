@@ -186,8 +186,17 @@
       scrollbar-width: none;
       scroll-snap-type: x mandatory;
       padding-bottom: .5rem;
+      cursor: grab;
+      -webkit-overflow-scrolling: touch;
     }
     .sw-cards::-webkit-scrollbar { display: none; }
+    .sw-cards.dragging {
+      cursor: grabbing;
+      scroll-snap-type: none;
+      user-select: none;
+    }
+    .sw-cards.dragging .sw-card { pointer-events: none; }
+    .sw-cards.dragging .sw-card__img { -webkit-user-drag: none; }
 
     .sw-card {
       flex-shrink: 0;
@@ -637,7 +646,8 @@
         const { data: entries, error: listErr } = await db.storage.from(BUCKET).list('', { limit: 200 });
         if (listErr) { console.error('Bucket list error:', listErr); return; }
 
-        const allPhotos = []; // { url, albumName, location, date }
+        const allPhotos = []; // { url, albumName, location, date } — every photo, used for hero/feature visuals
+        const albums = [];    // { coverUrl, albumName, location, date } — one entry per album, used for the cards row
 
         /* Folder entries (id === null) */
         const albumFolders = (entries || [])
@@ -667,11 +677,14 @@
           } catch (e) {}
 
           const photos = (files || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
-          for (const p of photos) {
+          photos.forEach((p, i) => {
             const { data } = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`);
             allPhotos.push({ url: data.publicUrl, albumName: meta.name, location: meta.location, date: meta.date });
-          }
-          if (allPhotos.length >= 20) break;
+            /* First photo of the album becomes its cover in the cards row */
+            if (i === 0) {
+              albums.push({ coverUrl: data.publicUrl, albumName: meta.name, location: meta.location, date: meta.date });
+            }
+          });
         }
 
         /* Fallback: root-level image files (legacy uploads) */
@@ -700,14 +713,14 @@
           heroImgs.appendChild(img);
         });
 
-        /* Cards */
+        /* Cards — one card per album (cover photo), so distinct albums are shown */
         const cardsEl = document.getElementById('swCards');
         cardsEl.innerHTML = '';
-        allPhotos.slice(2, 8).forEach(({ url, albumName, location, date }) => {
+        albums.forEach(({ coverUrl, albumName, location, date }) => {
           const card = document.createElement('div');
           card.className = 'sw-card';
           card.innerHTML = `
-            <img class="sw-card__img" src="${url}" alt="" loading="lazy">
+            <img class="sw-card__img" src="${coverUrl}" alt="" loading="lazy">
             <div class="sw-card__body">
               <div class="sw-card__name">${albumName}</div>
               <div class="sw-card__desc">${location || '—'}</div>
@@ -715,6 +728,7 @@
             </div>`;
           cardsEl.appendChild(card);
         });
+        updateCardsNav();
 
         /* Feature image 1 */
         const img1 = document.getElementById('featureImg1');
@@ -741,12 +755,51 @@
 
     /* Card carousel arrows */
     const swCardsEl = document.getElementById('swCards');
-    document.getElementById('swCardsPrev').addEventListener('click', () => {
-      swCardsEl.scrollBy({ left: -200, behavior: 'smooth' });
+    const swCardsPrev = document.getElementById('swCardsPrev');
+    const swCardsNext = document.getElementById('swCardsNext');
+    swCardsPrev.addEventListener('click', () => {
+      swCardsEl.scrollBy({ left: -210, behavior: 'smooth' });
     });
-    document.getElementById('swCardsNext').addEventListener('click', () => {
-      swCardsEl.scrollBy({ left: 200, behavior: 'smooth' });
+    swCardsNext.addEventListener('click', () => {
+      swCardsEl.scrollBy({ left: 210, behavior: 'smooth' });
     });
+
+    /* Hide the nav arrows when the row isn't wide enough to scroll */
+    function updateCardsNav() {
+      const scrollable = swCardsEl.scrollWidth - swCardsEl.clientWidth > 4;
+      const nav = document.querySelector('.sw-cards-nav');
+      if (nav) nav.style.display = scrollable ? 'flex' : 'none';
+    }
+    window.addEventListener('resize', updateCardsNav, { passive: true });
+
+    /* Drag-to-scroll the cards row sideways with the mouse */
+    let isDragging = false, dragStartX = 0, dragStartScroll = 0, dragMoved = 0;
+    swCardsEl.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      dragMoved = 0;
+      dragStartX = e.clientX;
+      dragStartScroll = swCardsEl.scrollLeft;
+      swCardsEl.classList.add('dragging');
+      swCardsEl.setPointerCapture(e.pointerId);
+    });
+    swCardsEl.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const delta = e.clientX - dragStartX;
+      dragMoved = Math.abs(delta);
+      swCardsEl.scrollLeft = dragStartScroll - delta;
+    });
+    const endDrag = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      swCardsEl.classList.remove('dragging');
+      try { swCardsEl.releasePointerCapture(e.pointerId); } catch (_) {}
+    };
+    swCardsEl.addEventListener('pointerup', endDrag);
+    swCardsEl.addEventListener('pointercancel', endDrag);
+    /* Suppress accidental clicks that follow a drag */
+    swCardsEl.addEventListener('click', (e) => {
+      if (dragMoved > 5) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
 
     /* Header scroll shadow */
     const swHeader = document.getElementById('swHeader');
