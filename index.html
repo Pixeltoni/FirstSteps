@@ -109,26 +109,46 @@
     .sw-hero__imgs {
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .sw-hero__img-main {
-      width: 50%;
-      aspect-ratio: 3/4;
-      object-fit: cover;
-      position: relative;
-      z-index: 2;
-      flex-shrink: 0;
-    }
-    .sw-hero__img-side {
+    .sw-hero__img {
       position: absolute;
-      width: 36%;
-      aspect-ratio: 2/3;
       object-fit: cover;
-      top: 7%; right: 5%;
+    }
+    .sw-hero__img:nth-child(1) {
+      width: 58%; height: 58%;
+      top: -4%; left: -4%;
+      transform: rotate(-3deg);
       z-index: 1;
-      opacity: .8;
+    }
+    .sw-hero__img:nth-child(2) {
+      width: 54%; height: 56%;
+      top: -3%; right: -4%;
+      transform: rotate(2.5deg);
+      z-index: 2;
+    }
+    .sw-hero__img:nth-child(3) {
+      width: 56%; height: 56%;
+      top: 28%; left: 5%;
+      transform: rotate(1.5deg);
+      z-index: 3;
+    }
+    .sw-hero__img:nth-child(4) {
+      width: 52%; height: 54%;
+      top: 24%; right: 3%;
+      transform: rotate(-2deg);
+      z-index: 2;
+    }
+    .sw-hero__img:nth-child(5) {
+      width: 58%; height: 58%;
+      bottom: -4%; left: -3%;
+      transform: rotate(-1.5deg);
+      z-index: 1;
+    }
+    .sw-hero__img:nth-child(6) {
+      width: 54%; height: 56%;
+      bottom: -3%; right: -4%;
+      transform: rotate(3deg);
+      z-index: 2;
     }
     .sw-hero__loading {
       color: #555;
@@ -674,23 +694,16 @@
         if (!allUrls.length) { console.warn('Keine Bilder in der Galerie.'); return; }
         allUrls.sort(() => Math.random() - 0.5);
 
-        /* Hero images */
+        /* Hero images — 6 overlapping images to cover the full area */
         const heroImgs = document.getElementById('heroImgs');
         heroImgs.innerHTML = '';
-        if (allUrls[0]) {
-          const main = new Image();
-          main.className = 'sw-hero__img-main';
-          main.src = allUrls[0];
-          main.alt = '';
-          heroImgs.appendChild(main);
-        }
-        if (allUrls[1]) {
-          const side = new Image();
-          side.className = 'sw-hero__img-side';
-          side.src = allUrls[1];
-          side.alt = '';
-          heroImgs.appendChild(side);
-        }
+        allUrls.slice(0, 6).forEach(url => {
+          const img = new Image();
+          img.className = 'sw-hero__img';
+          img.src = url;
+          img.alt = '';
+          heroImgs.appendChild(img);
+        });
 
         /* Cards */
         const cardsEl = document.getElementById('swCards');
