@@ -790,6 +790,30 @@
         || 'album';
     }
 
+    // Read an album's _meta.json via download() — bypasses the public CDN
+    // cache (which ignores ?t= cache-busters), so edits are seen immediately.
+    async function loadAlbumMeta(folder) {
+      try {
+        const { data, error } = await db.storage.from(BUCKET).download(`${folder}/_meta.json`);
+        if (!error && data) return JSON.parse(await data.text());
+      } catch (e) {}
+      // Fallback to public URL if download is unavailable
+      try {
+        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
+        const r = await fetch(mu.publicUrl + '?t=' + Date.now(), { cache: 'no-store' });
+        if (r.ok) return await r.json();
+      } catch (e) {}
+      return null;
+    }
+
+    // Write an album's _meta.json with no-cache so reads stay fresh.
+    async function saveAlbumMeta(folder, meta) {
+      const blob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
+      return db.storage
+        .from(BUCKET)
+        .upload(`${folder}/_meta.json`, blob, { contentType: 'application/json', cacheControl: '0', upsert: true });
+    }
+
     function formatDate(iso) {
       if (!iso) return '';
       const [y, m, d] = iso.split('-');
@@ -906,13 +930,9 @@
         const { data: sub } = await db.storage.from(BUCKET).list(folder, { limit: 10 });
         const photos = (sub || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
         let name = folder;
-        const metaItem = (sub || []).find(f => f.name === '_meta.json');
-        if (metaItem) {
-          try {
-            const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
-            const r = await fetch(mu.publicUrl + '?t=' + Date.now());
-            if (r.ok) { const m = await r.json(); name = m.name || folder; }
-          } catch (e) {}
+        if ((sub || []).some(f => f.name === '_meta.json')) {
+          const m = await loadAlbumMeta(folder);
+          if (m) name = m.name || folder;
         }
         const cover = photos[0]
           ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
@@ -989,11 +1009,8 @@
 
       const folderId = `${slugify(name)}-${Date.now()}`;
       const meta = { name, date: new Date().toISOString().slice(0, 10), location: '', created_at: new Date().toISOString() };
-      const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
 
-      const { error: metaErr } = await db.storage
-        .from(BUCKET)
-        .upload(`${folderId}/_meta.json`, metaBlob, { contentType: 'application/json', upsert: true });
+      const { error: metaErr } = await saveAlbumMeta(folderId, meta);
 
       if (metaErr) {
         setStatus('Fehler beim Erstellen: ' + metaErr.message, 'error');
@@ -1029,11 +1046,8 @@
       if (!currentFolder) return;
       // Load current meta
       let meta = { name: currentFolder, dateFrom: '', dateTo: '', date: '', location: '' };
-      try {
-        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${currentFolder}/_meta.json`);
-        const r = await fetch(mu.publicUrl + '?t=' + Date.now());
-        if (r.ok) meta = { ...meta, ...(await r.json()) };
-      } catch (e) {}
+      const loaded = await loadAlbumMeta(currentFolder);
+      if (loaded) meta = { ...meta, ...loaded };
 
       document.getElementById('editAlbumName').value     = meta.name || '';
       document.getElementById('editAlbumDateFrom').value = meta.dateFrom || meta.date || '';
@@ -1057,29 +1071,10 @@
       editAlbumSave.disabled = true;
       editAlbumSave.textContent = 'Speichert…';
 
-      // Load existing meta to preserve created_at etc.
-      let existing = {};
-      try {
-        const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
-        const r = await fetch(mu.publicUrl + '?t=' + Date.now());
-        if (r.ok) existing = await r.json();
-      } catch (e) {}
-
+      // Load existing meta to preserve created_at etc., then overwrite in place.
+      const existing = (await loadAlbumMeta(folder)) || {};
       const meta = { ...existing, name, dateFrom, dateTo, location };
-      const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
-      const metaPath = `${folder}/_meta.json`;
-
-      // Use update() for existing files; fall back to upload() if not yet created
-      let { error } = await db.storage
-        .from(BUCKET)
-        .update(metaPath, metaBlob, { contentType: 'application/json', cacheControl: '0', upsert: true });
-
-      if (error) {
-        const up = await db.storage
-          .from(BUCKET)
-          .upload(metaPath, metaBlob, { contentType: 'application/json', cacheControl: '0', upsert: true });
-        error = up.error;
-      }
+      const { error } = await saveAlbumMeta(folder, meta);
 
       editAlbumSave.disabled = false;
       editAlbumSave.textContent = 'Speichern';
@@ -1166,10 +1161,7 @@
       const meta = { name, dateFrom, dateTo, location: loc, created_at: new Date().toISOString() };
 
       // Upload meta
-      const metaBlob = new Blob([JSON.stringify(meta, null, 2)], { type: 'application/json' });
-      const { error: metaErr } = await db.storage
-        .from(BUCKET)
-        .upload(`${folderId}/_meta.json`, metaBlob, { contentType: 'application/json', upsert: true });
+      const { error: metaErr } = await saveAlbumMeta(folderId, meta);
       if (metaErr) {
         console.error(metaErr);
         setStatus('Fehler beim Speichern der Album-Daten: ' + metaErr.message, 'error');
@@ -1240,13 +1232,9 @@
         const { data: items } = await db.storage.from(BUCKET).list(folder, { limit: 100 });
         const photos = (items || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
         let meta = { name: folder, date: '', location: '' };
-        const metaItem = (items || []).find(f => f.name === '_meta.json');
-        if (metaItem) {
-          try {
-            const { data: metaUrl } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
-            const r = await fetch(metaUrl.publicUrl + '?t=' + Date.now());
-            if (r.ok) meta = { ...meta, ...(await r.json()) };
-          } catch (e) { console.warn('meta load failed', folder, e); }
+        if ((items || []).some(f => f.name === '_meta.json')) {
+          const m = await loadAlbumMeta(folder);
+          if (m) meta = { ...meta, ...m };
         }
         const cover = photos[0]
           ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
@@ -1324,21 +1312,15 @@
           .map(f => ({ name: f.name, fullPath: `${folder}/${f.name}` }));
 
         // Try to load meta
-        try {
-          const { data: metaUrl } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
-          const r = await fetch(metaUrl.publicUrl + '?t=' + Date.now());
-          if (r.ok) {
-            const meta = await r.json();
-            sectionTitle.textContent = meta.name || folder;
-            const parts = [];
-            if (meta.dateFrom) parts.push(formatDate(meta.dateFrom) + (meta.dateTo ? ' – ' + formatDate(meta.dateTo) : ''));
-            else if (meta.date) parts.push(formatDate(meta.date));
-            if (meta.location) parts.push(meta.location);
-            metaText = parts.join(' · ');
-          } else {
-            sectionTitle.textContent = folder;
-          }
-        } catch (e) {
+        const meta = await loadAlbumMeta(folder);
+        if (meta) {
+          sectionTitle.textContent = meta.name || folder;
+          const parts = [];
+          if (meta.dateFrom) parts.push(formatDate(meta.dateFrom) + (meta.dateTo ? ' – ' + formatDate(meta.dateTo) : ''));
+          else if (meta.date) parts.push(formatDate(meta.date));
+          if (meta.location) parts.push(meta.location);
+          metaText = parts.join(' · ');
+        } else {
           sectionTitle.textContent = folder;
         }
         sectionSub.textContent = metaText || 'Album';

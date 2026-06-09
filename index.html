@@ -647,13 +647,19 @@
         for (const folder of albumFolders) {
           const { data: files } = await db.storage.from(BUCKET).list(folder, { limit: 50 });
 
-          /* Load album metadata */
+          /* Load album metadata — download() bypasses the public CDN cache
+             so renamed albums show up immediately. */
           let meta = { name: folder, location: '', date: '' };
           try {
-            const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
-            const r = await fetch(mu.publicUrl + '?t=' + Date.now());
-            if (r.ok) {
-              const m = await r.json();
+            let m = null;
+            const { data: blob, error } = await db.storage.from(BUCKET).download(`${folder}/_meta.json`);
+            if (!error && blob) m = JSON.parse(await blob.text());
+            if (!m) {
+              const { data: mu } = db.storage.from(BUCKET).getPublicUrl(`${folder}/_meta.json`);
+              const r = await fetch(mu.publicUrl + '?t=' + Date.now(), { cache: 'no-store' });
+              if (r.ok) m = await r.json();
+            }
+            if (m) {
               meta.name     = m.name     || folder;
               meta.location = m.location || '';
               meta.date     = m.dateFrom || m.date || '';
