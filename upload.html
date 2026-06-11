@@ -400,6 +400,26 @@
     .lb__full:hover:not(:disabled) { background: rgba(255,255,255,.22); }
     .lb__full:disabled { opacity: .6; cursor: wait; }
     .lb__full[hidden] { display: none; }
+    .lb__nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; font-size: 1.5rem; line-height: 1;
+      display: grid; place-items: center;
+      cursor: pointer; user-select: none;
+    }
+    .lb__nav:hover { background: rgba(255,255,255,.22); }
+    .lb__nav--prev { left: 1.25rem; }
+    .lb__nav--next { right: 1.25rem; }
+    .lb__nav[hidden] { display: none; }
+    .lb__counter {
+      position: absolute; top: 1.85rem; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.7); font-size: .8rem; letter-spacing: .08em;
+    }
+    @media (max-width: 600px) {
+      .lb__nav--prev { left: .5rem; }
+      .lb__nav--next { right: .5rem; }
+    }
 
     /* ── Password Screen ── */
     #pwScreen {
@@ -738,7 +758,10 @@
   <!-- Lightbox -->
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
     <button class="lb__close" id="lbClose">✕</button>
+    <span class="lb__counter" id="lbCounter"></span>
+    <button class="lb__nav lb__nav--prev" id="lbPrev" aria-label="Vorheriges Bild" hidden>&#8249;</button>
     <img class="lb__img" id="lbImg" src="" alt="" />
+    <button class="lb__nav lb__nav--next" id="lbNext" aria-label="Nächstes Bild" hidden>&#8250;</button>
     <button class="lb__full" id="lbFullBtn" hidden>Volle Auflösung anzeigen</button>
   </div>
 
@@ -1547,8 +1570,7 @@
         removeDerivedFor([path]);
         await openAlbum(currentFolder);
       } else if (img) {
-        const el = img.closest('.gallery-item');
-        openLightbox(el.dataset.display || el.dataset.url, el.dataset.url);
+        openLightboxFromItem(img.closest('.gallery-item'));
       }
     });
 
@@ -1558,8 +1580,13 @@
     document.getElementById('lbClose').addEventListener('click', closeLb);
     lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
     document.addEventListener('keydown', e => {
+      if (lb.classList.contains('open')) {
+        if (e.key === 'Escape')     return closeLb();
+        if (e.key === 'ArrowLeft')  return lbStep(-1);
+        if (e.key === 'ArrowRight') return lbStep(1);
+        return;
+      }
       if (e.key !== 'Escape') return;
-      if (lb.classList.contains('open'))          return closeLb();
       if (confirmModal.classList.contains('open')) return confirmCancel.click();
       if (moveModal.classList.contains('open'))    return closeMoveModal();
       if (modal.classList.contains('open'))        return closeModal();
@@ -1571,25 +1598,81 @@
       lbImg.onload  = null;
       lbImg.src = '';
       lbFullBtn.hidden = true;
+      lbItems = [];
+      lbIndex = -1;
     }
 
     // Lightbox zeigt zuerst die Display-Version (~1600px); der Button
-    // lädt auf Wunsch das unveränderte Original nach.
+    // lädt auf Wunsch das unveränderte Original nach. Mit den Pfeilen
+    // (Buttons, Tastatur, Wischgeste) springt man direkt zum nächsten Foto.
     const lbFullBtn = document.getElementById('lbFullBtn');
+    const lbPrev    = document.getElementById('lbPrev');
+    const lbNext    = document.getElementById('lbNext');
+    const lbCounter = document.getElementById('lbCounter');
     let lbFullUrl = null;
+    let lbItems = [];   // [{ display, full }] — alle Fotos des offenen Albums
+    let lbIndex = -1;
 
-    function openLightbox(displayUrl, fullUrl) {
-      lbFullUrl = fullUrl;
-      lbImg.onload = null;
-      // Keine Display-Version vorhanden (z.B. noch nicht optimiert) → Original zeigen
-      lbImg.onerror = () => { lbImg.onerror = null; lbImg.src = fullUrl; lbFullBtn.hidden = true; };
-      lbImg.src = displayUrl;
-      lbFullBtn.hidden = displayUrl === fullUrl;
-      lbFullBtn.disabled = false;
-      lbFullBtn.textContent = 'Volle Auflösung anzeigen';
+    function openLightboxFromItem(el) {
+      const items = [...galleryGrid.querySelectorAll('.gallery-item')];
+      lbItems = items.map(it => ({
+        display: it.dataset.display || it.dataset.url,
+        full:    it.dataset.url,
+      }));
+      lbIndex = items.indexOf(el);
+      if (lbIndex < 0) lbIndex = 0;
+      showLbImage();
       lb.classList.add('open');
       lb.setAttribute('aria-hidden', 'false');
     }
+
+    function showLbImage() {
+      const { display, full } = lbItems[lbIndex];
+      lbFullUrl = full;
+      lbImg.onload = null;
+      // Keine Display-Version vorhanden (z.B. noch nicht optimiert) → Original zeigen
+      lbImg.onerror = () => { lbImg.onerror = null; lbImg.src = full; lbFullBtn.hidden = true; };
+      lbImg.src = display;
+      lbFullBtn.hidden = display === full;
+      lbFullBtn.disabled = false;
+      lbFullBtn.textContent = 'Volle Auflösung anzeigen';
+
+      const many = lbItems.length > 1;
+      lbPrev.hidden = !many;
+      lbNext.hidden = !many;
+      lbCounter.textContent = many ? `${lbIndex + 1} / ${lbItems.length}` : '';
+
+      // Nachbarbilder vorladen, damit das Blättern flüssig wirkt
+      if (many) {
+        for (const d of [1, -1]) {
+          const n = (lbIndex + d + lbItems.length) % lbItems.length;
+          new Image().src = lbItems[n].display;
+        }
+      }
+    }
+
+    function lbStep(dir) {
+      if (!lbItems.length) return;
+      lbIndex = (lbIndex + dir + lbItems.length) % lbItems.length;
+      showLbImage();
+    }
+
+    lbPrev.addEventListener('click', e => { e.stopPropagation(); lbStep(-1); });
+    lbNext.addEventListener('click', e => { e.stopPropagation(); lbStep(1); });
+
+    // Wischgeste (Touch): horizontal > 40px und überwiegend horizontal
+    let lbTouchX = null, lbTouchY = null;
+    lb.addEventListener('touchstart', e => {
+      lbTouchX = e.touches[0].clientX;
+      lbTouchY = e.touches[0].clientY;
+    }, { passive: true });
+    lb.addEventListener('touchend', e => {
+      if (lbTouchX === null) return;
+      const dx = e.changedTouches[0].clientX - lbTouchX;
+      const dy = e.changedTouches[0].clientY - lbTouchY;
+      lbTouchX = lbTouchY = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) lbStep(dx < 0 ? 1 : -1);
+    }, { passive: true });
 
     lbFullBtn.addEventListener('click', () => {
       if (!lbFullUrl) return;
