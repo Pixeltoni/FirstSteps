@@ -390,6 +390,16 @@
       cursor: pointer;
     }
     .lb__close:hover { background: rgba(255,255,255,.22); }
+    .lb__full {
+      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      padding: .6rem 1.3rem; border-radius: 2rem;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+      color: #fff; font-size: .82rem; letter-spacing: .03em;
+      cursor: pointer; font-family: inherit;
+    }
+    .lb__full:hover:not(:disabled) { background: rgba(255,255,255,.22); }
+    .lb__full:disabled { opacity: .6; cursor: wait; }
+    .lb__full[hidden] { display: none; }
 
     /* ── Password Screen ── */
     #pwScreen {
@@ -554,6 +564,7 @@
           <span class="gallery-section__count" id="galleryCount"></span>
           <div class="gallery-section__actions" id="folderActions">
             <button class="btn-gallery-action btn-gallery-action--primary" id="newAlbumBtn" type="button">+ Neues Album</button>
+            <button class="btn-gallery-action" id="optimizeBtn" type="button" title="Erzeugt verkleinerte Vorschau-Versionen für ältere Uploads">Bilder optimieren</button>
             <button class="btn-gallery-action" id="selectFolderModeBtn" type="button">Auswählen</button>
           </div>
           <div class="gallery-section__actions" id="albumActions" hidden>
@@ -728,6 +739,7 @@
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
     <button class="lb__close" id="lbClose">✕</button>
     <img class="lb__img" id="lbImg" src="" alt="" />
+    <button class="lb__full" id="lbFullBtn" hidden>Volle Auflösung anzeigen</button>
   </div>
 
   <script>
@@ -851,11 +863,83 @@
       return `${d}.${m}.${y}`;
     }
 
+    // ── Verkleinerte Bildversionen (thumbs = Raster, display = Lightbox) ──
+    // Pro Foto liegen neben dem Original zwei JPEGs in Unterordnern:
+    //   <album>/thumbs/<datei>.jpg   (~480px, fürs Raster & Cover)
+    //   <album>/display/<datei>.jpg  (~1600px, für die Großansicht)
+    // Das Original bleibt unangetastet und ist über den Lightbox-Button abrufbar.
+    const THUMB_DIR   = 'thumbs';
+    const DISPLAY_DIR = 'display';
+    const THUMB_MAX   = 480,  THUMB_Q   = 0.8;
+    const DISPLAY_MAX = 1600, DISPLAY_Q = 0.85;
+
+    function publicUrl(path) {
+      return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+    function thumbPath(folder, name)   { return `${folder}/${THUMB_DIR}/${name}.jpg`; }
+    function displayPath(folder, name) { return `${folder}/${DISPLAY_DIR}/${name}.jpg`; }
+
+    async function resizeToJpeg(blob, maxDim, quality) {
+      const bmp = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+      const scale = Math.min(1, maxDim / Math.max(bmp.width, bmp.height));
+      const w = Math.max(1, Math.round(bmp.width * scale));
+      const h = Math.max(1, Math.round(bmp.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(bmp, 0, 0, w, h);
+      bmp.close();
+      return new Promise(res => canvas.toBlob(res, 'image/jpeg', quality));
+    }
+
+    // Erzeugt thumb + display für ein Original und lädt beide hoch.
+    // Fehler sind unkritisch: ohne abgeleitete Version greift der
+    // onerror-Fallback im <img> auf das Original zurück.
+    async function uploadDerived(folder, name, blob) {
+      try {
+        const [t, d] = await Promise.all([
+          resizeToJpeg(blob, THUMB_MAX, THUMB_Q),
+          resizeToJpeg(blob, DISPLAY_MAX, DISPLAY_Q),
+        ]);
+        const jobs = [];
+        if (t) jobs.push(db.storage.from(BUCKET).upload(thumbPath(folder, name), t, { contentType: 'image/jpeg', upsert: true }));
+        if (d) jobs.push(db.storage.from(BUCKET).upload(displayPath(folder, name), d, { contentType: 'image/jpeg', upsert: true }));
+        await Promise.all(jobs);
+        return !!(t && d);
+      } catch (e) {
+        console.warn('Vorschau-Erzeugung fehlgeschlagen:', name, e);
+        return false;
+      }
+    }
+
+    // Löscht die abgeleiteten Versionen zu Original-Pfaden (best effort).
+    function removeDerivedFor(paths) {
+      const derived = [];
+      for (const p of paths) {
+        const idx = p.lastIndexOf('/');
+        if (idx < 0) continue; // Legacy-Datei im Root → keine abgeleiteten Versionen
+        const folder = p.slice(0, idx), name = p.slice(idx + 1);
+        derived.push(thumbPath(folder, name), displayPath(folder, name));
+      }
+      if (derived.length) db.storage.from(BUCKET).remove(derived).catch(() => {});
+    }
+
+    // remove() in 100er-Blöcken, damit auch sehr große Alben sauber gelöscht werden.
+    async function removePaths(paths) {
+      for (let i = 0; i < paths.length; i += 100) {
+        const { error } = await db.storage.from(BUCKET).remove(paths.slice(i, i + 100));
+        if (error) return error;
+      }
+      return null;
+    }
+
     // ── Confirm Modal ──
-    function showConfirm(title, msg) {
+    function showConfirm(title, msg, okText = 'Löschen') {
       return new Promise(resolve => {
         confirmTitle.textContent = title;
         confirmMsg.textContent   = msg;
+        confirmOk.textContent    = okText;
         confirmModal.classList.add('open');
         confirmModal.setAttribute('aria-hidden', 'false');
         function ok()  { cleanup(); resolve(true);  }
@@ -915,7 +999,8 @@
         const { error } = await db.storage
           .from(BUCKET)
           .upload(`${currentFolder}/${safeName}`, file, { contentType: file.type, upsert: false });
-        if (error) { fail++; console.error(error); } else ok++;
+        if (error) { fail++; console.error(error); }
+        else { ok++; await uploadDerived(currentFolder, safeName, file); }
       }
       addImagesBtn.disabled = false;
       addImagesBtn.textContent = '+ Bilder hinzufügen';
@@ -933,8 +1018,10 @@
         `Sollen ${n} Bild${n > 1 ? 'er' : ''} wirklich dauerhaft gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.`
       );
       if (!confirmed) return;
-      const { error } = await db.storage.from(BUCKET).remove([...selectedPaths]);
+      const paths = [...selectedPaths];
+      const error = await removePaths(paths);
       if (error) { setStatus('Löschen fehlgeschlagen: ' + error.message, 'error'); return; }
+      removeDerivedFor(paths);
       exitSelectMode();
       setStatus(`${n} Bild${n > 1 ? 'er' : ''} gelöscht`, 'ok');
       await openAlbum(currentFolder);
@@ -965,18 +1052,17 @@
           const m = await loadAlbumMeta(folder);
           if (m) name = m.name || folder;
         }
-        const cover = photos[0]
-          ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
-          : null;
-        return { folder, name, cover };
+        const cover      = photos[0] ? publicUrl(`${folder}/${photos[0].name}`) : null;
+        const coverThumb = photos[0] ? publicUrl(thumbPath(folder, photos[0].name)) : null;
+        return { folder, name, cover, coverThumb };
       }));
 
       moveAlbumList.innerHTML = '';
-      items.forEach(({ folder, name, cover }) => {
+      items.forEach(({ folder, name, cover, coverThumb }) => {
         const el = document.createElement('div');
         el.className = 'move-album-item';
         el.innerHTML = cover
-          ? `<img class="move-album-item__thumb" src="${cover}" alt="" loading="lazy"><span class="move-album-item__name">${name}</span>`
+          ? `<img class="move-album-item__thumb" src="${coverThumb}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${cover}'"><span class="move-album-item__name">${name}</span>`
           : `<div class="move-album-item__thumb"></div><span class="move-album-item__name">${name}</span>`;
         el.addEventListener('click', () => doMoveImages(folder));
         moveAlbumList.appendChild(el);
@@ -999,8 +1085,11 @@
             .from(BUCKET)
             .upload(`${targetFolder}/${fileName}`, dlData, { contentType: dlData.type, upsert: true });
           if (upErr) { fail++; console.error('Upload fehlgeschlagen', upErr); continue; }
+          // Verkleinerte Versionen am Ziel neu erzeugen, alte am Quellort entfernen
+          await uploadDerived(targetFolder, fileName, dlData);
           const { error: rmErr } = await db.storage.from(BUCKET).remove([srcPath]);
           if (rmErr) console.error('Löschen aus Quellalbum fehlgeschlagen', srcPath, rmErr);
+          removeDerivedFor([srcPath]);
           ok++;
         } catch (e) { fail++; console.error(e); }
       }
@@ -1231,7 +1320,7 @@
           .from(BUCKET)
           .upload(`${folderId}/${safeName}`, file, { contentType: file.type, upsert: false });
         if (error) { fail++; console.error(error); }
-        else ok++;
+        else { ok++; await uploadDerived(folderId, safeName, file); }
         progressFill.style.width = `${((i + 1) / pendingFiles.length) * 100}%`;
       }
 
@@ -1288,10 +1377,9 @@
         let meta = { name: folder, date: '', location: '' };
         const m = await loadAlbumMeta(folder);
         if (m) meta = { ...meta, ...m };
-        const cover = photos[0]
-          ? db.storage.from(BUCKET).getPublicUrl(`${folder}/${photos[0].name}`).data.publicUrl
-          : null;
-        return { folder, meta, count: photos.length, cover };
+        const cover      = photos[0] ? publicUrl(`${folder}/${photos[0].name}`) : null;
+        const coverThumb = photos[0] ? publicUrl(thumbPath(folder, photos[0].name)) : null;
+        return { folder, meta, count: photos.length, cover, coverThumb };
       }));
 
       // Sort: newest by meta.created_at desc
@@ -1306,7 +1394,7 @@
         card.innerHTML = `
           <button class="folder-card__rm" data-action="rm-folder" aria-label="Album löschen">✕</button>
           <div class="folder-card__cover">
-            ${c.cover ? `<img src="${c.cover}" alt="" loading="lazy">` : '<div class="folder-card__cover-placeholder">⌑</div>'}
+            ${c.cover ? `<img src="${c.coverThumb}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${c.cover}'">` : '<div class="folder-card__cover-placeholder">⌑</div>'}
             <span class="folder-card__count-badge">${c.count} Foto${c.count !== 1 ? 's' : ''}</span>
           </div>
           <div class="folder-card__body">
@@ -1388,13 +1476,16 @@
       }
 
       galleryGrid.innerHTML = '';
+      const isLegacy = folder === '__legacy__';
       files.forEach((file, i) => {
-        const url = db.storage.from(BUCKET).getPublicUrl(file.fullPath).data.publicUrl;
+        const url   = publicUrl(file.fullPath);
+        const thumb = isLegacy ? url : publicUrl(thumbPath(folder, file.name));
         const div = document.createElement('div');
         div.className = 'gallery-item';
-        div.dataset.path = file.fullPath;
-        div.dataset.url  = url;
-        div.innerHTML = `<img src="${url}" alt="" loading="lazy">
+        div.dataset.path    = file.fullPath;
+        div.dataset.url     = url;
+        div.dataset.display = isLegacy ? url : publicUrl(displayPath(folder, file.name));
+        div.innerHTML = `<img src="${thumb}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${url}'">
                          <button class="gallery-item__rm" aria-label="Löschen">✕</button>`;
         galleryGrid.appendChild(div);
       });
@@ -1413,11 +1504,14 @@
           `Album "${albumName}" inkl. aller Bilder wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`
         );
         if (!confirmed) return;
-        const { data: items, error } = await db.storage.from(BUCKET).list(folder, { limit: 1000 });
-        if (error) { setStatus('Löschen fehlgeschlagen: ' + error.message, 'error'); return; }
-        const paths = (items || []).map(f => `${folder}/${f.name}`);
+        const paths = [];
+        // Abgeleitete Versionen zuerst, dann Originale + _meta.json
+        for (const sub of [`${folder}/${THUMB_DIR}`, `${folder}/${DISPLAY_DIR}`]) {
+          (await listAllInFolder(sub)).forEach(f => { if (f.id) paths.push(`${sub}/${f.name}`); });
+        }
+        (await listAllInFolder(folder)).forEach(f => { if (f.id) paths.push(`${folder}/${f.name}`); });
         if (paths.length) {
-          const { error: rmErr } = await db.storage.from(BUCKET).remove(paths);
+          const rmErr = await removePaths(paths);
           if (rmErr) { setStatus('Löschen fehlgeschlagen: ' + rmErr.message, 'error'); return; }
         }
         setStatus('Album gelöscht', 'ok');
@@ -1450,12 +1544,11 @@
         if (!confirmed) return;
         const { error } = await db.storage.from(BUCKET).remove([path]);
         if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
+        removeDerivedFor([path]);
         await openAlbum(currentFolder);
       } else if (img) {
-        const url = img.closest('.gallery-item').dataset.url;
-        lbImg.src = url;
-        lb.classList.add('open');
-        lb.setAttribute('aria-hidden', 'false');
+        const el = img.closest('.gallery-item');
+        openLightbox(el.dataset.display || el.dataset.url, el.dataset.url);
       }
     });
 
@@ -1474,8 +1567,38 @@
     function closeLb() {
       lb.classList.remove('open');
       lb.setAttribute('aria-hidden', 'true');
+      lbImg.onerror = null;
+      lbImg.onload  = null;
       lbImg.src = '';
+      lbFullBtn.hidden = true;
     }
+
+    // Lightbox zeigt zuerst die Display-Version (~1600px); der Button
+    // lädt auf Wunsch das unveränderte Original nach.
+    const lbFullBtn = document.getElementById('lbFullBtn');
+    let lbFullUrl = null;
+
+    function openLightbox(displayUrl, fullUrl) {
+      lbFullUrl = fullUrl;
+      lbImg.onload = null;
+      // Keine Display-Version vorhanden (z.B. noch nicht optimiert) → Original zeigen
+      lbImg.onerror = () => { lbImg.onerror = null; lbImg.src = fullUrl; lbFullBtn.hidden = true; };
+      lbImg.src = displayUrl;
+      lbFullBtn.hidden = displayUrl === fullUrl;
+      lbFullBtn.disabled = false;
+      lbFullBtn.textContent = 'Volle Auflösung anzeigen';
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+    }
+
+    lbFullBtn.addEventListener('click', () => {
+      if (!lbFullUrl) return;
+      lbFullBtn.disabled = true;
+      lbFullBtn.textContent = 'Lädt…';
+      lbImg.onerror = null;
+      lbImg.onload = () => { lbImg.onload = null; lbFullBtn.hidden = true; };
+      lbImg.src = lbFullUrl;
+    });
 
     // ── Password Protection ──
     // To change the password:
@@ -1515,6 +1638,74 @@
     if (sessionStorage.getItem(PW_SESSION)) {
       pwScreen.remove();
     }
+
+    // ── Bestehende Alben optimieren ──
+    // Erzeugt fehlende thumbs/display-Versionen für alle bereits hochgeladenen
+    // Bilder. Einmalig nötig für Alben, die vor dieser Funktion entstanden sind.
+    const optimizeBtn = document.getElementById('optimizeBtn');
+    optimizeBtn.addEventListener('click', async () => {
+      optimizeBtn.disabled = true;
+      optimizeBtn.textContent = 'Prüfe…';
+      try {
+        const { data, error } = await db.storage.from(BUCKET).list('', { limit: 200 });
+        if (error) { setStatus('Fehler: ' + error.message, 'error'); return; }
+        const folders = (data || []).filter(e => e && e.name && e.id === null).map(e => e.name);
+
+        const tasks = [];
+        for (const folder of folders) {
+          const items  = await listAllInFolder(folder);
+          const photos = items.filter(f => f.name && f.name !== '_meta.json' && f.id);
+          const thumbs   = new Set((await listAllInFolder(`${folder}/${THUMB_DIR}`)).map(f => f.name));
+          const displays = new Set((await listAllInFolder(`${folder}/${DISPLAY_DIR}`)).map(f => f.name));
+          for (const p of photos) {
+            if (!thumbs.has(`${p.name}.jpg`) || !displays.has(`${p.name}.jpg`)) {
+              tasks.push({ folder, name: p.name });
+            }
+          }
+        }
+
+        if (!tasks.length) {
+          setStatus('Alle Bilder sind bereits optimiert ✓', 'ok');
+          return;
+        }
+
+        const confirmed = await showConfirm(
+          'Bilder optimieren',
+          `Für ${tasks.length} Bild${tasks.length > 1 ? 'er' : ''} werden verkleinerte Vorschau-Versionen erzeugt. ` +
+          `Das kann einige Minuten dauern — bitte den Tab geöffnet lassen.`,
+          'Optimieren'
+        );
+        if (!confirmed) return;
+
+        let done = 0, failed = 0;
+        const queue = [...tasks];
+        const tick = () => { optimizeBtn.textContent = `Optimiere… ${done + failed}/${tasks.length}`; };
+        tick();
+        // 3 Bilder parallel: schnell genug, ohne Browser/Verbindung zu überlasten
+        await Promise.all(Array.from({ length: 3 }, async () => {
+          while (queue.length) {
+            const t = queue.shift();
+            try {
+              const { data: blob, error: dlErr } = await db.storage.from(BUCKET).download(`${t.folder}/${t.name}`);
+              if (dlErr || !blob) throw dlErr || new Error('Download fehlgeschlagen');
+              const okDerived = await uploadDerived(t.folder, t.name, blob);
+              if (okDerived) done++; else failed++;
+            } catch (e) {
+              failed++;
+              console.error('Optimierung fehlgeschlagen:', t.folder, t.name, e);
+            }
+            tick();
+          }
+        }));
+
+        if (failed === 0) setStatus(`${done} Bild${done > 1 ? 'er' : ''} optimiert ✓`, 'ok');
+        else              setStatus(`${done} optimiert, ${failed} fehlgeschlagen`, 'error');
+        await loadFolders();
+      } finally {
+        optimizeBtn.disabled = false;
+        optimizeBtn.textContent = 'Bilder optimieren';
+      }
+    });
 
     // ── Init ──
     loadFolders();

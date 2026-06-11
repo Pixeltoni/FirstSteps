@@ -678,11 +678,14 @@
 
           const photos = (files || []).filter(f => f.name && f.name !== '_meta.json' && f.id);
           photos.forEach((p, i) => {
-            const { data } = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`);
-            allPhotos.push({ url: data.publicUrl, albumName: meta.name, location: meta.location, date: meta.date });
+            const url = db.storage.from(BUCKET).getPublicUrl(`${folder}/${p.name}`).data.publicUrl;
+            /* Verkleinerte Versionen (von der Galerie erzeugt); onerror fällt aufs Original zurück */
+            const thumb   = db.storage.from(BUCKET).getPublicUrl(`${folder}/thumbs/${p.name}.jpg`).data.publicUrl;
+            const display = db.storage.from(BUCKET).getPublicUrl(`${folder}/display/${p.name}.jpg`).data.publicUrl;
+            allPhotos.push({ url, thumb, display, albumName: meta.name, location: meta.location, date: meta.date });
             /* First photo of the album becomes its cover in the cards row */
             if (i === 0) {
-              albums.push({ coverUrl: data.publicUrl, albumName: meta.name, location: meta.location, date: meta.date });
+              albums.push({ coverUrl: url, coverThumb: thumb, albumName: meta.name, location: meta.location, date: meta.date });
             }
           });
         }
@@ -691,36 +694,42 @@
         if (!allPhotos.length) {
           const rootFiles = (entries || []).filter(e => e && e.id && e.name && e.name !== '.emptyFolderPlaceholder');
           for (const f of rootFiles) {
-            const { data } = db.storage.from(BUCKET).getPublicUrl(f.name);
-            allPhotos.push({ url: data.publicUrl, albumName: '—', location: '', date: '' });
+            const url = db.storage.from(BUCKET).getPublicUrl(f.name).data.publicUrl;
+            allPhotos.push({ url, thumb: url, display: url, albumName: '—', location: '', date: '' });
           }
         }
 
-        const allUrls = allPhotos.map(p => p.url);
+        /* Setzt src auf die verkleinerte Version; existiert sie (noch) nicht,
+           lädt onerror das Original. */
+        function setImgWithFallback(img, src, fallback) {
+          if (src !== fallback) img.onerror = () => { img.onerror = null; img.src = fallback; };
+          img.src = src;
+        }
 
-        console.log(`Galerie: ${albumFolders.length} Alben, ${allUrls.length} Bilder gefunden`);
-        if (!allUrls.length) { console.warn('Keine Bilder in der Galerie.'); return; }
-        allUrls.sort(() => Math.random() - 0.5);
+        console.log(`Galerie: ${albumFolders.length} Alben, ${allPhotos.length} Bilder gefunden`);
+        if (!allPhotos.length) { console.warn('Keine Bilder in der Galerie.'); return; }
+        allPhotos.sort(() => Math.random() - 0.5);
 
         /* Hero images — 6 overlapping images to cover the full area */
         const heroImgs = document.getElementById('heroImgs');
         heroImgs.innerHTML = '';
-        allUrls.slice(0, 9).forEach(url => {
+        allPhotos.slice(0, 9).forEach(photo => {
           const img = new Image();
           img.className = 'sw-hero__img';
-          img.src = url;
           img.alt = '';
+          img.decoding = 'async';
+          setImgWithFallback(img, photo.display, photo.url);
           heroImgs.appendChild(img);
         });
 
         /* Cards — one card per album (cover photo), so distinct albums are shown */
         const cardsEl = document.getElementById('swCards');
         cardsEl.innerHTML = '';
-        albums.forEach(({ coverUrl, albumName, location, date }) => {
+        albums.forEach(({ coverUrl, coverThumb, albumName, location, date }) => {
           const card = document.createElement('div');
           card.className = 'sw-card';
           card.innerHTML = `
-            <img class="sw-card__img" src="${coverUrl}" alt="" loading="lazy">
+            <img class="sw-card__img" src="${coverThumb}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${coverUrl}'">
             <div class="sw-card__body">
               <div class="sw-card__name">${albumName}</div>
               <div class="sw-card__desc">${location || '—'}</div>
@@ -732,16 +741,16 @@
 
         /* Feature image 1 */
         const img1 = document.getElementById('featureImg1');
-        if (allUrls[8] && img1) {
-          img1.src = allUrls[8];
+        if (allPhotos[8] && img1) {
+          setImgWithFallback(img1, allPhotos[8].display, allPhotos[8].url);
           img1.style.opacity = '1';
           document.getElementById('featureVisual1').style.background = '#1a1a1a';
         }
 
         /* Feature image 2 */
         const img2 = document.getElementById('featureImg2');
-        if (allUrls[9] && img2) {
-          img2.src = allUrls[9];
+        if (allPhotos[9] && img2) {
+          setImgWithFallback(img2, allPhotos[9].display, allPhotos[9].url);
           img2.style.opacity = '1';
           document.getElementById('featureVisual2').style.background = '#1a1a1a';
         }
