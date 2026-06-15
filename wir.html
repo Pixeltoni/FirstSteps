@@ -307,7 +307,8 @@
   const HAIR_COLORS = ['#1a1a1a', '#3b2614', '#6b4423', '#b87333', '#d9a441', '#e8e3da', '#9b3b3b', '#4a6fa5'];
   const SHIRT_COLORS= ['#0f0f0f', '#ffffff', '#9aa0a6', '#c0392b', '#27ae60', '#2980b9', '#f39c12', '#8e44ad'];
 
-  const HAIR_STYLES = ['Glatze', 'Kurz', 'Seite', 'Spiky', 'Locken', 'Bob', 'Lang', 'Zopf'];
+  const HAIR_STYLES = ['Glatze', 'Kurz', 'Seite', 'Strubbel', 'Lockig', 'Rund',
+                       'Bob', 'Lang', 'Wellig', 'Mittelscheitel', 'Zopf'];
   const EYE_STYLES  = ['Punkte', 'Groß', 'Schmal', 'Müde', 'Zwinkern'];
   const BROW_STYLES = ['Keine', 'Normal', 'Hoch', 'Skeptisch'];
   const NOSE_STYLES = ['Punkt', 'Strich', 'Spitz', 'Keine'];
@@ -362,54 +363,95 @@
       <path d="M190 112 q12 2 9 16 q-3 11 -13 8" fill="${skin}" stroke="${INK}" stroke-width="2.4"/>`;
   }
 
-  /* Frisuren — locker gezeichnete Striche, Farbe = Haarfarbe.
-     Orientiert an der Vorlage (kurz oben, lang unten).             */
+  /* Frisuren — volle, gefüllte Haar-Formen mit Volumen.
+     Nachgebildet nach der Vorlage: oben kurze, unten lange Stile.
+     Jede Form ist eine geschlossene Fläche (Haarfarbe) mit Kontur,
+     die oben/seitlich übers Gesicht ragt und die Stirn frei lässt.   */
   function hair(color) {
-    const s = `stroke="${color}" fill="none" stroke-width="3.4"`;
+    const f = `fill="${color}" stroke="${INK}" stroke-width="3"`;
     switch (HAIR_STYLES[state.hair]) {
       case 'Glatze':
         return '';
+
       case 'Kurz':
-        // Haaransatz über der Stirn + ein paar kurze Strähnchen
+        // Kurzer, runder Haarschopf mit kleinem Wirbel
         return `
-          <path d="M52 104 C56 56 88 40 120 40 C152 40 184 56 188 104" ${s}/>
-          <path d="M120 42 C112 56 110 66 117 80" ${s} stroke-width="2.6"/>
-          <path d="M92 50 C88 60 88 68 92 76" ${s} stroke-width="2.6"/>
-          <path d="M150 50 C154 60 154 68 150 78" ${s} stroke-width="2.6"/>`;
+          <path d="M44 110 C40 60 78 34 120 34 C162 34 200 60 196 110
+                   C184 82 156 76 120 78 C86 76 58 82 44 110 Z" ${f}/>
+          <path d="M118 36 C128 26 146 28 150 40 C140 36 130 38 124 48 Z" ${f}/>`;
+
       case 'Seite':
-        // Seitenscheitel: langer Schwung von einer Seite
-        return `
-          <path d="M50 108 C50 54 86 40 122 40 C160 40 188 58 190 100" ${s}/>
-          <path d="M122 42 C104 54 86 64 64 70" ${s}/>
-          <path d="M120 50 C108 60 96 66 80 70" ${s} stroke-width="2.6"/>`;
-      case 'Spiky':
-        // Zackige, abstehende Haare
-        return `<path d="M52 98 L64 58 L80 92 L96 52 L112 90 L120 48 L130 90 L146 52 L162 92 L178 58 L188 98" ${s}/>`;
-      case 'Locken':
-        // Lockige, wellige Kontur (Bögen)
-        return `<path d="M52 110
-                  a13 13 0 0 1 20 -12 a13 13 0 0 1 22 -8 a12 12 0 0 1 24 -4
-                  a12 12 0 0 1 24 3 a13 13 0 0 1 20 9 a13 13 0 0 1 14 14" ${s}/>`;
+        // Seitenscheitel: Volumen oben, Schwung über die Stirn
+        return `<path d="M44 116 C42 56 80 32 122 32 C166 32 198 58 196 114
+                  C188 84 168 76 140 80 C158 62 138 52 116 58
+                  C142 66 104 96 64 88 C54 96 48 106 44 116 Z" ${f}/>`;
+
+      case 'Strubbel':
+        // Strubbelig/struppig: gezackte, abstehende Kontur
+        return `<path d="M44 112 L52 70 L66 96 L74 58 L90 90 L102 52 L116 86
+                  L126 48 L140 88 L154 56 L168 94 L180 64 L196 112
+                  C184 84 156 78 120 80 C86 78 58 84 44 112 Z" ${f}/>`;
+
+      case 'Lockig':
+        // Lockig: rundliche Bögen ringsum, viel Volumen
+        return `<path d="M42 116
+                  a17 17 0 0 1 18 -24 a17 17 0 0 1 24 -14 a16 16 0 0 1 24 -8
+                  a16 16 0 0 1 26 0 a16 16 0 0 1 24 8 a17 17 0 0 1 24 14
+                  a17 17 0 0 1 18 24
+                  C186 90 156 82 120 84 C84 82 56 90 42 116 Z" ${f}/>`;
+
+      case 'Rund':
+        // Voller, runder Topf/Pilz-Schnitt
+        return `<path d="M40 122 C40 54 80 30 120 30 C160 30 200 54 200 122
+                  C192 92 170 82 120 82 C70 82 48 92 40 122 Z" ${f}/>`;
+
       case 'Bob':
-        // Bob: Deckhaar + zwei Seiten bis aufs Kinn
-        return `
-          <path d="M48 116 C48 56 86 40 120 40 C154 40 192 56 192 116" ${s}/>
-          <path d="M50 110 C42 138 46 162 58 178" ${s}/>
-          <path d="M190 110 C198 138 194 162 182 178" ${s}/>
-          <path d="M120 42 C112 58 110 70 116 84" ${s} stroke-width="2.6"/>`;
+        // Bob bis aufs Kinn, mit Pony
+        return `<path d="M46 178 C34 118 36 48 120 34 C204 48 206 118 194 178
+                  C190 142 186 106 172 90
+                  C176 102 176 114 174 122
+                  C172 98 150 84 120 84 C90 84 68 98 66 122
+                  C64 114 64 102 68 90
+                  C54 106 50 142 46 178 Z" ${f}/>`;
+
       case 'Lang':
-        // Lange Haare: Deckhaar + lange Seitenpartien bis über die Schultern
+        // Lange, glatte Haare mit Pony, über die Schultern
+        return `<path d="M46 258 C30 158 34 52 120 34 C206 52 210 158 194 258
+                  C190 200 186 122 172 92
+                  C176 104 176 116 174 124
+                  C172 100 150 86 120 86 C90 86 68 100 66 124
+                  C64 116 64 104 68 92
+                  C54 122 50 200 46 258 Z" ${f}/>`;
+
+      case 'Wellig':
+        // Lange, wellige Haare (geschwungene Seiten)
+        return `<path d="M50 256 C34 216 56 198 44 166 C32 134 54 114 46 84
+                  C58 50 88 32 120 34 C152 32 182 50 194 84
+                  C186 114 208 134 196 166 C184 198 206 216 190 256
+                  C186 206 184 124 172 94
+                  C176 106 176 118 174 126
+                  C172 102 150 88 120 88 C90 88 68 102 66 126
+                  C64 118 64 106 68 94
+                  C56 124 54 206 50 256 Z" ${f}/>`;
+
+      case 'Mittelscheitel':
+        // Lange Haare mit Mittelscheitel (Stirn frei)
         return `
-          <path d="M48 118 C48 54 86 40 120 40 C154 40 192 54 192 118" ${s}/>
-          <path d="M50 112 C36 160 40 214 52 246" ${s}/>
-          <path d="M190 112 C204 160 200 214 188 246" ${s}/>
-          <path d="M120 42 C108 60 104 76 112 92" ${s} stroke-width="2.6"/>`;
+          <path d="M46 258 C30 158 34 52 120 34 C206 52 210 158 194 258
+                   C190 200 184 120 170 90
+                   C156 74 138 70 120 72 C102 70 84 74 70 90
+                   C56 120 50 200 46 258 Z" ${f}/>
+          <path d="M120 36 L120 74" fill="none" stroke="${INK}" stroke-width="2.4"/>`;
+
       case 'Zopf':
-        // Seitlicher Pferdeschwanz
+        // Hoher Pferdeschwanz seitlich
         return `
-          <path d="M50 110 C52 56 86 40 120 40 C154 40 188 56 190 104" ${s}/>
-          <path d="M186 96 C214 96 226 126 218 156 C214 172 202 180 190 176" ${s}/>
-          <path d="M120 42 C110 58 108 70 115 84" ${s} stroke-width="2.6"/>`;
+          <path d="M186 70 C214 46 244 52 248 80 C252 106 232 122 212 116
+                   C226 104 228 86 214 78 C202 72 192 76 186 88 Z" ${f}/>
+          <path d="M48 110 C48 54 84 34 120 34 C156 34 192 54 192 104
+                   C182 80 158 74 120 76 C82 74 58 82 48 110 Z" ${f}/>
+          <ellipse cx="184" cy="92" rx="9" ry="8" ${f}/>`;
+
       default:
         return '';
     }
