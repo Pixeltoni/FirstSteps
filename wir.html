@@ -84,7 +84,7 @@
 
     /* ── APP LAYOUT ── */
     .wir-app {
-      max-width: 980px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 1rem 2.5rem 4rem;
       display: flex;
@@ -173,13 +173,10 @@
     }
     .wir-scene-bar__clear:hover { color: var(--sw-black); }
 
-    /* ── GROUP SCENE ── */
+    /* ── GROUP SCENE (randlos) ── */
     .wir-scene {
       position: relative;
-      background:
-        linear-gradient(180deg, #ffffff 0%, #fbfbfb 38%, #f3f3f3 100%);
-      border: 1px solid var(--sw-border);
-      border-radius: 10px;
+      background: var(--sw-white);
       overflow: hidden;
     }
     .wir-scene canvas { display: block; width: 100%; height: auto; }
@@ -270,8 +267,8 @@
 
   // Perspektive des Bodens (45°-Aufsicht angedeutet):
   // hintere Reihen sitzen höher und sind kleiner als vordere.
-  const FLOOR_BACK  = 0.34;  // Anteil der Höhe: Fußlinie der hintersten Reihe
-  const FLOOR_FRONT = 0.93;  // Fußlinie der vordersten Reihe
+  const FLOOR_BACK  = 0.40;  // Anteil der Höhe: Fußlinie der hintersten Figuren
+  const FLOOR_FRONT = 0.88;  // Fußlinie der vordersten Figuren
   const FAR_SCALE   = 0.52;  // Größen-Faktor ganz hinten
   const NEAR_SCALE  = 1.0;   // Größen-Faktor ganz vorne
   let   BASE_SCALE  = 0.5;   // Grund-Skalierung (aus Canvas-Höhe berechnet)
@@ -366,39 +363,50 @@
   }
 
   /* ════════════════════════════════════════════════════════
-     LAYOUT · Charaktere als Gruppe auf dem Boden anordnen
-     Reihen von hinten (klein, hoch) nach vorne (groß, tief).
+     LAYOUT · Charaktere als geclusterte Gruppe (Menschenmenge)
+     Keine starren Reihen: die Figuren werden über eine
+     Phyllotaxis-Verteilung (Sonnenblumen-Muster) gleichmäßig
+     im Cluster verteilt und zusätzlich pro Charakter leicht
+     zufällig versetzt – wirkt natürlich gedrängt.
+     Die vertikale Cluster-Achse bildet die Tiefe (hinten klein
+     und hoch, vorne groß und tief) für die 45°-Aufsicht.
   ════════════════════════════════════════════════════════ */
+  const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
   function layout() {
     const n = chars.length;
     if (!n) return;
 
-    const perRow = Math.min(6, Math.ceil(Math.sqrt(n * 1.4)));
-    const rows = Math.ceil(n / perRow);
+    const clusterRX = CW * 0.26;   // horizontale Cluster-Ausdehnung
 
     chars.forEach((c, i) => {
-      const row = Math.floor(i / perRow);              // 0 = hinten
-      // Anzahl in dieser Reihe (letzte Reihe evtl. kürzer)
-      const inRow = Math.min(perRow, n - row * perRow);
-      const col = i - row * perRow;
+      const r = seeded(c.id);
 
-      // Tiefe 0..1 (0 hinten, 1 vorne)
-      const dz = rows === 1 ? 0.62 : 0.18 + 0.78 * (row / (rows - 1));
+      // Position im Einheitskreis (gleichmäßige Sonnenblumen-Verteilung)
+      let dx, dy;
+      if (n === 1) {
+        dx = 0; dy = 0.25;          // einzelne Figur leicht nach vorn, mittig
+      } else {
+        const rad = Math.sqrt((i + 0.5) / n);
+        const ang = i * GOLDEN_ANGLE;
+        dx = rad * Math.cos(ang);
+        dy = rad * Math.sin(ang);
+        // dauerhafter Jitter pro Charakter → weniger "perfekt", mehr Zufall
+        dx += (r() - 0.5) * 0.22;
+        dy += (r() - 0.5) * 0.22;
+      }
+
+      // Tiefe 0..1 aus der vertikalen Cluster-Achse (-1 hinten .. +1 vorne)
+      const dz = Math.min(1, Math.max(0, (dy + 1) / 2));
 
       const sc = BASE_SCALE * (FAR_SCALE + (NEAR_SCALE - FAR_SCALE) * dz);
       const groundY = CH * (FLOOR_BACK + (FLOOR_FRONT - FLOOR_BACK) * dz);
 
-      // Kleine, dauerhafte Variation pro Charakter (aus id)
-      const r = seeded(c.id);
+      // nähere Figuren etwas breiter gestreut (Perspektive)
+      const spread = clusterRX * (0.78 + 0.42 * dz);
       const heightVar = 0.94 + r() * 0.12;
 
-      // horizontale Verteilung; nähere Reihen breiter (Perspektive)
-      const gap = CW * 0.16 * (0.55 + 0.55 * dz);
-      const stagger = (row % 2) * 0.5;                 // versetzt für Gruppen-Look
-      const jitter = (r() - 0.5) * gap * 0.18;
-      const cx = CW / 2 + (col - (inRow - 1) / 2 + stagger) * gap + jitter;
-
-      c.cx = cx;
+      c.cx = CW / 2 + dx * spread;
       c.groundY = groundY;
       c.sc = sc * heightVar;
       c.dz = dz;
@@ -406,37 +414,37 @@
   }
 
   /* ════════════════════════════════════════════════════════
-     BODEN zeichnen (perspektivische Fläche, 45°-Anmutung)
+     GRUPPEN-SCHATTEN (statt Boden)
+     Eine weiche, flache Schatten-Ellipse unter der gesamten
+     Gruppe deutet den Boden an, ohne eine Fläche zu zeichnen.
   ════════════════════════════════════════════════════════ */
-  function drawFloor() {
-    const backY  = CH * FLOOR_BACK;
-    const frontY = CH * FLOOR_FRONT;
-    const backHalf  = CW * 0.30;
-    const frontHalf = CW * 0.62;
-    const midX = CW / 2;
+  function drawGroupShadow() {
+    if (!chars.length) return;
 
-    // Bodenfläche
+    let minX = Infinity, maxX = -Infinity, sumY = 0;
+    chars.forEach(c => {
+      minX = Math.min(minX, c.cx);
+      maxX = Math.max(maxX, c.cx);
+      sumY += c.groundY;
+    });
+
+    const midX = (minX + maxX) / 2;
+    const midY = sumY / chars.length + CH * 0.05;   // knapp unter den Füßen
+    const rx = Math.max(CW * 0.16, (maxX - minX) / 2 + CW * 0.12);
+    const ry = rx * 0.22;
+
+    ctx.save();
+    ctx.translate(midX, midY);
+    ctx.scale(1, ry / rx);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0,   'rgba(0,0,0,0.20)');
+    g.addColorStop(0.55,'rgba(0,0,0,0.11)');
+    g.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.moveTo(midX - backHalf, backY);
-    ctx.lineTo(midX + backHalf, backY);
-    ctx.lineTo(midX + frontHalf, frontY);
-    ctx.lineTo(midX - frontHalf, frontY);
-    ctx.closePath();
-    ctx.fillStyle = '#eef0f2';
+    ctx.arc(0, 0, rx, 0, Math.PI * 2);
     ctx.fill();
-
-    // Tiefen-Linien (Querstreifen) für 45°-Gefühl
-    ctx.strokeStyle = '#e2e5e8';
-    ctx.lineWidth = 1.5;
-    for (let i = 1; i < 5; i++) {
-      const d = i / 5;
-      const y = backY + (frontY - backY) * d;
-      const half = backHalf + (frontHalf - backHalf) * d;
-      line(midX - half, y, midX + half, y);
-    }
-    // hintere Kante betonen
-    ctx.strokeStyle = '#d7dadd';
-    line(midX - backHalf, backY, midX + backHalf, backY);
+    ctx.restore();
   }
 
   /* ════════════════════════════════════════════════════════
@@ -489,7 +497,7 @@
   ════════════════════════════════════════════════════════ */
   function render() {
     ctx.clearRect(0, 0, CW, CH);
-    drawFloor();
+    drawGroupShadow();
 
     if (!chars.length) return;
 
@@ -572,7 +580,7 @@
   ════════════════════════════════════════════════════════ */
   function resize() {
     const w = sceneEl.clientWidth;
-    const h = Math.round(Math.min(560, Math.max(360, w * 0.52)));
+    const h = Math.round(Math.min(760, Math.max(460, w * 0.6)));
     dpr = window.devicePixelRatio || 1;
     CW = w; CH = h;
     canvas.width = Math.round(w * dpr);
