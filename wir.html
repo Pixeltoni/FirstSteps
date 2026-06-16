@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wir · Charakter erstellen</title>
+  <title>Wir · Charaktere</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -55,6 +55,152 @@
       letter-spacing: .03em;
     }
     .wir-header__back:hover { color: var(--sw-black); }
+
+    /* ── TITLE BLOCK ── */
+    .wir-intro {
+      padding: 2.5rem 2.5rem 1rem;
+      max-width: 640px;
+    }
+    .wir-intro__label {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+      margin-bottom: .9rem;
+    }
+    .wir-intro__title {
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.035em;
+      margin: 0 0 .7rem;
+    }
+    .wir-intro__sub {
+      font-size: .9rem;
+      color: var(--sw-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── APP LAYOUT ── */
+    .wir-app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1rem 2.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ── CREATE PANEL ── */
+    .wir-create {
+      background: var(--sw-gray);
+      border: 1px solid var(--sw-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .9rem;
+      max-width: 420px;
+    }
+    .wir-create__label {
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+    }
+    .wir-create__input {
+      width: 100%;
+      border: 1px solid var(--sw-border);
+      background: var(--sw-white);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: .75rem .9rem;
+      outline: none;
+      color: var(--sw-black);
+    }
+    .wir-create__input:focus { border-color: var(--sw-black); }
+    .wir-create__input::placeholder { color: var(--sw-muted); font-weight: 500; }
+
+    .wir-btn {
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      padding: .8rem 1rem;
+      border: 1px solid var(--sw-border);
+      background: var(--sw-white);
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: .01em;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .wir-btn:hover { border-color: var(--sw-black); }
+    .wir-btn--primary {
+      background: var(--sw-black);
+      color: var(--sw-white);
+      border-color: var(--sw-black);
+    }
+    .wir-btn--primary:hover { background: #333; }
+    .wir-btn--primary:disabled {
+      background: var(--sw-border);
+      border-color: var(--sw-border);
+      color: var(--sw-muted);
+      cursor: not-allowed;
+    }
+
+    /* ── SCENE TOOLBAR ── */
+    .wir-scene-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .wir-scene-bar__count {
+      font-size: .8rem;
+      color: var(--sw-muted);
+    }
+    .wir-scene-bar__clear {
+      font-size: .75rem;
+      color: var(--sw-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: inherit;
+      padding: 0;
+    }
+    .wir-scene-bar__clear:hover { color: var(--sw-black); }
+
+    /* ── GROUP SCENE ── */
+    .wir-scene {
+      position: relative;
+      background:
+        linear-gradient(180deg, #ffffff 0%, #fbfbfb 38%, #f3f3f3 100%);
+      border: 1px solid var(--sw-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .wir-scene canvas { display: block; width: 100%; height: auto; }
+    .wir-scene__empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      color: var(--sw-muted);
+      font-size: .9rem;
+      pointer-events: none;
+    }
+
+    @media (max-width: 720px) {
+      .wir-app   { padding: 1rem 1.25rem 3rem; }
+      .wir-intro { padding: 2rem 1.25rem 1rem; }
+      .wir-header { padding: 1rem 1.25rem; }
+    }
   </style>
 </head>
 <body>
@@ -67,7 +213,450 @@
     <a href="index.html" class="wir-header__back">&#8249;&nbsp; Zurück</a>
   </header>
 
-  <!-- Charakter-Erstellung wird hier neu aufgebaut -->
+  <section class="wir-intro">
+    <p class="wir-intro__label">Wir</p>
+    <h1 class="wir-intro__title">Eure Charaktere</h1>
+    <p class="wir-intro__sub">Gib einen Namen ein und füge einen neuen Charakter hinzu. Alle Charaktere bilden gemeinsam eine kleine Gruppe. Fahre mit der Maus über eine Figur, um sie hervorzuheben und ihren Namen zu sehen.</p>
+  </section>
+
+  <main class="wir-app">
+
+    <!-- CREATE PANEL -->
+    <section class="wir-create">
+      <label class="wir-create__label" for="charName">Name</label>
+      <input class="wir-create__input" type="text" id="charName" placeholder="z. B. Anna" maxlength="24" autocomplete="off" />
+      <button class="wir-btn wir-btn--primary" type="button" id="btnAdd">Charakter hinzufügen</button>
+    </section>
+
+    <!-- TOOLBAR -->
+    <div class="wir-scene-bar">
+      <span class="wir-scene-bar__count" id="count">0 Charaktere</span>
+      <button class="wir-scene-bar__clear" type="button" id="btnClear">Alle entfernen</button>
+    </div>
+
+    <!-- GROUP SCENE -->
+    <section class="wir-scene">
+      <canvas id="scene"></canvas>
+      <p class="wir-scene__empty" id="emptyHint">Noch keine Charaktere – füge oben den ersten hinzu.</p>
+    </section>
+
+  </main>
+
+  <script>
+  /* ════════════════════════════════════════════════════════
+     WIR · CHARAKTER-GRUPPE
+     - Namen eingeben → Strichmännchen-Charakter hinzufügen
+     - Alle Charaktere stehen als Gruppe auf einem Boden
+       (Kamera blickt in ~45° leicht von oben auf die Szene)
+     - Hover über eine Figur: sie wird größer, winkt und zeigt
+       ihren Namen über dem Kopf
+     - Sammlung wird im localStorage gesichert
+  ════════════════════════════════════════════════════════ */
+
+  const STORAGE_KEY = 'erinnerungen_charaktere';
+  const INK = '#0f0f0f';
+
+  /* ── Datenmodell ────────────────────────────────────────
+     Jeder Charakter: { id, name }
+     (id dient als Seed für kleine, dauerhafte Variationen)   */
+  let chars = load();
+  let nextId = chars.reduce((m, c) => Math.max(m, c.id), 0) + 1;
+
+  /* ── Canvas / Szene ─────────────────────────────────────── */
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  const sceneEl = canvas.parentElement;
+  let CW = 0, CH = 0, dpr = 1;
+
+  // Perspektive des Bodens (45°-Aufsicht angedeutet):
+  // hintere Reihen sitzen höher und sind kleiner als vordere.
+  const FLOOR_BACK  = 0.34;  // Anteil der Höhe: Fußlinie der hintersten Reihe
+  const FLOOR_FRONT = 0.93;  // Fußlinie der vordersten Reihe
+  const FAR_SCALE   = 0.52;  // Größen-Faktor ganz hinten
+  const NEAR_SCALE  = 1.0;   // Größen-Faktor ganz vorne
+  let   BASE_SCALE  = 0.5;   // Grund-Skalierung (aus Canvas-Höhe berechnet)
+
+  let t = 0;                 // Zeit für Winke-Animation
+  let last = performance.now();
+  let hoveredId = null;
+  let mouse = { x: -1, y: -1, inside: false };
+  let dirty = true;          // erzwingt Neuzeichnen (Layout/Hinzufügen/Resize)
+
+  /* ════════════════════════════════════════════════════════
+     STRICHMÄNNCHEN  (Front, mit optionalem Winken)
+     w = 0..1 : Vergrößern + rechter Arm winkt
+  ════════════════════════════════════════════════════════ */
+  function drawFigure(cx, groundY, baseSc, w) {
+    const sc = baseSc * (1 + 0.35 * w);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = INK;
+    ctx.fillStyle = INK;
+    ctx.lineWidth = Math.max(1.5, 18 * sc * (1 + 0.15 * w));
+
+    const headR = 46 * sc;
+    const neckY = groundY - 330 * sc;
+    const hipY  = groundY - 150 * sc;
+    const footY = groundY;
+
+    // Schatten am Boden (Gruppen-/Standgefühl)
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.beginPath();
+    ctx.ellipse(cx, footY, 52 * sc, 13 * sc, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Kopf
+    const headCY = neckY - headR - 6;
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Gesicht (zur Kamera): Augen + Lächeln
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx - 16 * sc, headCY - 6 * sc, 5 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + 16 * sc, headCY - 6 * sc, 5 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.lineWidth = Math.max(1, 10 * sc);
+    ctx.beginPath();
+    ctx.arc(cx, headCY + 6 * sc, (18 + 4 * w) * sc, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+    ctx.lineWidth = Math.max(1.5, 18 * sc * (1 + 0.15 * w));
+
+    // Rumpf
+    line(cx, neckY, cx, hipY);
+
+    const shoulderY = neckY + 24 * sc;
+    const upper = 42 * sc, fore = 42 * sc;
+
+    // Linker Arm: hängt ruhig (leicht gebeugt)
+    {
+      const ex = cx - 26 * sc, ey = shoulderY + upper * 0.95;
+      const hx = cx - 40 * sc, hy = shoulderY + upper + fore * 0.9;
+      line(cx, shoulderY, ex, ey);
+      line(ex, ey, hx, hy);
+    }
+
+    // Rechter Arm: lerp Ruhe ↔ Winken
+    {
+      const restE = { x: cx + 26 * sc, y: shoulderY + upper * 0.95 };
+      const restH = { x: cx + 40 * sc, y: shoulderY + upper + fore * 0.9 };
+      const waggle = Math.sin(t * 11) * 16 * sc;
+      const waveE = { x: cx + 52 * sc, y: shoulderY - 6 * sc };
+      const waveH = { x: cx + 60 * sc + waggle, y: shoulderY - 66 * sc };
+      const ex = restE.x + (waveE.x - restE.x) * w;
+      const ey = restE.y + (waveE.y - restE.y) * w;
+      const hx = restH.x + (waveH.x - restH.x) * w;
+      const hy = restH.y + (waveH.y - restH.y) * w;
+      line(cx, shoulderY, ex, ey);
+      line(ex, ey, hx, hy);
+    }
+
+    // Beine
+    line(cx, hipY, cx - 42 * sc, footY);
+    line(cx, hipY, cx + 42 * sc, footY);
+  }
+
+  function line(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  /* ════════════════════════════════════════════════════════
+     LAYOUT · Charaktere als Gruppe auf dem Boden anordnen
+     Reihen von hinten (klein, hoch) nach vorne (groß, tief).
+  ════════════════════════════════════════════════════════ */
+  function layout() {
+    const n = chars.length;
+    if (!n) return;
+
+    const perRow = Math.min(6, Math.ceil(Math.sqrt(n * 1.4)));
+    const rows = Math.ceil(n / perRow);
+
+    chars.forEach((c, i) => {
+      const row = Math.floor(i / perRow);              // 0 = hinten
+      // Anzahl in dieser Reihe (letzte Reihe evtl. kürzer)
+      const inRow = Math.min(perRow, n - row * perRow);
+      const col = i - row * perRow;
+
+      // Tiefe 0..1 (0 hinten, 1 vorne)
+      const dz = rows === 1 ? 0.62 : 0.18 + 0.78 * (row / (rows - 1));
+
+      const sc = BASE_SCALE * (FAR_SCALE + (NEAR_SCALE - FAR_SCALE) * dz);
+      const groundY = CH * (FLOOR_BACK + (FLOOR_FRONT - FLOOR_BACK) * dz);
+
+      // Kleine, dauerhafte Variation pro Charakter (aus id)
+      const r = seeded(c.id);
+      const heightVar = 0.94 + r() * 0.12;
+
+      // horizontale Verteilung; nähere Reihen breiter (Perspektive)
+      const gap = CW * 0.16 * (0.55 + 0.55 * dz);
+      const stagger = (row % 2) * 0.5;                 // versetzt für Gruppen-Look
+      const jitter = (r() - 0.5) * gap * 0.18;
+      const cx = CW / 2 + (col - (inRow - 1) / 2 + stagger) * gap + jitter;
+
+      c.cx = cx;
+      c.groundY = groundY;
+      c.sc = sc * heightVar;
+      c.dz = dz;
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════
+     BODEN zeichnen (perspektivische Fläche, 45°-Anmutung)
+  ════════════════════════════════════════════════════════ */
+  function drawFloor() {
+    const backY  = CH * FLOOR_BACK;
+    const frontY = CH * FLOOR_FRONT;
+    const backHalf  = CW * 0.30;
+    const frontHalf = CW * 0.62;
+    const midX = CW / 2;
+
+    // Bodenfläche
+    ctx.beginPath();
+    ctx.moveTo(midX - backHalf, backY);
+    ctx.lineTo(midX + backHalf, backY);
+    ctx.lineTo(midX + frontHalf, frontY);
+    ctx.lineTo(midX - frontHalf, frontY);
+    ctx.closePath();
+    ctx.fillStyle = '#eef0f2';
+    ctx.fill();
+
+    // Tiefen-Linien (Querstreifen) für 45°-Gefühl
+    ctx.strokeStyle = '#e2e5e8';
+    ctx.lineWidth = 1.5;
+    for (let i = 1; i < 5; i++) {
+      const d = i / 5;
+      const y = backY + (frontY - backY) * d;
+      const half = backHalf + (frontHalf - backHalf) * d;
+      line(midX - half, y, midX + half, y);
+    }
+    // hintere Kante betonen
+    ctx.strokeStyle = '#d7dadd';
+    line(midX - backHalf, backY, midX + backHalf, backY);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     NAME-LABEL über dem Kopf
+  ════════════════════════════════════════════════════════ */
+  function drawNameLabel(c, w) {
+    const sc = c.sc * (1 + 0.35 * w);
+    const headTopY = c.groundY - (422 * sc + 6);
+    const y = Math.max(18, headTopY - 14 * sc);
+    const text = c.name;
+
+    ctx.save();
+    ctx.font = '600 ' + Math.round(15 + 6 * w) + 'px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const padX = 10, h = 24 + 4 * w;
+    const tw = ctx.measureText(text).width;
+    const bx = c.cx - tw / 2 - padX;
+    const bw = tw + padX * 2;
+
+    // Sprechblasen-Hintergrund
+    ctx.fillStyle = '#0f0f0f';
+    roundRect(bx, y - h / 2, bw, h, 7);
+    ctx.fill();
+    // kleiner Zeiger nach unten
+    ctx.beginPath();
+    ctx.moveTo(c.cx - 6, y + h / 2 - 1);
+    ctx.lineTo(c.cx + 6, y + h / 2 - 1);
+    ctx.lineTo(c.cx, y + h / 2 + 7);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, c.cx, y);
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ════════════════════════════════════════════════════════
+     RENDER-SCHLEIFE
+  ════════════════════════════════════════════════════════ */
+  function render() {
+    ctx.clearRect(0, 0, CW, CH);
+    drawFloor();
+
+    if (!chars.length) return;
+
+    // von hinten nach vorne zeichnen; gehoverte Figur zuletzt (oben drauf)
+    const order = chars.map((c, i) => i)
+      .sort((a, b) => chars[a].dz - chars[b].dz);
+
+    let hoveredIndex = -1;
+    order.forEach(i => {
+      const c = chars[i];
+      if (c.id === hoveredId) { hoveredIndex = i; return; }
+      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0);
+    });
+
+    if (hoveredIndex >= 0) {
+      const c = chars[hoveredIndex];
+      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0);
+      drawNameLabel(c, c.hv || 0);
+    }
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    t += dt;
+
+    // Hover-Werte weich nachziehen
+    let animating = false;
+    chars.forEach(c => {
+      const target = (c.id === hoveredId) ? 1 : 0;
+      c.hv = (c.hv || 0) + (target - (c.hv || 0)) * Math.min(1, dt * 9);
+      if (Math.abs(target - c.hv) > 0.002) animating = true;
+      if (c.id === hoveredId) animating = true; // Winken läuft weiter
+    });
+
+    // Nur neu zeichnen, wenn sich etwas bewegt – im Ruhezustand
+    // bleibt die Szene stehen und spart Leistung.
+    if (animating || dirty) {
+      render();
+      dirty = false;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     HOVER-ERKENNUNG
+  ════════════════════════════════════════════════════════ */
+  function hitTest(mx, my) {
+    // von vorne nach hinten prüfen (vordere Figuren liegen oben)
+    const order = chars.map((c, i) => i)
+      .sort((a, b) => chars[b].dz - chars[a].dz);
+    for (const i of order) {
+      const c = chars[i];
+      const halfW = 58 * c.sc;
+      const topY = c.groundY - 430 * c.sc;
+      if (mx >= c.cx - halfW && mx <= c.cx + halfW &&
+          my >= topY && my <= c.groundY + 6 * c.sc) {
+        return c.id;
+      }
+    }
+    return null;
+  }
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (CW / rect.width);
+    const my = (e.clientY - rect.top) * (CH / rect.height);
+    mouse = { x: mx, y: my, inside: true };
+    hoveredId = hitTest(mx, my);
+    canvas.style.cursor = hoveredId ? 'pointer' : 'default';
+  });
+  canvas.addEventListener('mouseleave', () => {
+    mouse.inside = false;
+    hoveredId = null;
+    canvas.style.cursor = 'default';
+  });
+
+  /* ════════════════════════════════════════════════════════
+     CANVAS-GRÖSSE / DPR
+  ════════════════════════════════════════════════════════ */
+  function resize() {
+    const w = sceneEl.clientWidth;
+    const h = Math.round(Math.min(560, Math.max(360, w * 0.52)));
+    dpr = window.devicePixelRatio || 1;
+    CW = w; CH = h;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Grund-Skalierung an Höhe koppeln (vordere Figur ~ 46 % der Höhe)
+    BASE_SCALE = (CH * 0.46) / 422;
+    layout();
+    dirty = true;
+  }
+  window.addEventListener('resize', resize);
+
+  /* ════════════════════════════════════════════════════════
+     SPEICHERN / LADEN / AKTIONEN
+  ════════════════════════════════════════════════════════ */
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY,
+        JSON.stringify(chars.map(c => ({ id: c.id, name: c.name }))));
+    } catch (e) { /* ignorieren */ }
+  }
+
+  // kleiner deterministischer Zufallsgenerator (Mulberry32) als Seed
+  function seeded(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let x = Math.imul(a ^ (a >>> 15), 1 | a);
+      x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const nameInput = document.getElementById('charName');
+  const btnAdd = document.getElementById('btnAdd');
+  const countEl = document.getElementById('count');
+  const emptyHint = document.getElementById('emptyHint');
+
+  function addCharacter() {
+    const name = nameInput.value.trim();
+    if (!name) { nameInput.focus(); return; }
+    chars.push({ id: nextId++, name, hv: 0 });
+    persist();
+    nameInput.value = '';
+    nameInput.focus();
+    resize();      // Layout neu (Reihen können sich ändern)
+    updateUI();
+  }
+
+  function clearAll() {
+    if (!chars.length) return;
+    if (!confirm('Wirklich alle Charaktere entfernen?')) return;
+    chars = [];
+    hoveredId = null;
+    persist();
+    updateUI();
+    render();
+  }
+
+  function updateUI() {
+    const n = chars.length;
+    countEl.textContent = n === 1 ? '1 Charakter' : n + ' Charaktere';
+    emptyHint.style.display = n ? 'none' : 'flex';
+  }
+
+  btnAdd.addEventListener('click', addCharacter);
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addCharacter();
+  });
+  document.getElementById('btnClear').addEventListener('click', clearAll);
+
+  /* ── Start ── */
+  resize();
+  updateUI();
+  requestAnimationFrame(frame);
+  </script>
 
 </body>
 </html>

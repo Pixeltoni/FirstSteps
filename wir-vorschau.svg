@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520">
+<rect width="980" height="520" fill="#fbfbfb"/>
+<polygon points="196,176.8 784,176.8 1097.6,483.6 -117.60000000000002,483.6" fill="#eef0f2"/><line x1="133.3" y1="238.2" x2="846.7" y2="238.2" stroke="#e2e5e8" stroke-width="1.5"/><line x1="70.6" y1="299.5" x2="909.4" y2="299.5" stroke="#e2e5e8" stroke-width="1.5"/><line x1="7.8" y1="360.9" x2="972.2" y2="360.9" stroke="#e2e5e8" stroke-width="1.5"/><line x1="-54.9" y1="422.2" x2="1034.9" y2="422.2" stroke="#e2e5e8" stroke-width="1.5"/><line x1="196" y1="176.8" x2="784" y2="176.8" stroke="#d7dadd" stroke-width="1.5"/>
+<ellipse cx="388.2" cy="232.0" rx="17.9" ry="4.5" fill="#000000" fill-opacity="0.12"/>
+<circle cx="388.2" cy="96.8" r="15.8" fill="none" stroke="#0f0f0f" stroke-width="6.19"/>
+<circle cx="382.7" cy="94.7" r="1.7" fill="#0f0f0f"/>
+<circle cx="393.7" cy="94.7" r="1.7" fill="#0f0f0f"/>
+<path d="M 393.7 101.7 A 6.2 6.2 0 0 1 382.7 101.7" fill="none" stroke="#0f0f0f" stroke-width="3.44" stroke-linecap="round"/>
+<line x1="388.2" y1="118.6" x2="388.2" y2="180.5" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="388.2" y1="126.8" x2="379.3" y2="140.6" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="379.3" y1="140.6" x2="374.5" y2="154.3" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="388.2" y1="126.8" x2="397.2" y2="140.6" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="397.2" y1="140.6" x2="402.0" y2="154.3" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="388.2" y1="180.5" x2="373.8" y2="232.0" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="388.2" y1="180.5" x2="402.7" y2="232.0" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<ellipse cx="490.0" cy="232.0" rx="17.9" ry="4.5" fill="#000000" fill-opacity="0.12"/>
+<circle cx="490.0" cy="96.8" r="15.8" fill="none" stroke="#0f0f0f" stroke-width="6.19"/>
+<circle cx="484.5" cy="94.7" r="1.7" fill="#0f0f0f"/>
+<circle cx="495.5" cy="94.7" r="1.7" fill="#0f0f0f"/>
+<path d="M 495.5 101.7 A 6.2 6.2 0 0 1 484.5 101.7" fill="none" stroke="#0f0f0f" stroke-width="3.44" stroke-linecap="round"/>
+<line x1="490.0" y1="118.6" x2="490.0" y2="180.5" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="490.0" y1="126.8" x2="481.1" y2="140.6" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="481.1" y1="140.6" x2="476.3" y2="154.3" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="490.0" y1="126.8" x2="498.9" y2="140.6" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="498.9" y1="140.6" x2="503.7" y2="154.3" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="490.0" y1="180.5" x2="475.6" y2="232.0" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="490.0" y1="180.5" x2="504.4" y2="232.0" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<ellipse cx="591.8" cy="232.0" rx="17.9" ry="4.5" fill="#000000" fill-opacity="0.12"/>
+<circle cx="591.8" cy="96.8" r="15.8" fill="none" stroke="#0f0f0f" stroke-width="6.19"/>
+<circle cx="586.3" cy="94.7" r="1.7" fill="#0f0f0f"/>
+<circle cx="597.3" cy="94.7" r="1.7" fill="#0f0f0f"/>
+<path d="M 597.3 101.7 A 6.2 6.2 0 0 1 586.3 101.7" fill="none" stroke="#0f0f0f" stroke-width="3.44" stroke-linecap="round"/>
+<line x1="591.8" y1="118.6" x2="591.8" y2="180.5" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="591.8" y1="126.8" x2="582.8" y2="140.6" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="582.8" y1="140.6" x2="578.0" y2="154.3" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="591.8" y1="126.8" x2="600.7" y2="140.6" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="600.7" y1="140.6" x2="605.5" y2="154.3" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="591.8" y1="180.5" x2="577.3" y2="232.0" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<line x1="591.8" y1="180.5" x2="606.2" y2="232.0" stroke="#0f0f0f" stroke-width="6.19" stroke-linecap="round"/>
+<ellipse cx="405.5" cy="471.3" rx="28.9" ry="7.2" fill="#000000" fill-opacity="0.12"/>
+<circle cx="405.5" cy="256.3" r="25.6" fill="none" stroke="#0f0f0f" stroke-width="10.01"/>
+<circle cx="396.6" cy="253.0" r="2.8" fill="#0f0f0f"/>
+<circle cx="414.4" cy="253.0" r="2.8" fill="#0f0f0f"/>
+<path d="M 414.4 264.2 A 10.0 10.0 0 0 1 396.6 264.2" fill="none" stroke="#0f0f0f" stroke-width="5.56" stroke-linecap="round"/>
+<line x1="405.5" y1="287.9" x2="405.5" y2="387.9" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="405.5" y1="301.2" x2="391.0" y2="323.4" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="391.0" y1="323.4" x2="383.2" y2="345.6" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="405.5" y1="301.2" x2="419.9" y2="323.4" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="419.9" y1="323.4" x2="427.7" y2="345.6" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="405.5" y1="387.9" x2="382.1" y2="471.3" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="405.5" y1="387.9" x2="428.8" y2="471.3" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<ellipse cx="743.5" cy="471.3" rx="28.9" ry="7.2" fill="#000000" fill-opacity="0.12"/>
+<circle cx="743.5" cy="256.3" r="25.6" fill="none" stroke="#0f0f0f" stroke-width="10.01"/>
+<circle cx="734.7" cy="253.0" r="2.8" fill="#0f0f0f"/>
+<circle cx="752.4" cy="253.0" r="2.8" fill="#0f0f0f"/>
+<path d="M 752.5 264.2 A 10.0 10.0 0 0 1 734.6 264.2" fill="none" stroke="#0f0f0f" stroke-width="5.56" stroke-linecap="round"/>
+<line x1="743.5" y1="287.9" x2="743.5" y2="387.9" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="743.5" y1="301.2" x2="729.1" y2="323.4" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="729.1" y1="323.4" x2="721.3" y2="345.6" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="743.5" y1="301.2" x2="758.0" y2="323.4" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="758.0" y1="323.4" x2="765.8" y2="345.6" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="743.5" y1="387.9" x2="720.2" y2="471.3" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<line x1="743.5" y1="387.9" x2="766.9" y2="471.3" stroke="#0f0f0f" stroke-width="10.01" stroke-linecap="round"/>
+<ellipse cx="574.5" cy="471.3" rx="39.0" ry="9.8" fill="#000000" fill-opacity="0.12"/>
+<circle cx="574.5" cy="183.1" r="34.5" fill="none" stroke="#0f0f0f" stroke-width="15.54"/>
+<circle cx="562.5" cy="178.6" r="3.8" fill="#0f0f0f"/>
+<circle cx="586.5" cy="178.6" r="3.8" fill="#0f0f0f"/>
+<path d="M 589.2 195.1 A 16.5 16.5 0 0 1 559.8 195.1" fill="none" stroke="#0f0f0f" stroke-width="7.51" stroke-linecap="round"/>
+<line x1="574.5" y1="223.7" x2="574.5" y2="358.7" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<line x1="574.5" y1="241.7" x2="555.0" y2="271.6" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<line x1="555.0" y1="271.6" x2="544.5" y2="301.6" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<line x1="574.5" y1="241.7" x2="613.5" y2="237.2" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<line x1="613.5" y1="237.2" x2="619.5" y2="192.1" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<line x1="574.5" y1="358.7" x2="543.0" y2="471.3" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<line x1="574.5" y1="358.7" x2="606.0" y2="471.3" stroke="#0f0f0f" stroke-width="15.54" stroke-linecap="round"/>
+<rect x="548.0" y="124.1" width="53" height="28" rx="7" fill="#0f0f0f"/><polygon points="568.5152,151.10076754502364 580.5152,151.10076754502364 574.5152,159.10076754502364" fill="#0f0f0f"/><text x="574.5152" y="139.1" fill="#fff" font-family="system-ui,sans-serif" font-size="18" font-weight="600" text-anchor="middle" dominant-baseline="middle">Mia</text>
+</svg>
