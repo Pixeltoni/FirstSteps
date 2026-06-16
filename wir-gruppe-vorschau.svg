@@ -8,17 +8,25 @@
       <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
     </radialGradient>
 
-    <!-- Strichmännchen-Vorlage (Fuß bei 0,0, nach oben gezeichnet) -->
-    <g id="fig" stroke="#0f0f0f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none">
-      <circle cx="0" cy="-330" r="46"/>
-      <circle cx="-16" cy="-336" r="5" fill="#0f0f0f" stroke="none"/>
-      <circle cx="16" cy="-336" r="5" fill="#0f0f0f" stroke="none"/>
-      <path d="M -16 -318 Q 0 -304 16 -318" stroke-width="9"/>
-      <line x1="0" y1="-284" x2="0" y2="-150"/>
-      <line x1="0" y1="-270" x2="-40" y2="-200"/>
-      <line x1="0" y1="-270" x2="40" y2="-200"/>
-      <line x1="0" y1="-150" x2="-40" y2="0"/>
-      <line x1="0" y1="-150" x2="40" y2="0"/>
+    <!-- Piktogramm-Figur (massiv/gefüllt), Fuß bei 0,0 -->
+    <g id="fig">
+      <line x1="-20" y1="-140" x2="-24" y2="0" stroke="#0f0f0f" stroke-width="32" stroke-linecap="round"/>
+      <line x1="20"  y1="-140" x2="24"  y2="0" stroke="#0f0f0f" stroke-width="32" stroke-linecap="round"/>
+      <line x1="-30" y1="-274" x2="-44" y2="-140" stroke="#0f0f0f" stroke-width="28" stroke-linecap="round"/>
+      <line x1="30"  y1="-274" x2="44"  y2="-140" stroke="#0f0f0f" stroke-width="28" stroke-linecap="round"/>
+      <path d="M -40 -140 L -56 -262 Q -56 -296 -22 -296 L 22 -296 Q 56 -296 56 -262 L 40 -140 Z" fill="#0f0f0f"/>
+      <circle cx="0" cy="-352" r="52" fill="#0f0f0f"/>
+    </g>
+
+    <!-- Figur mit erhobenem, winkendem rechten Arm -->
+    <g id="figWave">
+      <line x1="-20" y1="-140" x2="-24" y2="0" stroke="#0f0f0f" stroke-width="32" stroke-linecap="round"/>
+      <line x1="20"  y1="-140" x2="24"  y2="0" stroke="#0f0f0f" stroke-width="32" stroke-linecap="round"/>
+      <line x1="-30" y1="-274" x2="-44" y2="-140" stroke="#0f0f0f" stroke-width="28" stroke-linecap="round"/>
+      <line x1="30"  y1="-274" x2="56"  y2="-302" stroke="#0f0f0f" stroke-width="28" stroke-linecap="round"/>
+      <line x1="56"  y1="-302" x2="66"  y2="-372" stroke="#0f0f0f" stroke-width="28" stroke-linecap="round"/>
+      <path d="M -40 -140 L -56 -262 Q -56 -296 -22 -296 L 22 -296 Q 56 -296 56 -262 L 40 -140 Z" fill="#0f0f0f"/>
+      <circle cx="0" cy="-352" r="52" fill="#0f0f0f"/>
     </g>
   </defs>
 
@@ -26,23 +34,20 @@
   <ellipse cx="450" cy="455" rx="300" ry="62" fill="url(#grpShadow)"/>
 
   <!-- Gruppe: hinten klein/hoch → vorne groß/tief, geclustert -->
-  <!-- hintere Reihe -->
   <use href="#fig" transform="translate(372,312) scale(0.42)"/>
   <use href="#fig" transform="translate(452,305) scale(0.44)"/>
   <use href="#fig" transform="translate(534,314) scale(0.42)"/>
-  <!-- mittlere Reihe (versetzt) -->
   <use href="#fig" transform="translate(322,382) scale(0.50)"/>
   <use href="#fig" transform="translate(412,392) scale(0.52)"/>
   <use href="#fig" transform="translate(502,386) scale(0.50)"/>
   <use href="#fig" transform="translate(588,378) scale(0.48)"/>
-  <!-- vordere Reihe -->
   <use href="#fig" transform="translate(388,462) scale(0.60)"/>
   <use href="#fig" transform="translate(504,470) scale(0.62)"/>
 
-  <!-- Beispiel: Hover-Hervorhebung mit Namens-Label -->
+  <!-- Beispiel: Hover-Hervorhebung (größer + Winken) mit Namens-Label -->
   <g>
-    <use href="#fig" transform="translate(640,468) scale(0.80)"/>
-    <g transform="translate(640,150)">
+    <use href="#figWave" transform="translate(648,470) scale(0.82)"/>
+    <g transform="translate(648,150)">
       <rect x="-46" y="-16" width="92" height="30" rx="7" fill="#0f0f0f"/>
       <path d="M -6 13 L 6 13 L 0 21 Z" fill="#0f0f0f"/>
       <text x="0" y="0" font-family="system-ui, sans-serif" font-size="16" font-weight="600"

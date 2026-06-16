@@ -125,77 +125,60 @@
   function drawIdle(cx, w) {
     w = w || 0;
 
-    // Skalierung: bei w=1 wächst die Figur auf 135 %.
-    // Strichdicke wächst leicht mit, Füße bleiben am Boden.
+    // Skalierung: bei w=1 wächst die Figur auf 135 %. Füße bleiben am Boden.
     const sc = S * (1 + 0.35 * w);
-    ctx.lineWidth = 9 * (1 + 0.18 * w);
-
-    // Statische Pose – kein Atmen/Pendeln, damit im Stillstand
-    // nichts gerechnet/neu gezeichnet werden muss.
-    const headR = 46 * sc;
-    const neckY = GROUND - 330 * sc;   // Halsansatz oben
-    const hipY  = GROUND - 150 * sc;   // Hüfte
-    const footY = GROUND;
-
-    // Kopf
-    const headCY = neckY - headR - 6;
-    ctx.beginPath();
-    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Gesicht (zur Kamera): zwei Augen + Lächeln
-    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0f0f0f';
     ctx.fillStyle = '#0f0f0f';
-    ctx.beginPath(); ctx.arc(cx - 16 * sc, headCY - 6, 5 * sc, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + 16 * sc, headCY - 6, 5 * sc, 0, Math.PI * 2); ctx.fill();
-    ctx.lineWidth = 5 * sc;
-    ctx.beginPath();
-    // beim Winken etwas breiteres, freundlicheres Lächeln
-    ctx.arc(cx, headCY + 6, (18 + 4 * w) * sc, 0.15 * Math.PI, 0.85 * Math.PI);
-    ctx.stroke();
-    ctx.restore();
-    setStyle();
-    ctx.lineWidth = 9 * (1 + 0.18 * w);
 
-    // Rumpf
-    line(cx, neckY, cx, hipY);
+    const footY     = GROUND;
+    const headR     = 52 * sc;
+    const headCY    = GROUND - 352 * sc;
+    const shoulderY = GROUND - 296 * sc;   // Oberkante Torso
+    const hipY      = GROUND - 140 * sc;
+    const attachY   = shoulderY + 22 * sc; // Schulteransatz der Arme
 
-    const shoulderY = neckY + 24 * sc;
-    const upper = 42 * sc;   // Oberarm-Länge
-    const fore  = 42 * sc;   // Unterarm-Länge
+    // ── Beine (dicke Säulen mit Lücke) ──
+    ctx.lineWidth = 32 * sc;
+    line(cx - 20 * sc, hipY, cx - 24 * sc, footY);
+    line(cx + 20 * sc, hipY, cx + 24 * sc, footY);
 
-    // Linker Arm: hängt ruhig nach unten (leicht abgewinkelt)
+    // ── Arme (dick) ──
+    ctx.lineWidth = 28 * sc;
+    // linker Arm ruht seitlich
+    line(cx - 30 * sc, attachY, cx - 44 * sc, hipY);
+    // rechter Arm: lerp Ruhe (unten) ↔ Winken (oben), Ellbogen knickt nach oben
     {
-      const ex = cx - 26 * sc, ey = shoulderY + upper * 0.95;
-      const hx = cx - 40 * sc, hy = shoulderY + upper + fore * 0.9;
-      line(cx, shoulderY, ex, ey);
-      line(ex, ey, hx, hy);
-    }
-
-    // Rechter Arm: lerp zwischen Ruhe-Pose (unten) und Winke-Pose (oben).
-    // Beide Posen sind als Gelenkpunkte definiert; wir interpolieren mit w.
-    {
-      // Ruhe-Pose (Arm hängt, Ellbogen leicht gebeugt)
-      const restE = { x: cx + 26 * sc, y: shoulderY + upper * 0.95 };
-      const restH = { x: cx + 40 * sc, y: shoulderY + upper + fore * 0.9 };
-
-      // Winke-Pose: Oberarm hebt sich seitlich, Ellbogen knickt nach OBEN,
-      // Hand oben und wedelt seitlich hin und her.
+      const restE = { x: cx + 40 * sc, y: attachY };
+      const restH = { x: cx + 44 * sc, y: hipY };
       const waggle = Math.sin(t * 11) * 16 * sc;          // schnelles Wedeln
-      const waveE = { x: cx + 52 * sc, y: shoulderY - 6 * sc };   // Ellbogen seitlich/oben
-      const waveH = { x: cx + 60 * sc + waggle, y: shoulderY - 66 * sc }; // Hand hoch
-
+      const waveE = { x: cx + 56 * sc, y: shoulderY - 6 * sc };
+      const waveH = { x: cx + 66 * sc + waggle, y: shoulderY - 72 * sc };
       const ex = restE.x + (waveE.x - restE.x) * w;
       const ey = restE.y + (waveE.y - restE.y) * w;
       const hx = restH.x + (waveH.x - restH.x) * w;
       const hy = restH.y + (waveH.y - restH.y) * w;
-      line(cx, shoulderY, ex, ey);   // Oberarm
-      line(ex, ey, hx, hy);          // Unterarm + Hand
+      line(cx + 30 * sc, attachY, ex, ey);   // Oberarm
+      line(ex, ey, hx, hy);                    // Unterarm + Hand
     }
 
-    // Beine (gerade, leicht gespreizt)
-    line(cx, hipY, cx - 42 * sc, footY);   // linkes Bein
-    line(cx, hipY, cx + 42 * sc, footY);   // rechtes Bein
+    // ── Torso (gefüllt, runde Schultern) ──
+    const halfTop = 56 * sc, halfBot = 40 * sc, r = 34 * sc;
+    ctx.beginPath();
+    ctx.moveTo(cx - halfBot, hipY);
+    ctx.lineTo(cx - halfTop, shoulderY + r);
+    ctx.quadraticCurveTo(cx - halfTop, shoulderY, cx - halfTop + r, shoulderY);
+    ctx.lineTo(cx + halfTop - r, shoulderY);
+    ctx.quadraticCurveTo(cx + halfTop, shoulderY, cx + halfTop, shoulderY + r);
+    ctx.lineTo(cx + halfBot, hipY);
+    ctx.closePath();
+    ctx.fill();
+
+    // ── Kopf (gefüllt, gesichtslos wie im Piktogramm) ──
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   /* ════════════════════════════════════════════════════════
@@ -206,44 +189,44 @@
     const phase = t * speed;
     const bob   = Math.abs(Math.cos(phase)) * 12; // Auf-/Ab beim Gehen
 
-    const headR = 46 * S;
-    const neckY = GROUND - 330 * S + bob;
-    const footY = GROUND;
-
-    // Kopf
-    const headCY = neckY - headR - 6;
-    ctx.beginPath();
-    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Gesicht im Profil: ein Auge + Nase nach rechts (Blickrichtung)
-    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0f0f0f';
     ctx.fillStyle = '#0f0f0f';
-    ctx.beginPath(); ctx.arc(cx + 14, headCY - 6, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.lineWidth = 6;
-    line(cx + headR - 2, headCY + 4, cx + headR + 12, headCY + 8); // Nase
-    ctx.restore();
-    setStyle();
 
-    // Rumpf (leicht nach vorn geneigt)
+    const footY = GROUND;
+    const headR = 50 * S;
+    const neckY = GROUND - 300 * S + bob;   // Oberkante Torso
     const leanX = 16 * S;
     const hipX  = cx - leanX;
-    const hipY  = GROUND - 150 * S + bob;
-    line(cx, neckY, hipX, hipY);
+    const hipY  = GROUND - 140 * S + bob;
+    const shoulderX = cx - leanX * 0.5;
+    const shoulderY = neckY + 14 * S;
+    const headCY = neckY - headR + 6 * S;   // Kopf sitzt auf dem Torso
 
-    // Schulter sitzt auf dem (geneigten) Rumpf
-    const shoulderX = cx - leanX * 0.18;
-    const shoulderY = neckY + 24 * S;
+    const legSeg = (footY - hipY) * 0.52;   // Ober-/Unterschenkel
+    const armSeg = 46 * S;                   // Ober-/Unterarm
 
-    // ── Arme: gegengleich schwingend, mit Ellbogen-Beugung ──
-    const armSeg = 50 * S;  // Ober-/Unterarm
-    walkArm(shoulderX, shoulderY,  Math.sin(phase),         armSeg); // vorderer Arm
-    walkArm(shoulderX, shoulderY,  Math.sin(phase + Math.PI), armSeg); // hinterer Arm
+    // ── hinteres Bein + hinterer Arm (hinter dem Körper) ──
+    ctx.lineWidth = 30 * S;
+    walkLeg(hipX, hipY, phase + Math.PI, legSeg, footY);
+    ctx.lineWidth = 26 * S;
+    walkArm(shoulderX, shoulderY, Math.sin(phase + Math.PI), armSeg);
 
-    // ── Beine: gegengleich, mit Knie-Beugung (Inverse-Kinematik) ──
-    const legSeg = (footY - hipY) * 0.52; // Ober-/Unterschenkel
-    walkLeg(hipX, hipY, phase,          legSeg, footY); // vorderes Bein
-    walkLeg(hipX, hipY, phase + Math.PI, legSeg, footY); // hinteres Bein
+    // ── Torso (dicke Kapsel, leicht nach vorn geneigt) ──
+    ctx.lineWidth = 42 * S;
+    line(shoulderX, neckY, hipX, hipY);
+
+    // ── vorderes Bein + vorderer Arm (vor dem Körper) ──
+    ctx.lineWidth = 30 * S;
+    walkLeg(hipX, hipY, phase, legSeg, footY);
+    ctx.lineWidth = 26 * S;
+    walkArm(shoulderX, shoulderY, Math.sin(phase), armSeg);
+
+    // ── Kopf (gefüllt, gesichtslos) ──
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   /* Ein Bein über Inverse-Kinematik zeichnen.

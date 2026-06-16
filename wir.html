@@ -280,7 +280,10 @@
   let dirty = true;          // erzwingt Neuzeichnen (Layout/Hinzufügen/Resize)
 
   /* ════════════════════════════════════════════════════════
-     STRICHMÄNNCHEN  (Front, mit optionalem Winken)
+     FIGUR im Piktogramm-Stil (massiv/gefüllt, "Toiletten-Symbol")
+     - runder, gefüllter Kopf
+     - kräftiger Körper mit runden Schultern
+     - dicke Arme & Beine (Beine mit Lücke)
      w = 0..1 : Vergrößern + rechter Arm winkt
   ════════════════════════════════════════════════════════ */
   function drawFigure(cx, groundY, baseSc, w) {
@@ -289,70 +292,62 @@
     ctx.lineJoin = 'round';
     ctx.strokeStyle = INK;
     ctx.fillStyle = INK;
-    ctx.lineWidth = Math.max(1.5, 18 * sc * (1 + 0.15 * w));
 
-    const headR = 46 * sc;
-    const neckY = groundY - 330 * sc;
-    const hipY  = groundY - 150 * sc;
-    const footY = groundY;
+    const footY      = groundY;
+    const headR      = 52 * sc;
+    const headCY     = groundY - 352 * sc;
+    const shoulderY  = groundY - 296 * sc;   // Oberkante Torso
+    const hipY       = groundY - 140 * sc;
+    const attachY    = shoulderY + 22 * sc;  // Schulteransatz der Arme
 
-    // Schatten am Boden (Gruppen-/Standgefühl)
+    // Schatten am Boden
     ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.fillStyle = 'rgba(0,0,0,0.13)';
     ctx.beginPath();
-    ctx.ellipse(cx, footY, 52 * sc, 13 * sc, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, footY, 56 * sc, 13 * sc, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // Kopf
-    const headCY = neckY - headR - 6;
-    ctx.beginPath();
-    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
-    ctx.stroke();
+    // ── Beine (dicke Säulen mit Lücke) ──
+    ctx.lineWidth = 32 * sc;
+    line(cx - 20 * sc, hipY, cx - 24 * sc, footY);
+    line(cx + 20 * sc, hipY, cx + 24 * sc, footY);
 
-    // Gesicht (zur Kamera): Augen + Lächeln
-    ctx.save();
-    ctx.beginPath(); ctx.arc(cx - 16 * sc, headCY - 6 * sc, 5 * sc, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + 16 * sc, headCY - 6 * sc, 5 * sc, 0, Math.PI * 2); ctx.fill();
-    ctx.lineWidth = Math.max(1, 10 * sc);
-    ctx.beginPath();
-    ctx.arc(cx, headCY + 6 * sc, (18 + 4 * w) * sc, 0.15 * Math.PI, 0.85 * Math.PI);
-    ctx.stroke();
-    ctx.restore();
-    ctx.lineWidth = Math.max(1.5, 18 * sc * (1 + 0.15 * w));
-
-    // Rumpf
-    line(cx, neckY, cx, hipY);
-
-    const shoulderY = neckY + 24 * sc;
-    const upper = 42 * sc, fore = 42 * sc;
-
-    // Linker Arm: hängt ruhig (leicht gebeugt)
+    // ── Arme (dick) ──
+    ctx.lineWidth = 28 * sc;
+    // linker Arm: ruht seitlich am Körper
+    line(cx - 30 * sc, attachY, cx - 44 * sc, hipY);
+    // rechter Arm: lerp zwischen Ruhe (unten) und Winken (oben)
     {
-      const ex = cx - 26 * sc, ey = shoulderY + upper * 0.95;
-      const hx = cx - 40 * sc, hy = shoulderY + upper + fore * 0.9;
-      line(cx, shoulderY, ex, ey);
-      line(ex, ey, hx, hy);
-    }
-
-    // Rechter Arm: lerp Ruhe ↔ Winken
-    {
-      const restE = { x: cx + 26 * sc, y: shoulderY + upper * 0.95 };
-      const restH = { x: cx + 40 * sc, y: shoulderY + upper + fore * 0.9 };
-      const waggle = Math.sin(t * 11) * 16 * sc;
-      const waveE = { x: cx + 52 * sc, y: shoulderY - 6 * sc };
-      const waveH = { x: cx + 60 * sc + waggle, y: shoulderY - 66 * sc };
+      const restE = { x: cx + 40 * sc, y: attachY };
+      const restH = { x: cx + 44 * sc, y: hipY };
+      const waggle = Math.sin(t * 11) * 16 * sc;          // schnelles Wedeln
+      const waveE = { x: cx + 56 * sc, y: shoulderY - 6 * sc };
+      const waveH = { x: cx + 66 * sc + waggle, y: shoulderY - 72 * sc };
       const ex = restE.x + (waveE.x - restE.x) * w;
       const ey = restE.y + (waveE.y - restE.y) * w;
       const hx = restH.x + (waveH.x - restH.x) * w;
       const hy = restH.y + (waveH.y - restH.y) * w;
-      line(cx, shoulderY, ex, ey);
-      line(ex, ey, hx, hy);
+      line(cx + 30 * sc, attachY, ex, ey);   // Oberarm
+      line(ex, ey, hx, hy);                   // Unterarm + Hand
     }
 
-    // Beine
-    line(cx, hipY, cx - 42 * sc, footY);
-    line(cx, hipY, cx + 42 * sc, footY);
+    // ── Torso (gefüllt, runde Schultern) ──
+    const halfTop = 56 * sc, halfBot = 40 * sc, r = 34 * sc;
+    ctx.beginPath();
+    ctx.moveTo(cx - halfBot, hipY);
+    ctx.lineTo(cx - halfTop, shoulderY + r);
+    ctx.quadraticCurveTo(cx - halfTop, shoulderY, cx - halfTop + r, shoulderY);
+    ctx.lineTo(cx + halfTop - r, shoulderY);
+    ctx.quadraticCurveTo(cx + halfTop, shoulderY, cx + halfTop, shoulderY + r);
+    ctx.lineTo(cx + halfBot, hipY);
+    ctx.closePath();
+    ctx.fill();
+
+    // ── Kopf (gefüllt, gesichtslos wie im Piktogramm) ──
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function line(x1, y1, x2, y2) {
@@ -551,7 +546,7 @@
       .sort((a, b) => chars[b].dz - chars[a].dz);
     for (const i of order) {
       const c = chars[i];
-      const halfW = 58 * c.sc;
+      const halfW = 64 * c.sc;
       const topY = c.groundY - 430 * c.sc;
       if (mx >= c.cx - halfW && mx <= c.cx + halfW &&
           my >= topY && my <= c.groundY + 6 * c.sc) {
