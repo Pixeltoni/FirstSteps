@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wir · Charakter erstellen</title>
+  <title>Wir · Charaktere</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -58,7 +58,7 @@
 
     /* ── TITLE BLOCK ── */
     .wir-intro {
-      padding: 2.5rem 2.5rem 1.5rem;
+      padding: 2.5rem 2.5rem 1rem;
       max-width: 640px;
     }
     .wir-intro__label {
@@ -82,70 +82,58 @@
       margin: 0;
     }
 
-    /* ── LAYOUT ── */
-    .wir-studio {
-      display: grid;
-      grid-template-columns: 42% 58%;
-      gap: 2.5rem;
-      padding: 1.5rem 2.5rem 4rem;
-      align-items: start;
-    }
-
-    /* ── PREVIEW (left) ── */
-    .wir-stage {
-      position: sticky;
-      top: 1.5rem;
-      background: var(--sw-gray);
-      border: 1px solid var(--sw-border);
-      padding: 2rem 1.5rem;
+    /* ── APP LAYOUT ── */
+    .wir-app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1rem 2.5rem 4rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 1.25rem;
+      gap: 1.5rem;
     }
-    .wir-stage__avatar {
-      width: 100%;
-      max-width: 300px;
-    }
-    .wir-stage__avatar svg { width: 100%; height: auto; display: block; }
 
-    .wir-stage__name {
-      width: 100%;
-      max-width: 300px;
-    }
-    .wir-stage__name input {
-      width: 100%;
-      border: none;
-      border-bottom: 1px solid var(--sw-border);
-      background: transparent;
-      font-family: inherit;
-      font-size: 1.15rem;
-      font-weight: 700;
-      text-align: center;
-      padding: .5rem 0;
-      outline: none;
-      letter-spacing: -.02em;
-      color: var(--sw-black);
-    }
-    .wir-stage__name input:focus { border-color: var(--sw-black); }
-    .wir-stage__name input::placeholder { color: var(--sw-muted); font-weight: 600; }
-
-    .wir-stage__actions {
+    /* ── CREATE PANEL ── */
+    .wir-create {
+      background: var(--sw-gray);
+      border: 1px solid var(--sw-border);
+      border-radius: 10px;
+      padding: 1.5rem;
       display: flex;
-      gap: .5rem;
-      width: 100%;
-      max-width: 300px;
+      flex-direction: column;
+      gap: .9rem;
+      max-width: 420px;
     }
-    .wir-btn {
-      flex: 1;
-      padding: .7rem .5rem;
-      font-family: inherit;
-      font-size: .78rem;
-      font-weight: 600;
+    .wir-create__label {
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--sw-muted);
+    }
+    .wir-create__input {
+      width: 100%;
       border: 1px solid var(--sw-border);
       background: var(--sw-white);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      padding: .75rem .9rem;
+      outline: none;
+      color: var(--sw-black);
+    }
+    .wir-create__input:focus { border-color: var(--sw-black); }
+    .wir-create__input::placeholder { color: var(--sw-muted); font-weight: 500; }
+
+    .wir-btn {
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      padding: .8rem 1rem;
+      border: 1px solid var(--sw-border);
+      background: var(--sw-white);
+      border-radius: 8px;
       cursor: pointer;
-      letter-spacing: .02em;
+      letter-spacing: .01em;
       transition: background .15s, color .15s, border-color .15s;
     }
     .wir-btn:hover { border-color: var(--sw-black); }
@@ -155,104 +143,63 @@
       border-color: var(--sw-black);
     }
     .wir-btn--primary:hover { background: #333; }
-
-    /* ── CONTROLS (right) ── */
-    .wir-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .wir-group__title {
-      font-size: .68rem;
-      letter-spacing: .16em;
-      text-transform: uppercase;
+    .wir-btn--primary:disabled {
+      background: var(--sw-border);
+      border-color: var(--sw-border);
       color: var(--sw-muted);
-      margin: 1.75rem 0 .6rem;
+      cursor: not-allowed;
     }
-    .wir-group:first-child .wir-group__title { margin-top: 0; }
 
-    /* Stepper row: < value > */
-    .wir-row {
+    /* ── SCENE TOOLBAR ── */
+    .wir-scene-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: .55rem 0;
-      border-bottom: 1px solid var(--sw-border);
     }
-    .wir-row__label {
-      font-size: .9rem;
-      font-weight: 600;
-      flex-shrink: 0;
-      width: 90px;
-    }
-    .wir-stepper {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      flex: 1;
-      justify-content: flex-end;
-    }
-    .wir-stepper__btn {
-      width: 30px; height: 30px;
-      border: 1px solid var(--sw-border);
-      background: var(--sw-white);
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1rem;
-      line-height: 1;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--sw-black);
-      flex-shrink: 0;
-    }
-    .wir-stepper__btn:hover {
-      background: var(--sw-black);
-      color: var(--sw-white);
-      border-color: var(--sw-black);
-    }
-    .wir-stepper__value {
-      font-size: .85rem;
+    .wir-scene-bar__count {
+      font-size: .8rem;
       color: var(--sw-muted);
-      min-width: 96px;
-      text-align: center;
     }
-
-    /* Swatch row */
-    .wir-swatches {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      padding: .35rem 0 .2rem;
-    }
-    .wir-swatch {
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      border: 2px solid var(--sw-border);
-      cursor: pointer;
-      padding: 0;
-      transition: transform .1s;
-    }
-    .wir-swatch:hover { transform: scale(1.1); }
-    .wir-swatch.is-active {
-      border-color: var(--sw-black);
-      box-shadow: 0 0 0 2px var(--sw-white), 0 0 0 4px var(--sw-black);
-    }
-
-    .wir-saved-hint {
+    .wir-scene-bar__clear {
       font-size: .75rem;
       color: var(--sw-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: inherit;
+      padding: 0;
+    }
+    .wir-scene-bar__clear:hover { color: var(--sw-black); }
+
+    /* ── GROUP SCENE ── */
+    .wir-scene {
+      position: relative;
+      background:
+        linear-gradient(180deg, #ffffff 0%, #fbfbfb 38%, #f3f3f3 100%);
+      border: 1px solid var(--sw-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .wir-scene canvas { display: block; width: 100%; height: auto; }
+    .wir-scene__empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      min-height: 1.1em;
-      width: 100%;
-      max-width: 300px;
+      padding: 2rem;
+      color: var(--sw-muted);
+      font-size: .9rem;
+      pointer-events: none;
     }
 
-    @media (max-width: 820px) {
-      .wir-studio { grid-template-columns: 1fr; padding: 1.5rem 1.5rem 3rem; }
-      .wir-stage { position: static; }
-      .wir-intro { padding: 2rem 1.5rem 1rem; }
-      .wir-header { padding: 1rem 1.5rem; }
+    @media (max-width: 720px) {
+      .wir-app   { padding: 1rem 1.25rem 3rem; }
+      .wir-intro { padding: 2rem 1.25rem 1rem; }
+      .wir-header { padding: 1rem 1.25rem; }
     }
   </style>
 </head>
@@ -268,469 +215,447 @@
 
   <section class="wir-intro">
     <p class="wir-intro__label">Wir</p>
-    <h1 class="wir-intro__title">Erstelle deinen Charakter</h1>
-    <p class="wir-intro__sub">Bau dir ein kleines Abbild von dir selbst – Gesicht, Frisur, Farben. Ganz einfach. Dein Charakter wird automatisch in diesem Browser gespeichert.</p>
+    <h1 class="wir-intro__title">Eure Charaktere</h1>
+    <p class="wir-intro__sub">Gib einen Namen ein und füge einen neuen Charakter hinzu. Alle Charaktere bilden gemeinsam eine kleine Gruppe. Fahre mit der Maus über eine Figur, um sie hervorzuheben und ihren Namen zu sehen.</p>
   </section>
 
-  <main class="wir-studio">
+  <main class="wir-app">
 
-    <!-- PREVIEW -->
-    <div class="wir-stage">
-      <div class="wir-stage__avatar" id="avatar"></div>
-      <div class="wir-stage__name">
-        <input type="text" id="charName" placeholder="Name" maxlength="20" />
-      </div>
-      <div class="wir-stage__actions">
-        <button class="wir-btn" type="button" id="btnRandom">Zufall</button>
-        <button class="wir-btn" type="button" id="btnReset">Zurücksetzen</button>
-        <button class="wir-btn wir-btn--primary" type="button" id="btnSave">Speichern</button>
-      </div>
-      <div class="wir-saved-hint" id="savedHint"></div>
+    <!-- CREATE PANEL -->
+    <section class="wir-create">
+      <label class="wir-create__label" for="charName">Name</label>
+      <input class="wir-create__input" type="text" id="charName" placeholder="z. B. Anna" maxlength="24" autocomplete="off" />
+      <button class="wir-btn wir-btn--primary" type="button" id="btnAdd">Charakter hinzufügen</button>
+    </section>
+
+    <!-- TOOLBAR -->
+    <div class="wir-scene-bar">
+      <span class="wir-scene-bar__count" id="count">0 Charaktere</span>
+      <button class="wir-scene-bar__clear" type="button" id="btnClear">Alle entfernen</button>
     </div>
 
-    <!-- CONTROLS -->
-    <div class="wir-controls" id="controls"></div>
+    <!-- GROUP SCENE -->
+    <section class="wir-scene">
+      <canvas id="scene"></canvas>
+      <p class="wir-scene__empty" id="emptyHint">Noch keine Charaktere – füge oben den ersten hinzu.</p>
+    </section>
 
   </main>
 
   <script>
   /* ════════════════════════════════════════════════════════
-     CHARAKTER-ERSTELLUNG  ·  "Wir"
-     Ein simpler, Mii-ähnlicher Avatar-Editor.
-     Alles wird als SVG gerendert und im localStorage gesichert.
+     WIR · CHARAKTER-GRUPPE
+     - Namen eingeben → Strichmännchen-Charakter hinzufügen
+     - Alle Charaktere stehen als Gruppe auf einem Boden
+       (Kamera blickt in ~45° leicht von oben auf die Szene)
+     - Hover über eine Figur: sie wird größer, winkt und zeigt
+       ihren Namen über dem Kopf
+     - Sammlung wird im localStorage gesichert
   ════════════════════════════════════════════════════════ */
 
-  const STORAGE_KEY = 'erinnerungen_charakter';
+  const STORAGE_KEY = 'erinnerungen_charaktere';
+  const INK = '#0f0f0f';
 
-  /* ── Optionen ───────────────────────────────────────── */
-  const SKIN_TONES  = ['#ffe0bd', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#5c3a21'];
-  const HAIR_COLORS = ['#1a1a1a', '#3b2614', '#6b4423', '#b87333', '#d9a441', '#e8e3da', '#9b3b3b', '#4a6fa5'];
-  const SHIRT_COLORS= ['#0f0f0f', '#ffffff', '#9aa0a6', '#c0392b', '#27ae60', '#2980b9', '#f39c12', '#8e44ad'];
+  /* ── Datenmodell ────────────────────────────────────────
+     Jeder Charakter: { id, name }
+     (id dient als Seed für kleine, dauerhafte Variationen)   */
+  let chars = load();
+  let nextId = chars.reduce((m, c) => Math.max(m, c.id), 0) + 1;
 
-  const HAIR_STYLES = ['Glatze', 'Kurz', 'Seite', 'Strubbel', 'Lockig', 'Rund',
-                       'Bob', 'Lang', 'Wellig', 'Mittelscheitel', 'Zopf'];
-  const EYE_STYLES  = ['Punkte', 'Groß', 'Schmal', 'Müde', 'Zwinkern'];
-  const BROW_STYLES = ['Keine', 'Normal', 'Hoch', 'Skeptisch'];
-  const NOSE_STYLES = ['Punkt', 'Strich', 'Spitz', 'Keine'];
-  const MOUTH_STYLES= ['Lächeln', 'Neutral', 'Grinsen', 'Überrascht', 'Frech'];
-  const FACE_SHAPES = ['Rund', 'Oval', 'Eckig'];
+  /* ── Canvas / Szene ─────────────────────────────────────── */
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  const sceneEl = canvas.parentElement;
+  let CW = 0, CH = 0, dpr = 1;
 
-  /* ── Standard-Zustand ───────────────────────────────── */
-  function defaultState() {
-    return {
-      name: '',
-      skin: 0,
-      face: 0,
-      hair: 1,
-      hairColor: 0,
-      eyes: 0,
-      brows: 0,
-      nose: 0,
-      mouth: 0,
-      shirt: 0
-    };
-  }
+  // Perspektive des Bodens (45°-Aufsicht angedeutet):
+  // hintere Reihen sitzen höher und sind kleiner als vordere.
+  const FLOOR_BACK  = 0.34;  // Anteil der Höhe: Fußlinie der hintersten Reihe
+  const FLOOR_FRONT = 0.93;  // Fußlinie der vordersten Reihe
+  const FAR_SCALE   = 0.52;  // Größen-Faktor ganz hinten
+  const NEAR_SCALE  = 1.0;   // Größen-Faktor ganz vorne
+  let   BASE_SCALE  = 0.5;   // Grund-Skalierung (aus Canvas-Höhe berechnet)
 
-  let state = defaultState();
+  let t = 0;                 // Zeit für Winke-Animation
+  let last = performance.now();
+  let hoveredId = null;
+  let mouse = { x: -1, y: -1, inside: false };
+  let dirty = true;          // erzwingt Neuzeichnen (Layout/Hinzufügen/Resize)
 
   /* ════════════════════════════════════════════════════════
-     SVG-RENDERING
+     STRICHMÄNNCHEN  (Front, mit optionalem Winken)
+     w = 0..1 : Vergrößern + rechter Arm winkt
   ════════════════════════════════════════════════════════ */
+  function drawFigure(cx, groundY, baseSc, w) {
+    const sc = baseSc * (1 + 0.35 * w);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = INK;
+    ctx.fillStyle = INK;
+    ctx.lineWidth = Math.max(1.5, 18 * sc * (1 + 0.15 * w));
 
-  /* Handgezeichneter Stil:
-     - alles als dünne schwarze Strichzeichnung ("ink")
-     - Haut & Kleidung nur als zarte Füllung hinter den Linien
-     - ein feTurbulence/feDisplacement-Filter gibt allen Pfaden ein
-       leichtes "Wackeln", damit es wie mit der Hand gezeichnet wirkt   */
-  const INK = '#1f1f1f';
+    const headR = 46 * sc;
+    const neckY = groundY - 330 * sc;
+    const hipY  = groundY - 150 * sc;
+    const footY = groundY;
 
-  function faceShape(skin) {
-    // Kopf-Umriss je nach Gesichtsform (Füllung Haut, schwarze Kontur)
-    switch (FACE_SHAPES[state.face]) {
-      case 'Oval':
-        return `<ellipse cx="120" cy="116" rx="66" ry="76" fill="${skin}" stroke="${INK}"/>`;
-      case 'Eckig':
-        return `<rect x="52" y="48" width="136" height="140" rx="40" fill="${skin}" stroke="${INK}"/>`;
-      default: // Rund
-        return `<circle cx="120" cy="116" r="74" fill="${skin}" stroke="${INK}"/>`;
+    // Schatten am Boden (Gruppen-/Standgefühl)
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.beginPath();
+    ctx.ellipse(cx, footY, 52 * sc, 13 * sc, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Kopf
+    const headCY = neckY - headR - 6;
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Gesicht (zur Kamera): Augen + Lächeln
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx - 16 * sc, headCY - 6 * sc, 5 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + 16 * sc, headCY - 6 * sc, 5 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.lineWidth = Math.max(1, 10 * sc);
+    ctx.beginPath();
+    ctx.arc(cx, headCY + 6 * sc, (18 + 4 * w) * sc, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+    ctx.lineWidth = Math.max(1.5, 18 * sc * (1 + 0.15 * w));
+
+    // Rumpf
+    line(cx, neckY, cx, hipY);
+
+    const shoulderY = neckY + 24 * sc;
+    const upper = 42 * sc, fore = 42 * sc;
+
+    // Linker Arm: hängt ruhig (leicht gebeugt)
+    {
+      const ex = cx - 26 * sc, ey = shoulderY + upper * 0.95;
+      const hx = cx - 40 * sc, hy = shoulderY + upper + fore * 0.9;
+      line(cx, shoulderY, ex, ey);
+      line(ex, ey, hx, hy);
     }
-  }
 
-  function ears(skin) {
-    // kleine angedeutete Ohren
-    return `
-      <path d="M50 112 q-12 2 -9 16 q3 11 13 8" fill="${skin}" stroke="${INK}" stroke-width="2.4"/>
-      <path d="M190 112 q12 2 9 16 q-3 11 -13 8" fill="${skin}" stroke="${INK}" stroke-width="2.4"/>`;
-  }
-
-  /* Frisuren — volle, gefüllte Haar-Formen mit Volumen.
-     Nachgebildet nach der Vorlage: oben kurze, unten lange Stile.
-     Jede Form ist eine geschlossene Fläche (Haarfarbe) mit Kontur,
-     die oben/seitlich übers Gesicht ragt und die Stirn frei lässt.   */
-  function hair(color) {
-    const f = `fill="${color}" stroke="${INK}" stroke-width="3"`;
-    switch (HAIR_STYLES[state.hair]) {
-      case 'Glatze':
-        return '';
-
-      case 'Kurz':
-        // Kurzer, runder Haarschopf mit kleinem Wirbel
-        return `
-          <path d="M44 110 C40 60 78 34 120 34 C162 34 200 60 196 110
-                   C184 82 156 76 120 78 C86 76 58 82 44 110 Z" ${f}/>
-          <path d="M118 36 C128 26 146 28 150 40 C140 36 130 38 124 48 Z" ${f}/>`;
-
-      case 'Seite':
-        // Seitenscheitel: Volumen oben, Schwung über die Stirn
-        return `<path d="M44 116 C42 56 80 32 122 32 C166 32 198 58 196 114
-                  C188 84 168 76 140 80 C158 62 138 52 116 58
-                  C142 66 104 96 64 88 C54 96 48 106 44 116 Z" ${f}/>`;
-
-      case 'Strubbel':
-        // Strubbelig/struppig: gezackte, abstehende Kontur
-        return `<path d="M44 112 L52 70 L66 96 L74 58 L90 90 L102 52 L116 86
-                  L126 48 L140 88 L154 56 L168 94 L180 64 L196 112
-                  C184 84 156 78 120 80 C86 78 58 84 44 112 Z" ${f}/>`;
-
-      case 'Lockig':
-        // Lockig: rundliche Bögen ringsum, viel Volumen
-        return `<path d="M42 116
-                  a17 17 0 0 1 18 -24 a17 17 0 0 1 24 -14 a16 16 0 0 1 24 -8
-                  a16 16 0 0 1 26 0 a16 16 0 0 1 24 8 a17 17 0 0 1 24 14
-                  a17 17 0 0 1 18 24
-                  C186 90 156 82 120 84 C84 82 56 90 42 116 Z" ${f}/>`;
-
-      case 'Rund':
-        // Voller, runder Topf/Pilz-Schnitt
-        return `<path d="M40 122 C40 54 80 30 120 30 C160 30 200 54 200 122
-                  C192 92 170 82 120 82 C70 82 48 92 40 122 Z" ${f}/>`;
-
-      case 'Bob':
-        // Bob bis aufs Kinn, mit Pony
-        return `<path d="M46 178 C34 118 36 48 120 34 C204 48 206 118 194 178
-                  C190 142 186 106 172 90
-                  C176 102 176 114 174 122
-                  C172 98 150 84 120 84 C90 84 68 98 66 122
-                  C64 114 64 102 68 90
-                  C54 106 50 142 46 178 Z" ${f}/>`;
-
-      case 'Lang':
-        // Lange, glatte Haare mit Pony, über die Schultern
-        return `<path d="M46 258 C30 158 34 52 120 34 C206 52 210 158 194 258
-                  C190 200 186 122 172 92
-                  C176 104 176 116 174 124
-                  C172 100 150 86 120 86 C90 86 68 100 66 124
-                  C64 116 64 104 68 92
-                  C54 122 50 200 46 258 Z" ${f}/>`;
-
-      case 'Wellig':
-        // Lange, wellige Haare (geschwungene Seiten)
-        return `<path d="M50 256 C34 216 56 198 44 166 C32 134 54 114 46 84
-                  C58 50 88 32 120 34 C152 32 182 50 194 84
-                  C186 114 208 134 196 166 C184 198 206 216 190 256
-                  C186 206 184 124 172 94
-                  C176 106 176 118 174 126
-                  C172 102 150 88 120 88 C90 88 68 102 66 126
-                  C64 118 64 106 68 94
-                  C56 124 54 206 50 256 Z" ${f}/>`;
-
-      case 'Mittelscheitel':
-        // Lange Haare mit Mittelscheitel (Stirn frei)
-        return `
-          <path d="M46 258 C30 158 34 52 120 34 C206 52 210 158 194 258
-                   C190 200 184 120 170 90
-                   C156 74 138 70 120 72 C102 70 84 74 70 90
-                   C56 120 50 200 46 258 Z" ${f}/>
-          <path d="M120 36 L120 74" fill="none" stroke="${INK}" stroke-width="2.4"/>`;
-
-      case 'Zopf':
-        // Hoher Pferdeschwanz seitlich
-        return `
-          <path d="M186 70 C214 46 244 52 248 80 C252 106 232 122 212 116
-                   C226 104 228 86 214 78 C202 72 192 76 186 88 Z" ${f}/>
-          <path d="M48 110 C48 54 84 34 120 34 C156 34 192 54 192 104
-                   C182 80 158 74 120 76 C82 74 58 82 48 110 Z" ${f}/>
-          <ellipse cx="184" cy="92" rx="9" ry="8" ${f}/>`;
-
-      default:
-        return '';
+    // Rechter Arm: lerp Ruhe ↔ Winken
+    {
+      const restE = { x: cx + 26 * sc, y: shoulderY + upper * 0.95 };
+      const restH = { x: cx + 40 * sc, y: shoulderY + upper + fore * 0.9 };
+      const waggle = Math.sin(t * 11) * 16 * sc;
+      const waveE = { x: cx + 52 * sc, y: shoulderY - 6 * sc };
+      const waveH = { x: cx + 60 * sc + waggle, y: shoulderY - 66 * sc };
+      const ex = restE.x + (waveE.x - restE.x) * w;
+      const ey = restE.y + (waveE.y - restE.y) * w;
+      const hx = restH.x + (waveH.x - restH.x) * w;
+      const hy = restH.y + (waveH.y - restH.y) * w;
+      line(cx, shoulderY, ex, ey);
+      line(ex, ey, hx, hy);
     }
+
+    // Beine
+    line(cx, hipY, cx - 42 * sc, footY);
+    line(cx, hipY, cx + 42 * sc, footY);
   }
 
-  // Augen — als kleine Punkte/Striche im Doodle-Stil
-  function eyes() {
-    const lx = 96, rx = 144, y = 122;
-    switch (EYE_STYLES[state.eyes]) {
-      case 'Groß':
-        return `
-          <circle cx="${lx}" cy="${y}" r="10" fill="#fff" stroke="${INK}" stroke-width="2.6"/>
-          <circle cx="${rx}" cy="${y}" r="10" fill="#fff" stroke="${INK}" stroke-width="2.6"/>
-          <circle cx="${lx}" cy="${y+1}" r="4.5" fill="${INK}" stroke="none"/>
-          <circle cx="${rx}" cy="${y+1}" r="4.5" fill="${INK}" stroke="none"/>`;
-      case 'Schmal':
-        return `
-          <path d="M${lx-9} ${y} q9 -6 18 0"/>
-          <path d="M${rx-9} ${y} q9 -6 18 0"/>`;
-      case 'Müde':
-        return `
-          <path d="M${lx-9} ${y-2} q9 8 18 0"/>
-          <path d="M${rx-9} ${y-2} q9 8 18 0"/>`;
-      case 'Zwinkern':
-        return `
-          <path d="M${lx-9} ${y} q9 7 18 0"/>
-          <circle cx="${rx}" cy="${y}" r="4.5" fill="${INK}" stroke="none"/>`;
-      default: // Punkte
-        return `
-          <circle cx="${lx}" cy="${y}" r="4.5" fill="${INK}" stroke="none"/>
-          <circle cx="${rx}" cy="${y}" r="4.5" fill="${INK}" stroke="none"/>`;
-    }
-  }
-
-  function brows(color) {
-    const lx = 96, rx = 144, y = 102;
-    switch (BROW_STYLES[state.brows]) {
-      case 'Normal':
-        return `
-          <path d="M${lx-11} ${y} q11 -5 22 0" stroke="${color}" stroke-width="2.8"/>
-          <path d="M${rx-11} ${y} q11 -5 22 0" stroke="${color}" stroke-width="2.8"/>`;
-      case 'Hoch':
-        return `
-          <path d="M${lx-11} ${y-5} q11 -5 22 0" stroke="${color}" stroke-width="2.8"/>
-          <path d="M${rx-11} ${y-5} q11 -5 22 0" stroke="${color}" stroke-width="2.8"/>`;
-      case 'Skeptisch':
-        return `
-          <path d="M${lx-11} ${y-3} q11 -2 22 4" stroke="${color}" stroke-width="2.8"/>
-          <path d="M${rx-11} ${y+2} q11 -6 22 -2" stroke="${color}" stroke-width="2.8"/>`;
-      default: // Keine
-        return '';
-    }
-  }
-
-  function nose() {
-    const cx = 120, y = 138;
-    switch (NOSE_STYLES[state.nose]) {
-      case 'Strich':
-        return `<path d="M${cx} ${y-8} L${cx} ${y+4}" stroke-width="2.4"/>`;
-      case 'Spitz':
-        return `<path d="M${cx+5} ${y-8} L${cx-4} ${y+5} L${cx+5} ${y+5}" stroke-width="2.4"/>`;
-      case 'Keine':
-        return '';
-      default: // Punkt
-        return `<circle cx="${cx}" cy="${y}" r="2.6" fill="${INK}" stroke="none"/>`;
-    }
-  }
-
-  function mouth() {
-    const cx = 120, y = 162;
-    switch (MOUTH_STYLES[state.mouth]) {
-      case 'Neutral':
-        return `<path d="M${cx-13} ${y} L${cx+13} ${y}"/>`;
-      case 'Grinsen':
-        return `<path d="M${cx-18} ${y-3} q18 20 36 0 q-18 5 -36 0 Z" fill="#fff"/>`;
-      case 'Überrascht':
-        return `<circle cx="${cx}" cy="${y+1}" r="8" fill="#fff"/>`;
-      case 'Frech':
-        return `
-          <path d="M${cx-15} ${y} q15 14 30 0"/>
-          <path d="M${cx-1} ${y+2} L${cx+11} ${y+2}" stroke-width="2"/>`;
-      default: // Lächeln
-        return `<path d="M${cx-16} ${y-2} q16 18 32 0"/>`;
-    }
-  }
-
-  function body(skin, shirtColor) {
-    // Kleiner Körper unter dem Kopf, im selben Strich-Stil
-    return `
-      <path d="M108 188 q12 10 24 0" fill="${skin}" stroke="${INK}" stroke-width="2.4"/>
-      <path d="M120 206
-               C96 206 78 220 72 248
-               L72 296 L168 296 L168 248
-               C162 220 144 206 120 206 Z"
-            fill="${shirtColor}" stroke="${INK}"/>`;
-  }
-
-  function renderAvatar() {
-    const skin  = SKIN_TONES[state.skin];
-    const hairC = HAIR_COLORS[state.hairColor];
-    const shirt = SHIRT_COLORS[state.shirt];
-
-    // Leichtes Zufalls-"Zittern" pro Render für den Handzeichnungs-Look
-    const seed = (state.face + state.hair * 3 + state.eyes + state.mouth) % 90;
-
-    const svg = `
-      <svg viewBox="0 0 240 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Charakter-Vorschau">
-        <defs>
-          <filter id="sketch" x="-8%" y="-8%" width="116%" height="116%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="${seed}" result="n"/>
-            <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/>
-          </filter>
-        </defs>
-        <g filter="url(#sketch)"
-           fill="none" stroke="${INK}" stroke-width="3"
-           stroke-linecap="round" stroke-linejoin="round">
-          ${body(skin, shirt)}
-          ${ears(skin)}
-          ${faceShape(skin)}
-          ${hair(hairC)}
-          ${brows(hairC)}
-          ${eyes()}
-          ${nose()}
-          ${mouth()}
-        </g>
-      </svg>`;
-    document.getElementById('avatar').innerHTML = svg;
+  function line(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
   }
 
   /* ════════════════════════════════════════════════════════
-     STEUERELEMENTE
+     LAYOUT · Charaktere als Gruppe auf dem Boden anordnen
+     Reihen von hinten (klein, hoch) nach vorne (groß, tief).
   ════════════════════════════════════════════════════════ */
+  function layout() {
+    const n = chars.length;
+    if (!n) return;
 
-  // Stepper-Definitionen: zyklische Auswahl
-  const STEPPERS = [
-    { group: 'Gesicht', label: 'Form',    key: 'face',  options: FACE_SHAPES },
-    { group: 'Gesicht', label: 'Augen',   key: 'eyes',  options: EYE_STYLES },
-    { group: 'Gesicht', label: 'Brauen',  key: 'brows', options: BROW_STYLES },
-    { group: 'Gesicht', label: 'Nase',    key: 'nose',  options: NOSE_STYLES },
-    { group: 'Gesicht', label: 'Mund',    key: 'mouth', options: MOUTH_STYLES },
-    { group: 'Haare',   label: 'Frisur',  key: 'hair',  options: HAIR_STYLES }
-  ];
+    const perRow = Math.min(6, Math.ceil(Math.sqrt(n * 1.4)));
+    const rows = Math.ceil(n / perRow);
 
-  // Farb-Definitionen
-  const SWATCHES = [
-    { group: 'Hautton',     key: 'skin',      colors: SKIN_TONES },
-    { group: 'Haarfarbe',   key: 'hairColor', colors: HAIR_COLORS },
-    { group: 'Kleidung',    key: 'shirt',     colors: SHIRT_COLORS }
-  ];
+    chars.forEach((c, i) => {
+      const row = Math.floor(i / perRow);              // 0 = hinten
+      // Anzahl in dieser Reihe (letzte Reihe evtl. kürzer)
+      const inRow = Math.min(perRow, n - row * perRow);
+      const col = i - row * perRow;
 
-  function buildControls() {
-    const root = document.getElementById('controls');
-    root.innerHTML = '';
+      // Tiefe 0..1 (0 hinten, 1 vorne)
+      const dz = rows === 1 ? 0.62 : 0.18 + 0.78 * (row / (rows - 1));
 
-    // Gruppiere Stepper nach "group"
-    const groups = {};
-    STEPPERS.forEach(s => { (groups[s.group] = groups[s.group] || []).push(s); });
+      const sc = BASE_SCALE * (FAR_SCALE + (NEAR_SCALE - FAR_SCALE) * dz);
+      const groundY = CH * (FLOOR_BACK + (FLOOR_FRONT - FLOOR_BACK) * dz);
 
-    // Stepper-Gruppen
-    Object.keys(groups).forEach(groupName => {
-      const g = document.createElement('div');
-      g.className = 'wir-group';
-      g.innerHTML = `<div class="wir-group__title">${groupName}</div>`;
-      groups[groupName].forEach(s => {
-        const row = document.createElement('div');
-        row.className = 'wir-row';
-        row.innerHTML = `
-          <span class="wir-row__label">${s.label}</span>
-          <div class="wir-stepper">
-            <button class="wir-stepper__btn" type="button" data-dir="-1">&#8249;</button>
-            <span class="wir-stepper__value" data-val="${s.key}">${s.options[state[s.key]]}</span>
-            <button class="wir-stepper__btn" type="button" data-dir="1">&#8250;</button>
-          </div>`;
-        row.querySelectorAll('.wir-stepper__btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const dir = parseInt(btn.dataset.dir, 10);
-            state[s.key] = (state[s.key] + dir + s.options.length) % s.options.length;
-            row.querySelector('[data-val]').textContent = s.options[state[s.key]];
-            renderAvatar();
-          });
-        });
-        g.appendChild(row);
-      });
-      root.appendChild(g);
-    });
+      // Kleine, dauerhafte Variation pro Charakter (aus id)
+      const r = seeded(c.id);
+      const heightVar = 0.94 + r() * 0.12;
 
-    // Farb-Gruppen
-    SWATCHES.forEach(sw => {
-      const g = document.createElement('div');
-      g.className = 'wir-group';
-      g.innerHTML = `<div class="wir-group__title">${sw.group}</div>`;
-      const wrap = document.createElement('div');
-      wrap.className = 'wir-swatches';
-      sw.colors.forEach((col, i) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'wir-swatch' + (state[sw.key] === i ? ' is-active' : '');
-        b.style.background = col;
-        b.setAttribute('aria-label', sw.group + ' ' + (i + 1));
-        b.addEventListener('click', () => {
-          state[sw.key] = i;
-          wrap.querySelectorAll('.wir-swatch').forEach(x => x.classList.remove('is-active'));
-          b.classList.add('is-active');
-          renderAvatar();
-        });
-        wrap.appendChild(b);
-      });
-      g.appendChild(wrap);
-      root.appendChild(g);
+      // horizontale Verteilung; nähere Reihen breiter (Perspektive)
+      const gap = CW * 0.16 * (0.55 + 0.55 * dz);
+      const stagger = (row % 2) * 0.5;                 // versetzt für Gruppen-Look
+      const jitter = (r() - 0.5) * gap * 0.18;
+      const cx = CW / 2 + (col - (inRow - 1) / 2 + stagger) * gap + jitter;
+
+      c.cx = cx;
+      c.groundY = groundY;
+      c.sc = sc * heightVar;
+      c.dz = dz;
     });
   }
+
+  /* ════════════════════════════════════════════════════════
+     BODEN zeichnen (perspektivische Fläche, 45°-Anmutung)
+  ════════════════════════════════════════════════════════ */
+  function drawFloor() {
+    const backY  = CH * FLOOR_BACK;
+    const frontY = CH * FLOOR_FRONT;
+    const backHalf  = CW * 0.30;
+    const frontHalf = CW * 0.62;
+    const midX = CW / 2;
+
+    // Bodenfläche
+    ctx.beginPath();
+    ctx.moveTo(midX - backHalf, backY);
+    ctx.lineTo(midX + backHalf, backY);
+    ctx.lineTo(midX + frontHalf, frontY);
+    ctx.lineTo(midX - frontHalf, frontY);
+    ctx.closePath();
+    ctx.fillStyle = '#eef0f2';
+    ctx.fill();
+
+    // Tiefen-Linien (Querstreifen) für 45°-Gefühl
+    ctx.strokeStyle = '#e2e5e8';
+    ctx.lineWidth = 1.5;
+    for (let i = 1; i < 5; i++) {
+      const d = i / 5;
+      const y = backY + (frontY - backY) * d;
+      const half = backHalf + (frontHalf - backHalf) * d;
+      line(midX - half, y, midX + half, y);
+    }
+    // hintere Kante betonen
+    ctx.strokeStyle = '#d7dadd';
+    line(midX - backHalf, backY, midX + backHalf, backY);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     NAME-LABEL über dem Kopf
+  ════════════════════════════════════════════════════════ */
+  function drawNameLabel(c, w) {
+    const sc = c.sc * (1 + 0.35 * w);
+    const headTopY = c.groundY - (422 * sc + 6);
+    const y = Math.max(18, headTopY - 14 * sc);
+    const text = c.name;
+
+    ctx.save();
+    ctx.font = '600 ' + Math.round(15 + 6 * w) + 'px "Plus Jakarta Sans", system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const padX = 10, h = 24 + 4 * w;
+    const tw = ctx.measureText(text).width;
+    const bx = c.cx - tw / 2 - padX;
+    const bw = tw + padX * 2;
+
+    // Sprechblasen-Hintergrund
+    ctx.fillStyle = '#0f0f0f';
+    roundRect(bx, y - h / 2, bw, h, 7);
+    ctx.fill();
+    // kleiner Zeiger nach unten
+    ctx.beginPath();
+    ctx.moveTo(c.cx - 6, y + h / 2 - 1);
+    ctx.lineTo(c.cx + 6, y + h / 2 - 1);
+    ctx.lineTo(c.cx, y + h / 2 + 7);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, c.cx, y);
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ════════════════════════════════════════════════════════
+     RENDER-SCHLEIFE
+  ════════════════════════════════════════════════════════ */
+  function render() {
+    ctx.clearRect(0, 0, CW, CH);
+    drawFloor();
+
+    if (!chars.length) return;
+
+    // von hinten nach vorne zeichnen; gehoverte Figur zuletzt (oben drauf)
+    const order = chars.map((c, i) => i)
+      .sort((a, b) => chars[a].dz - chars[b].dz);
+
+    let hoveredIndex = -1;
+    order.forEach(i => {
+      const c = chars[i];
+      if (c.id === hoveredId) { hoveredIndex = i; return; }
+      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0);
+    });
+
+    if (hoveredIndex >= 0) {
+      const c = chars[hoveredIndex];
+      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0);
+      drawNameLabel(c, c.hv || 0);
+    }
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    t += dt;
+
+    // Hover-Werte weich nachziehen
+    let animating = false;
+    chars.forEach(c => {
+      const target = (c.id === hoveredId) ? 1 : 0;
+      c.hv = (c.hv || 0) + (target - (c.hv || 0)) * Math.min(1, dt * 9);
+      if (Math.abs(target - c.hv) > 0.002) animating = true;
+      if (c.id === hoveredId) animating = true; // Winken läuft weiter
+    });
+
+    // Nur neu zeichnen, wenn sich etwas bewegt – im Ruhezustand
+    // bleibt die Szene stehen und spart Leistung.
+    if (animating || dirty) {
+      render();
+      dirty = false;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     HOVER-ERKENNUNG
+  ════════════════════════════════════════════════════════ */
+  function hitTest(mx, my) {
+    // von vorne nach hinten prüfen (vordere Figuren liegen oben)
+    const order = chars.map((c, i) => i)
+      .sort((a, b) => chars[b].dz - chars[a].dz);
+    for (const i of order) {
+      const c = chars[i];
+      const halfW = 58 * c.sc;
+      const topY = c.groundY - 430 * c.sc;
+      if (mx >= c.cx - halfW && mx <= c.cx + halfW &&
+          my >= topY && my <= c.groundY + 6 * c.sc) {
+        return c.id;
+      }
+    }
+    return null;
+  }
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (CW / rect.width);
+    const my = (e.clientY - rect.top) * (CH / rect.height);
+    mouse = { x: mx, y: my, inside: true };
+    hoveredId = hitTest(mx, my);
+    canvas.style.cursor = hoveredId ? 'pointer' : 'default';
+  });
+  canvas.addEventListener('mouseleave', () => {
+    mouse.inside = false;
+    hoveredId = null;
+    canvas.style.cursor = 'default';
+  });
+
+  /* ════════════════════════════════════════════════════════
+     CANVAS-GRÖSSE / DPR
+  ════════════════════════════════════════════════════════ */
+  function resize() {
+    const w = sceneEl.clientWidth;
+    const h = Math.round(Math.min(560, Math.max(360, w * 0.52)));
+    dpr = window.devicePixelRatio || 1;
+    CW = w; CH = h;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Grund-Skalierung an Höhe koppeln (vordere Figur ~ 46 % der Höhe)
+    BASE_SCALE = (CH * 0.46) / 422;
+    layout();
+    dirty = true;
+  }
+  window.addEventListener('resize', resize);
 
   /* ════════════════════════════════════════════════════════
      SPEICHERN / LADEN / AKTIONEN
   ════════════════════════════════════════════════════════ */
-
-  const nameInput = document.getElementById('charName');
-  const savedHint = document.getElementById('savedHint');
-
-  function syncUI() {
-    nameInput.value = state.name || '';
-    buildControls();
-    renderAvatar();
-  }
-
-  function save() {
-    state.name = nameInput.value.trim();
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      flashHint('Gespeichert ✓');
-    } catch (e) {
-      flashHint('Speichern nicht möglich');
-    }
-  }
-
   function load() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const saved = JSON.parse(raw);
-        state = Object.assign(defaultState(), saved);
-      }
-    } catch (e) { /* ignoriere defekte Daten */ }
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY,
+        JSON.stringify(chars.map(c => ({ id: c.id, name: c.name }))));
+    } catch (e) { /* ignorieren */ }
   }
 
-  let hintTimer = null;
-  function flashHint(msg) {
-    savedHint.textContent = msg;
-    clearTimeout(hintTimer);
-    hintTimer = setTimeout(() => { savedHint.textContent = ''; }, 2200);
+  // kleiner deterministischer Zufallsgenerator (Mulberry32) als Seed
+  function seeded(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let x = Math.imul(a ^ (a >>> 15), 1 | a);
+      x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
   }
 
-  function randomize() {
-    state.face      = Math.floor(Math.random() * FACE_SHAPES.length);
-    state.skin      = Math.floor(Math.random() * SKIN_TONES.length);
-    state.hair      = Math.floor(Math.random() * HAIR_STYLES.length);
-    state.hairColor = Math.floor(Math.random() * HAIR_COLORS.length);
-    state.eyes      = Math.floor(Math.random() * EYE_STYLES.length);
-    state.brows     = Math.floor(Math.random() * BROW_STYLES.length);
-    state.nose      = Math.floor(Math.random() * NOSE_STYLES.length);
-    state.mouth     = Math.floor(Math.random() * MOUTH_STYLES.length);
-    state.shirt     = Math.floor(Math.random() * SHIRT_COLORS.length);
-    syncUI();
+  const nameInput = document.getElementById('charName');
+  const btnAdd = document.getElementById('btnAdd');
+  const countEl = document.getElementById('count');
+  const emptyHint = document.getElementById('emptyHint');
+
+  function addCharacter() {
+    const name = nameInput.value.trim();
+    if (!name) { nameInput.focus(); return; }
+    chars.push({ id: nextId++, name, hv: 0 });
+    persist();
+    nameInput.value = '';
+    nameInput.focus();
+    resize();      // Layout neu (Reihen können sich ändern)
+    updateUI();
   }
 
-  function reset() {
-    const name = nameInput.value;
-    state = defaultState();
-    state.name = name;
-    syncUI();
+  function clearAll() {
+    if (!chars.length) return;
+    if (!confirm('Wirklich alle Charaktere entfernen?')) return;
+    chars = [];
+    hoveredId = null;
+    persist();
+    updateUI();
+    render();
   }
 
-  document.getElementById('btnSave').addEventListener('click', save);
-  document.getElementById('btnRandom').addEventListener('click', randomize);
-  document.getElementById('btnReset').addEventListener('click', reset);
+  function updateUI() {
+    const n = chars.length;
+    countEl.textContent = n === 1 ? '1 Charakter' : n + ' Charaktere';
+    emptyHint.style.display = n ? 'none' : 'flex';
+  }
+
+  btnAdd.addEventListener('click', addCharacter);
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addCharacter();
+  });
+  document.getElementById('btnClear').addEventListener('click', clearAll);
 
   /* ── Start ── */
-  load();
-  syncUI();
+  resize();
+  updateUI();
+  requestAnimationFrame(frame);
   </script>
 
 </body>
