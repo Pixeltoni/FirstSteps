@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="440" viewBox="0 0 1000 440">
+  <rect width="1000" height="440" fill="#ffffff"/>
+  <!-- Boden -->
+  <line x1="0" y1="372" x2="1000" y2="372" stroke="#e0e0e0" stroke-width="3"/>
+
+  <g stroke="#0f0f0f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+
+    <!-- ══ STEHEN (Front, Gesicht zur Kamera) ══ -->
+    <!-- Kopf -->
+    <circle cx="260" cy="78" r="42"/>
+    <!-- Augen -->
+    <circle cx="244" cy="72" r="5" fill="#0f0f0f" stroke="none"/>
+    <circle cx="276" cy="72" r="5" fill="#0f0f0f" stroke="none"/>
+    <!-- Lächeln -->
+    <path d="M 244 90 Q 260 104 276 90" stroke-width="5"/>
+    <!-- Rumpf -->
+    <line x1="260" y1="124" x2="260" y2="252"/>
+    <!-- Arme -->
+    <line x1="260" y1="150" x2="194" y2="246"/>
+    <line x1="260" y1="150" x2="326" y2="246"/>
+    <!-- Beine -->
+    <line x1="260" y1="252" x2="222" y2="372"/>
+    <line x1="260" y1="252" x2="298" y2="372"/>
+
+    <!-- ══ GEHEN nach rechts (Profil) ══ -->
+    <!-- Kopf -->
+    <circle cx="720" cy="78" r="42"/>
+    <!-- Auge (zur Laufrichtung) -->
+    <circle cx="734" cy="72" r="5" fill="#0f0f0f" stroke="none"/>
+    <!-- Nase -->
+    <line x1="760" y1="84" x2="776" y2="88" stroke-width="6"/>
+    <!-- Rumpf (leicht nach vorn geneigt) -->
+    <line x1="720" y1="124" x2="706" y2="252"/>
+    <!-- Arme (gegengleich schwingend) -->
+    <line x1="720" y1="150" x2="766" y2="236"/>
+    <line x1="720" y1="150" x2="678" y2="244"/>
+    <!-- vorderes Bein (angehoben, Knie) -->
+    <line x1="706" y1="252" x2="740" y2="312"/>
+    <line x1="740" y1="312" x2="766" y2="350"/>
+    <!-- hinteres Bein (gestreckt nach hinten) -->
+    <line x1="706" y1="252" x2="678" y2="316"/>
+    <line x1="678" y1="316" x2="648" y2="372"/>
+
+    <!-- Bewegungs-Pfeil -->
+    <g stroke="#bbbbbb" stroke-width="5">
+      <line x1="800" y1="220" x2="880" y2="220"/>
+      <line x1="880" y1="220" x2="862" y2="206"/>
+      <line x1="880" y1="220" x2="862" y2="234"/>
+    </g>
+  </g>
+
+  <g font-family="system-ui, sans-serif" fill="#888888" font-size="20" text-anchor="middle">
+    <text x="260" y="418">Stehen · Gesicht zur Kamera</text>
+    <text x="720" y="418">Gehen nach rechts</text>
+  </g>
+</svg>

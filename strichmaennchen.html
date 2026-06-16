@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strichmännchen · Prototyp</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 1rem;
+      background: #fafafa;
+      color: #0f0f0f;
+      font-family: system-ui, sans-serif;
+    }
+    h1 { font-size: 1.2rem; margin: 0; letter-spacing: -.02em; }
+    p.hint { margin: 0; color: #888; font-size: .85rem; }
+
+    .stage {
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 16 / 9;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .controls { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
+    button {
+      font-family: inherit;
+      font-size: .85rem;
+      font-weight: 600;
+      padding: .6rem 1.1rem;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    button:hover { border-color: #0f0f0f; }
+    button.is-active {
+      background: #0f0f0f;
+      color: #fff;
+      border-color: #0f0f0f;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Strichmännchen · Prototyp</h1>
+  <p class="hint">Wähle einen Zustand. „Stehen" zeigt das Gesicht zur Kamera, „Nach rechts" lässt es laufen.</p>
+
+  <div class="stage">
+    <canvas id="c" width="1280" height="720"></canvas>
+  </div>
+
+  <div class="controls">
+    <button data-state="idle" class="is-active">Stehen (Front)</button>
+    <button data-state="walk">Nach rechts gehen</button>
+  </div>
+
+  <script>
+  /* ════════════════════════════════════════════════════════
+     STRICHMÄNNCHEN  ·  Prototyp
+     Ein einfaches, animiertes Strichmännchen auf Canvas.
+     Zustände:
+       - idle: steht still, Gesicht zur Kamera (Front-Ansicht)
+       - walk: läuft im Profil nach rechts über den Bildschirm
+  ════════════════════════════════════════════════════════ */
+
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Boden-Linie (auf dieser Höhe stehen die Füße)
+  const GROUND = H * 0.82;
+  // Größe des Männchens (Beinlänge etc. skalieren hiermit)
+  const S = 1.0;
+
+  let current = 'idle';
+  let t = 0;            // globale Zeit (Sekunden)
+  let walkX = W * 0.18; // horizontale Position beim Gehen
+  let last = performance.now();
+
+  /* ── Hilfsfunktion: Linie ──────────────────────────────── */
+  function line(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  /* ── Grundstil setzen ──────────────────────────────────── */
+  function setStyle() {
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 9;
+    ctx.strokeStyle = '#0f0f0f';
+    ctx.fillStyle = '#0f0f0f';
+  }
+
+  /* ════════════════════════════════════════════════════════
+     ZUSTAND 1 · STEHEN (Gesicht zur Kamera)
+  ════════════════════════════════════════════════════════ */
+  function drawIdle(cx) {
+    // Leichtes Atmen: Körper hebt/senkt sich minimal
+    const breathe = Math.sin(t * 2) * 4;
+
+    const headR   = 46 * S;
+    const neckY   = GROUND - 330 * S + breathe;   // Halsansatz oben
+    const hipY    = GROUND - 150 * S + breathe;   // Hüfte
+    const footY   = GROUND;
+
+    // Kopf
+    const headCY = neckY - headR - 6;
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Gesicht (zur Kamera): zwei Augen + Lächeln
+    ctx.save();
+    ctx.fillStyle = '#0f0f0f';
+    ctx.beginPath(); ctx.arc(cx - 16, headCY - 6, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + 16, headCY - 6, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(cx, headCY + 6, 18, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+    setStyle();
+
+    // Rumpf
+    line(cx, neckY, cx, hipY);
+
+    // Arme (hängen symmetrisch nach unten, leichte Pendelbewegung)
+    const armSwing = Math.sin(t * 2) * 6;
+    const shoulderY = neckY + 24 * S;
+    line(cx, shoulderY, cx - 70 * S, hipY - 10 + armSwing);   // linker Arm
+    line(cx, shoulderY, cx + 70 * S, hipY - 10 - armSwing);   // rechter Arm
+
+    // Beine (gerade, leicht gespreizt)
+    line(cx, hipY, cx - 42 * S, footY);   // linkes Bein
+    line(cx, hipY, cx + 42 * S, footY);   // rechtes Bein
+  }
+
+  /* ════════════════════════════════════════════════════════
+     ZUSTAND 2 · GEHEN NACH RECHTS (Profil)
+  ════════════════════════════════════════════════════════ */
+  function drawWalk(cx) {
+    const speed = 4;                       // Geh-Tempo (Phasen pro Sekunde)
+    const phase = t * speed;
+    const swing = Math.sin(phase);         // Bein-/Armschwung -1..1
+    const bob   = Math.abs(Math.cos(phase)) * 10; // Auf-/Ab beim Gehen
+
+    const headR = 46 * S;
+    const neckY = GROUND - 330 * S + bob;
+    const hipY  = GROUND - 150 * S + bob;
+    const footY = GROUND;
+
+    // Kopf
+    const headCY = neckY - headR - 6;
+    ctx.beginPath();
+    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Gesicht im Profil: ein Auge + Nase nach rechts (Blickrichtung)
+    ctx.save();
+    ctx.fillStyle = '#0f0f0f';
+    ctx.beginPath(); ctx.arc(cx + 14, headCY - 6, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.lineWidth = 6;
+    line(cx + headR - 2, headCY + 4, cx + headR + 12, headCY + 8); // Nase
+    ctx.restore();
+    setStyle();
+
+    // Rumpf (leicht nach vorn geneigt)
+    const leanX = 14 * S;
+    line(cx, neckY, cx - leanX, hipY);
+    const hipX = cx - leanX;
+
+    // Arme (gegengleich schwingend)
+    const shoulderY = neckY + 24 * S;
+    const armLen = 95 * S;
+    // vorderer Arm (schwingt mit +swing nach vorne)
+    line(cx, shoulderY,
+         cx + swing * 55 * S,
+         shoulderY + armLen - Math.abs(swing) * 20);
+    // hinterer Arm (gegengleich)
+    line(cx, shoulderY,
+         cx - swing * 55 * S,
+         shoulderY + armLen - Math.abs(swing) * 20);
+
+    // Beine (Geh-Zyklus mit Knie via Zwischenpunkt)
+    const legLen = footY - hipY;
+    // vorderes Bein
+    drawLeg(hipX, hipY, swing, legLen, footY);
+    // hinteres Bein (gegengleich)
+    drawLeg(hipX, hipY, -swing, legLen, footY);
+  }
+
+  /* Ein Bein mit angedeutetem Knie zeichnen.
+     dir bestimmt, wie weit der Fuß vor/zurück steht. */
+  function drawLeg(hipX, hipY, dir, legLen, footY) {
+    const footX = hipX + dir * 60 * S;
+    // Knie liegt etwa mittig, leicht nach vorn versetzt
+    const kneeX = hipX + dir * 32 * S;
+    const kneeY = hipY + legLen * 0.5 + Math.abs(dir) * 6;
+    // Fuß hebt sich an, wenn er nach vorne schwingt
+    const lift  = dir > 0 ? Math.max(0, dir) * 22 : 0;
+    line(hipX, hipY, kneeX, kneeY);
+    line(kneeX, kneeY, footX, footY - lift);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     ANIMATIONS-SCHLEIFE
+  ════════════════════════════════════════════════════════ */
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    t += dt;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Boden andeuten
+    ctx.save();
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 3;
+    line(0, GROUND, W, GROUND);
+    ctx.restore();
+
+    setStyle();
+
+    if (current === 'idle') {
+      drawIdle(W / 2);
+    } else {
+      // nach rechts bewegen, am Rand wieder von links starten
+      walkX += 150 * dt;
+      if (walkX > W + 80) walkX = -80;
+      drawWalk(walkX);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  /* ── Buttons ──────────────────────────────────────────── */
+  document.querySelectorAll('button[data-state]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      current = btn.dataset.state;
+      if (current === 'walk') walkX = W * 0.18; // beim Start links beginnen
+      document.querySelectorAll('button[data-state]')
+        .forEach(b => b.classList.toggle('is-active', b === btn));
+    });
+  });
+
+  requestAnimationFrame(frame);
+  </script>
+
+</body>
+</html>
