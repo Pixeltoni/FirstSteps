@@ -286,12 +286,17 @@
      - dicke Arme & Beine (Beine mit Lücke)
      w = 0..1 : Vergrößern + rechter Arm winkt
   ════════════════════════════════════════════════════════ */
-  function drawFigure(cx, groundY, baseSc, w) {
+  // Tiefen-Abstufung: hintere Figuren heller, vordere tiefschwarz.
+  // d = 0 (hinten) .. 1 (vorne)
+  function shadeColor(d) {
+    const g = Math.round(15 + 95 * (1 - Math.max(0, Math.min(1, d))));
+    return 'rgb(' + g + ',' + g + ',' + g + ')';
+  }
+
+  function drawFigure(cx, groundY, baseSc, w, depth) {
     const sc = baseSc * (1 + 0.35 * w);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.strokeStyle = INK;
-    ctx.fillStyle = INK;
 
     const footY      = groundY;
     const headR      = 52 * sc;
@@ -299,6 +304,17 @@
     const shoulderY  = groundY - 296 * sc;   // Oberkante Torso
     const hipY       = groundY - 140 * sc;
     const attachY    = shoulderY + 22 * sc;  // Schulteransatz der Arme
+
+    // Rechter Arm: lerp zwischen Ruhe (unten) und Winken (oben) – einmal berechnen
+    const restE = { x: cx + 40 * sc, y: attachY };
+    const restH = { x: cx + 44 * sc, y: hipY };
+    const waggle = Math.sin(t * 11) * 16 * sc;            // schnelles Wedeln
+    const waveE = { x: cx + 56 * sc, y: shoulderY - 6 * sc };
+    const waveH = { x: cx + 66 * sc + waggle, y: shoulderY - 72 * sc };
+    const aEx = restE.x + (waveE.x - restE.x) * w;
+    const aEy = restE.y + (waveE.y - restE.y) * w;
+    const aHx = restH.x + (waveH.x - restH.x) * w;
+    const aHy = restH.y + (waveH.y - restH.y) * w;
 
     // Schatten am Boden
     ctx.save();
@@ -308,46 +324,47 @@
     ctx.fill();
     ctx.restore();
 
-    // ── Beine (dicke Säulen mit Lücke) ──
-    ctx.lineWidth = 32 * sc;
-    line(cx - 20 * sc, hipY, cx - 24 * sc, footY);
-    line(cx + 20 * sc, hipY, cx + 24 * sc, footY);
-
-    // ── Arme (dick) ──
-    ctx.lineWidth = 28 * sc;
-    // linker Arm: ruht seitlich am Körper
-    line(cx - 30 * sc, attachY, cx - 44 * sc, hipY);
-    // rechter Arm: lerp zwischen Ruhe (unten) und Winken (oben)
-    {
-      const restE = { x: cx + 40 * sc, y: attachY };
-      const restH = { x: cx + 44 * sc, y: hipY };
-      const waggle = Math.sin(t * 11) * 16 * sc;          // schnelles Wedeln
-      const waveE = { x: cx + 56 * sc, y: shoulderY - 6 * sc };
-      const waveH = { x: cx + 66 * sc + waggle, y: shoulderY - 72 * sc };
-      const ex = restE.x + (waveE.x - restE.x) * w;
-      const ey = restE.y + (waveE.y - restE.y) * w;
-      const hx = restH.x + (waveH.x - restH.x) * w;
-      const hy = restH.y + (waveH.y - restH.y) * w;
-      line(cx + 30 * sc, attachY, ex, ey);   // Oberarm
-      line(ex, ey, hx, hy);                   // Unterarm + Hand
+    const halfTop = 56 * sc, halfBot = 40 * sc, r = 34 * sc;
+    function torsoPath() {
+      ctx.beginPath();
+      ctx.moveTo(cx - halfBot, hipY);
+      ctx.lineTo(cx - halfTop, shoulderY + r);
+      ctx.quadraticCurveTo(cx - halfTop, shoulderY, cx - halfTop + r, shoulderY);
+      ctx.lineTo(cx + halfTop - r, shoulderY);
+      ctx.quadraticCurveTo(cx + halfTop, shoulderY, cx + halfTop, shoulderY + r);
+      ctx.lineTo(cx + halfBot, hipY);
+      ctx.closePath();
     }
 
-    // ── Torso (gefüllt, runde Schultern) ──
-    const halfTop = 56 * sc, halfBot = 40 * sc, r = 34 * sc;
-    ctx.beginPath();
-    ctx.moveTo(cx - halfBot, hipY);
-    ctx.lineTo(cx - halfTop, shoulderY + r);
-    ctx.quadraticCurveTo(cx - halfTop, shoulderY, cx - halfTop + r, shoulderY);
-    ctx.lineTo(cx + halfTop - r, shoulderY);
-    ctx.quadraticCurveTo(cx + halfTop, shoulderY, cx + halfTop, shoulderY + r);
-    ctx.lineTo(cx + halfBot, hipY);
-    ctx.closePath();
-    ctx.fill();
+    // Zeichnet die komplette Figur in einer Farbe.
+    // o = zusätzlicher Rand (für die weiße Outline-Schicht ringsum)
+    function paint(color, o) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      // Beine (dicke Säulen mit Lücke)
+      ctx.lineWidth = 32 * sc + 2 * o;
+      line(cx - 20 * sc, hipY, cx - 24 * sc, footY);
+      line(cx + 20 * sc, hipY, cx + 24 * sc, footY);
+      // Arme
+      ctx.lineWidth = 28 * sc + 2 * o;
+      line(cx - 30 * sc, attachY, cx - 44 * sc, hipY);   // linker Arm
+      line(cx + 30 * sc, attachY, aEx, aEy);             // rechter Oberarm
+      line(aEx, aEy, aHx, aHy);                          // rechter Unterarm + Hand
+      // Torso (gefüllt; in der Outline-Schicht zusätzlich weiß umrandet)
+      torsoPath();
+      if (o > 0) { ctx.lineWidth = 2 * o; ctx.stroke(); }
+      ctx.fill();
+      // Kopf (in der Outline-Schicht etwas größer für den Rand)
+      ctx.beginPath();
+      ctx.arc(cx, headCY, headR + o, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-    // ── Kopf (gefüllt, gesichtslos wie im Piktogramm) ──
-    ctx.beginPath();
-    ctx.arc(cx, headCY, headR, 0, Math.PI * 2);
-    ctx.fill();
+    // 1) weiße Outline-Schicht (trennt überlappende Figuren sichtbar)
+    const OUT = Math.max(1.5, 3.4 * sc);
+    paint('#ffffff', OUT);
+    // 2) eigentliche Figur mit Tiefen-Abstufung (Hover → voll schwarz)
+    paint(shadeColor(Math.max(depth || 0, w)), 0);
   }
 
   function line(x1, y1, x2, y2) {
@@ -504,12 +521,12 @@
     order.forEach(i => {
       const c = chars[i];
       if (c.id === hoveredId) { hoveredIndex = i; return; }
-      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0);
+      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0, c.dz);
     });
 
     if (hoveredIndex >= 0) {
       const c = chars[hoveredIndex];
-      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0);
+      drawFigure(c.cx, c.groundY, c.sc, c.hv || 0, c.dz);
       drawNameLabel(c, c.hv || 0);
     }
   }
