@@ -97,6 +97,7 @@
   let waveTarget = 0;
   let wave = 0;
   let hovering = false;
+  let staticDrawn = false;  // true, sobald die ruhende Pose einmal gezeichnet wurde
 
   /* ── Hilfsfunktion: Linie ──────────────────────────────── */
   function line(x1, y1, x2, y2) {
@@ -129,13 +130,12 @@
     const sc = S * (1 + 0.35 * w);
     ctx.lineWidth = 9 * (1 + 0.18 * w);
 
-    // Leichtes Atmen: Körper hebt/senkt sich minimal
-    const breathe = Math.sin(t * 2) * 4;
-
-    const headR   = 46 * sc;
-    const neckY   = GROUND - 330 * sc + breathe;   // Halsansatz oben
-    const hipY    = GROUND - 150 * sc + breathe;   // Hüfte
-    const footY   = GROUND;
+    // Statische Pose – kein Atmen/Pendeln, damit im Stillstand
+    // nichts gerechnet/neu gezeichnet werden muss.
+    const headR = 46 * sc;
+    const neckY = GROUND - 330 * sc;   // Halsansatz oben
+    const hipY  = GROUND - 150 * sc;   // Hüfte
+    const footY = GROUND;
 
     // Kopf
     const headCY = neckY - headR - 6;
@@ -161,31 +161,37 @@
     line(cx, neckY, cx, hipY);
 
     const shoulderY = neckY + 24 * sc;
+    const upper = 42 * sc;   // Oberarm-Länge
+    const fore  = 42 * sc;   // Unterarm-Länge
 
-    // Linker Arm: hängt (mit leichtem Pendeln) oder bleibt unten
-    const armSwing = Math.sin(t * 2) * 6;
-    line(cx, shoulderY, cx - 70 * sc, hipY - 10 + armSwing);
+    // Linker Arm: hängt ruhig nach unten (leicht abgewinkelt)
+    {
+      const ex = cx - 26 * sc, ey = shoulderY + upper * 0.95;
+      const hx = cx - 40 * sc, hy = shoulderY + upper + fore * 0.9;
+      line(cx, shoulderY, ex, ey);
+      line(ex, ey, hx, hy);
+    }
 
-    // Rechter Arm: bei w>0 hebt er sich und winkt.
-    // Schultergelenk → Ellbogen (oben) → Hand (hin- und herwinkend)
-    const armLen = 70 * sc;
-    const elbowX = cx + armLen * 0.55;
-    const elbowY = shoulderY - (armLen * 0.45) * w;       // hebt sich mit w
-    // Hand-Schwung beim Winken (schnelles Wedeln)
-    const waggle = Math.sin(t * 9) * 0.5 * w;
-    const handAng = -Math.PI * 0.18 + waggle;             // Winkel ab Ellbogen
-    const fore = armLen * 0.6;
-    // ruhender Endpunkt (Arm unten) für w=0
-    const restX = cx + 70 * sc, restY = hipY - 10 - armSwing;
-    const waveHandX = elbowX + Math.cos(handAng) * fore;
-    const waveHandY = elbowY - Math.sin(handAng) * fore;
-    // zwischen Ruhe-Pose und Winke-Pose interpolieren
-    const handX = restX + (waveHandX - restX) * w;
-    const handY = restY + (waveHandY - restY) * w;
-    const eX = cx + (elbowX - cx) * w + (1 - w) * (cx + 35 * sc);
-    const eY = shoulderY + (elbowY - shoulderY) * w + (1 - w) * ((hipY - 10 - armSwing + shoulderY) / 2 - shoulderY);
-    line(cx, shoulderY, eX, eY);   // Oberarm
-    line(eX, eY, handX, handY);    // Unterarm/Hand
+    // Rechter Arm: lerp zwischen Ruhe-Pose (unten) und Winke-Pose (oben).
+    // Beide Posen sind als Gelenkpunkte definiert; wir interpolieren mit w.
+    {
+      // Ruhe-Pose (Arm hängt, Ellbogen leicht gebeugt)
+      const restE = { x: cx + 26 * sc, y: shoulderY + upper * 0.95 };
+      const restH = { x: cx + 40 * sc, y: shoulderY + upper + fore * 0.9 };
+
+      // Winke-Pose: Oberarm hebt sich seitlich, Ellbogen knickt nach OBEN,
+      // Hand oben und wedelt seitlich hin und her.
+      const waggle = Math.sin(t * 11) * 16 * sc;          // schnelles Wedeln
+      const waveE = { x: cx + 52 * sc, y: shoulderY - 6 * sc };   // Ellbogen seitlich/oben
+      const waveH = { x: cx + 60 * sc + waggle, y: shoulderY - 66 * sc }; // Hand hoch
+
+      const ex = restE.x + (waveE.x - restE.x) * w;
+      const ey = restE.y + (waveE.y - restE.y) * w;
+      const hx = restH.x + (waveH.x - restH.x) * w;
+      const hy = restH.y + (waveH.y - restH.y) * w;
+      line(cx, shoulderY, ex, ey);   // Oberarm
+      line(ex, ey, hx, hy);          // Unterarm + Hand
+    }
 
     // Beine (gerade, leicht gespreizt)
     line(cx, hipY, cx - 42 * sc, footY);   // linkes Bein
@@ -196,14 +202,12 @@
      ZUSTAND 2 · GEHEN NACH RECHTS (Profil)
   ════════════════════════════════════════════════════════ */
   function drawWalk(cx) {
-    const speed = 4;                       // Geh-Tempo (Phasen pro Sekunde)
+    const speed = 8.5;                     // Geh-Tempo (höher = schnellerer Schritt)
     const phase = t * speed;
-    const swing = Math.sin(phase);         // Bein-/Armschwung -1..1
-    const bob   = Math.abs(Math.cos(phase)) * 10; // Auf-/Ab beim Gehen
+    const bob   = Math.abs(Math.cos(phase)) * 12; // Auf-/Ab beim Gehen
 
     const headR = 46 * S;
     const neckY = GROUND - 330 * S + bob;
-    const hipY  = GROUND - 150 * S + bob;
     const footY = GROUND;
 
     // Kopf
@@ -222,56 +226,70 @@
     setStyle();
 
     // Rumpf (leicht nach vorn geneigt)
-    const leanX = 14 * S;
-    line(cx, neckY, cx - leanX, hipY);
-    const hipX = cx - leanX;
+    const leanX = 16 * S;
+    const hipX  = cx - leanX;
+    const hipY  = GROUND - 150 * S + bob;
+    line(cx, neckY, hipX, hipY);
 
-    // Arme (gegengleich schwingend)
+    // Schulter sitzt auf dem (geneigten) Rumpf
+    const shoulderX = cx - leanX * 0.18;
     const shoulderY = neckY + 24 * S;
-    const armLen = 95 * S;
-    // vorderer Arm (schwingt mit +swing nach vorne)
-    line(cx, shoulderY,
-         cx + swing * 55 * S,
-         shoulderY + armLen - Math.abs(swing) * 20);
-    // hinterer Arm (gegengleich)
-    line(cx, shoulderY,
-         cx - swing * 55 * S,
-         shoulderY + armLen - Math.abs(swing) * 20);
 
-    // Beine (Geh-Zyklus mit Knie via Zwischenpunkt)
-    const legLen = footY - hipY;
-    // vorderes Bein
-    drawLeg(hipX, hipY, swing, legLen, footY);
-    // hinteres Bein (gegengleich)
-    drawLeg(hipX, hipY, -swing, legLen, footY);
+    // ── Arme: gegengleich schwingend, mit Ellbogen-Beugung ──
+    const armSeg = 50 * S;  // Ober-/Unterarm
+    walkArm(shoulderX, shoulderY,  Math.sin(phase),         armSeg); // vorderer Arm
+    walkArm(shoulderX, shoulderY,  Math.sin(phase + Math.PI), armSeg); // hinterer Arm
+
+    // ── Beine: gegengleich, mit Knie-Beugung (Inverse-Kinematik) ──
+    const legSeg = (footY - hipY) * 0.52; // Ober-/Unterschenkel
+    walkLeg(hipX, hipY, phase,          legSeg, footY); // vorderes Bein
+    walkLeg(hipX, hipY, phase + Math.PI, legSeg, footY); // hinteres Bein
   }
 
-  /* Ein Bein mit angedeutetem Knie zeichnen.
-     dir bestimmt, wie weit der Fuß vor/zurück steht. */
-  function drawLeg(hipX, hipY, dir, legLen, footY) {
-    const footX = hipX + dir * 60 * S;
-    // Knie liegt etwa mittig, leicht nach vorn versetzt
-    const kneeX = hipX + dir * 32 * S;
-    const kneeY = hipY + legLen * 0.5 + Math.abs(dir) * 6;
-    // Fuß hebt sich an, wenn er nach vorne schwingt
-    const lift  = dir > 0 ? Math.max(0, dir) * 22 : 0;
-    line(hipX, hipY, kneeX, kneeY);
-    line(kneeX, kneeY, footX, footY - lift);
+  /* Ein Bein über Inverse-Kinematik zeichnen.
+     Der Fuß folgt einer Geh-Bahn (vor/zurück + Anheben),
+     Knie wird daraus berechnet und beugt nach vorne. */
+  function walkLeg(hipX, hipY, phase, seg, footY) {
+    const stride = 46 * S;
+    const lift   = 30 * S;
+    const s = Math.sin(phase);
+    // Fußposition relativ zur Hüfte
+    const footX = hipX + s * stride;
+    // Fuß hebt sich nur in der vorderen (Schwung-)Hälfte
+    const fy = footY - Math.max(0, s) * lift;
+
+    const j = ikJoint(hipX, hipY, footX, fy, seg, -1); // Knie nach vorne (+x)
+    line(hipX, hipY, j.x, j.y);
+    line(j.x, j.y, footX, fy);
+  }
+
+  /* Ein Arm mit Ellbogen-Beugung. swing -1..1 steuert das Vorschwingen. */
+  function walkArm(sx, sy, swing, seg) {
+    const reach = 42 * S;
+    // Handziel: schwingt vor/zurück und hebt sich beim Vorschwung leicht
+    const handX = sx + swing * reach;
+    const handY = sy + seg * 1.55 - Math.abs(swing) * 14 * S;
+    const j = ikJoint(sx, sy, handX, handY, seg, +1); // Ellbogen nach hinten (-x)
+    line(sx, sy, j.x, j.y);
+    line(j.x, j.y, handX, handY);
+  }
+
+  /* Zwei-Segment-IK: gegeben Start- und Endpunkt sowie Segmentlänge,
+     liefert die Gelenkposition. side (+1/-1) wählt die Beugerichtung. */
+  function ikJoint(ax, ay, bx, by, seg, side) {
+    const dx = bx - ax, dy = by - ay;
+    let d = Math.hypot(dx, dy);
+    d = Math.min(d, 2 * seg - 0.001);      // nicht überstrecken
+    const a = Math.atan2(dy, dx);          // Richtung Start→Ende
+    const bend = Math.acos(d / (2 * seg)); // halber Knickwinkel
+    const ang = a + side * bend;
+    return { x: ax + Math.cos(ang) * seg, y: ay + Math.sin(ang) * seg };
   }
 
   /* ════════════════════════════════════════════════════════
      ANIMATIONS-SCHLEIFE
   ════════════════════════════════════════════════════════ */
-  function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    t += dt;
-
-    // Winke-Ziel bestimmen: aktiv beim Hovern ODER im "wave"-Button-Modus
-    waveTarget = (hovering || current === 'wave') ? 1 : 0;
-    // weiches Annähern (Ease) an das Ziel
-    wave += (waveTarget - wave) * Math.min(1, dt * 8);
-
+  function render() {
     ctx.clearRect(0, 0, W, H);
 
     // Boden andeuten
@@ -284,14 +302,36 @@
     setStyle();
 
     if (current === 'walk') {
-      // nach rechts bewegen, am Rand wieder von links starten
-      walkX += 150 * dt;
-      if (walkX > W + 80) walkX = -80;
       drawWalk(walkX);
     } else {
       // idle und wave teilen sich die Front-Ansicht;
       // der Winke-/Größen-Wert "wave" steuert den Übergang.
       drawIdle(W / 2, wave);
+    }
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    t += dt;
+
+    // Winke-Ziel bestimmen: aktiv beim Hovern ODER im "wave"-Button-Modus
+    waveTarget = (hovering || current === 'wave') ? 1 : 0;
+    wave += (waveTarget - wave) * Math.min(1, dt * 8);
+
+    // Bewegt sich nichts? (ruhiges Stehen, Blick zur Kamera)
+    // → einmal zeichnen, dann nur noch leerlaufen. Spart Leistung.
+    const staticIdle = current === 'idle' && waveTarget === 0 && wave < 0.002;
+
+    if (current === 'walk') {
+      // nach rechts bewegen, am Rand wieder von links starten
+      walkX += 260 * dt;
+      if (walkX > W + 80) walkX = -80;
+    }
+
+    if (!staticIdle || !staticDrawn) {
+      render();
+      staticDrawn = staticIdle;   // im Stillstand merken: ist gezeichnet
     }
 
     requestAnimationFrame(frame);
