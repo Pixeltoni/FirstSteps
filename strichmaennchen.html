@@ -55,7 +55,7 @@
 <body>
 
   <h1>Strichmännchen · Prototyp</h1>
-  <p class="hint">Wähle einen Zustand. „Stehen" zeigt das Gesicht zur Kamera, „Nach rechts" lässt es laufen.</p>
+  <p class="hint">Wähle einen Zustand. Beim <strong>Hovern über die Bühne</strong> wird das Männchen größer und winkt.</p>
 
   <div class="stage">
     <canvas id="c" width="1280" height="720"></canvas>
@@ -64,6 +64,7 @@
   <div class="controls">
     <button data-state="idle" class="is-active">Stehen (Front)</button>
     <button data-state="walk">Nach rechts gehen</button>
+    <button data-state="wave">Winken (größer)</button>
   </div>
 
   <script>
@@ -73,6 +74,7 @@
      Zustände:
        - idle: steht still, Gesicht zur Kamera (Front-Ansicht)
        - walk: läuft im Profil nach rechts über den Bildschirm
+       - wave: wird größer und winkt (z. B. beim Hovern)
   ════════════════════════════════════════════════════════ */
 
   const canvas = document.getElementById('c');
@@ -88,6 +90,13 @@
   let t = 0;            // globale Zeit (Sekunden)
   let walkX = W * 0.18; // horizontale Position beim Gehen
   let last = performance.now();
+
+  // Winken/Vergrößern: Ziel- und aktueller (weich nachziehender) Wert.
+  // wave = 0  → normale Größe, kein Winken
+  // wave = 1  → vergrößert und winkend
+  let waveTarget = 0;
+  let wave = 0;
+  let hovering = false;
 
   /* ── Hilfsfunktion: Linie ──────────────────────────────── */
   function line(x1, y1, x2, y2) {
@@ -108,14 +117,24 @@
 
   /* ════════════════════════════════════════════════════════
      ZUSTAND 1 · STEHEN (Gesicht zur Kamera)
+     w = Winke-/Vergrößerungs-Stärke (0..1).
+       0 → ruhiges Stehen
+       1 → vergrößert, rechter Arm winkt
   ════════════════════════════════════════════════════════ */
-  function drawIdle(cx) {
+  function drawIdle(cx, w) {
+    w = w || 0;
+
+    // Skalierung: bei w=1 wächst die Figur auf 135 %.
+    // Strichdicke wächst leicht mit, Füße bleiben am Boden.
+    const sc = S * (1 + 0.35 * w);
+    ctx.lineWidth = 9 * (1 + 0.18 * w);
+
     // Leichtes Atmen: Körper hebt/senkt sich minimal
     const breathe = Math.sin(t * 2) * 4;
 
-    const headR   = 46 * S;
-    const neckY   = GROUND - 330 * S + breathe;   // Halsansatz oben
-    const hipY    = GROUND - 150 * S + breathe;   // Hüfte
+    const headR   = 46 * sc;
+    const neckY   = GROUND - 330 * sc + breathe;   // Halsansatz oben
+    const hipY    = GROUND - 150 * sc + breathe;   // Hüfte
     const footY   = GROUND;
 
     // Kopf
@@ -127,27 +146,50 @@
     // Gesicht (zur Kamera): zwei Augen + Lächeln
     ctx.save();
     ctx.fillStyle = '#0f0f0f';
-    ctx.beginPath(); ctx.arc(cx - 16, headCY - 6, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + 16, headCY - 6, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(cx - 16 * sc, headCY - 6, 5 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + 16 * sc, headCY - 6, 5 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.lineWidth = 5 * sc;
     ctx.beginPath();
-    ctx.arc(cx, headCY + 6, 18, 0.15 * Math.PI, 0.85 * Math.PI);
+    // beim Winken etwas breiteres, freundlicheres Lächeln
+    ctx.arc(cx, headCY + 6, (18 + 4 * w) * sc, 0.15 * Math.PI, 0.85 * Math.PI);
     ctx.stroke();
     ctx.restore();
     setStyle();
+    ctx.lineWidth = 9 * (1 + 0.18 * w);
 
     // Rumpf
     line(cx, neckY, cx, hipY);
 
-    // Arme (hängen symmetrisch nach unten, leichte Pendelbewegung)
+    const shoulderY = neckY + 24 * sc;
+
+    // Linker Arm: hängt (mit leichtem Pendeln) oder bleibt unten
     const armSwing = Math.sin(t * 2) * 6;
-    const shoulderY = neckY + 24 * S;
-    line(cx, shoulderY, cx - 70 * S, hipY - 10 + armSwing);   // linker Arm
-    line(cx, shoulderY, cx + 70 * S, hipY - 10 - armSwing);   // rechter Arm
+    line(cx, shoulderY, cx - 70 * sc, hipY - 10 + armSwing);
+
+    // Rechter Arm: bei w>0 hebt er sich und winkt.
+    // Schultergelenk → Ellbogen (oben) → Hand (hin- und herwinkend)
+    const armLen = 70 * sc;
+    const elbowX = cx + armLen * 0.55;
+    const elbowY = shoulderY - (armLen * 0.45) * w;       // hebt sich mit w
+    // Hand-Schwung beim Winken (schnelles Wedeln)
+    const waggle = Math.sin(t * 9) * 0.5 * w;
+    const handAng = -Math.PI * 0.18 + waggle;             // Winkel ab Ellbogen
+    const fore = armLen * 0.6;
+    // ruhender Endpunkt (Arm unten) für w=0
+    const restX = cx + 70 * sc, restY = hipY - 10 - armSwing;
+    const waveHandX = elbowX + Math.cos(handAng) * fore;
+    const waveHandY = elbowY - Math.sin(handAng) * fore;
+    // zwischen Ruhe-Pose und Winke-Pose interpolieren
+    const handX = restX + (waveHandX - restX) * w;
+    const handY = restY + (waveHandY - restY) * w;
+    const eX = cx + (elbowX - cx) * w + (1 - w) * (cx + 35 * sc);
+    const eY = shoulderY + (elbowY - shoulderY) * w + (1 - w) * ((hipY - 10 - armSwing + shoulderY) / 2 - shoulderY);
+    line(cx, shoulderY, eX, eY);   // Oberarm
+    line(eX, eY, handX, handY);    // Unterarm/Hand
 
     // Beine (gerade, leicht gespreizt)
-    line(cx, hipY, cx - 42 * S, footY);   // linkes Bein
-    line(cx, hipY, cx + 42 * S, footY);   // rechtes Bein
+    line(cx, hipY, cx - 42 * sc, footY);   // linkes Bein
+    line(cx, hipY, cx + 42 * sc, footY);   // rechtes Bein
   }
 
   /* ════════════════════════════════════════════════════════
@@ -225,6 +267,11 @@
     last = now;
     t += dt;
 
+    // Winke-Ziel bestimmen: aktiv beim Hovern ODER im "wave"-Button-Modus
+    waveTarget = (hovering || current === 'wave') ? 1 : 0;
+    // weiches Annähern (Ease) an das Ziel
+    wave += (waveTarget - wave) * Math.min(1, dt * 8);
+
     ctx.clearRect(0, 0, W, H);
 
     // Boden andeuten
@@ -236,13 +283,15 @@
 
     setStyle();
 
-    if (current === 'idle') {
-      drawIdle(W / 2);
-    } else {
+    if (current === 'walk') {
       // nach rechts bewegen, am Rand wieder von links starten
       walkX += 150 * dt;
       if (walkX > W + 80) walkX = -80;
       drawWalk(walkX);
+    } else {
+      // idle und wave teilen sich die Front-Ansicht;
+      // der Winke-/Größen-Wert "wave" steuert den Übergang.
+      drawIdle(W / 2, wave);
     }
 
     requestAnimationFrame(frame);
@@ -257,6 +306,13 @@
         .forEach(b => b.classList.toggle('is-active', b === btn));
     });
   });
+
+  /* ── Hover: vergrößern + winken ───────────────────────────
+     Beim Hovern über die Bühne wird (außer im Geh-Modus) der
+     Winke-/Größen-Effekt ausgelöst. */
+  const stage = document.querySelector('.stage');
+  stage.addEventListener('mouseenter', () => { hovering = true; });
+  stage.addEventListener('mouseleave', () => { hovering = false; });
 
   requestAnimationFrame(frame);
   </script>

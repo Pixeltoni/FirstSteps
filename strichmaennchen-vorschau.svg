@@ -1,56 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="440" viewBox="0 0 1000 440">
-  <rect width="1000" height="440" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="540" viewBox="0 0 1120 540">
+  <rect width="1120" height="540" fill="#ffffff"/>
   <!-- Boden -->
-  <line x1="0" y1="372" x2="1000" y2="372" stroke="#e0e0e0" stroke-width="3"/>
+  <line x1="0" y1="470" x2="1120" y2="470" stroke="#e0e0e0" stroke-width="3"/>
 
+  <!-- ══ STEHEN (Front, Gesicht zur Kamera) ══ -->
   <g stroke="#0f0f0f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="210" cy="176" r="42"/>
+    <circle cx="194" cy="170" r="5" fill="#0f0f0f" stroke="none"/>
+    <circle cx="226" cy="170" r="5" fill="#0f0f0f" stroke="none"/>
+    <path d="M 194 188 Q 210 202 226 188" stroke-width="5"/>
+    <line x1="210" y1="222" x2="210" y2="350"/>
+    <line x1="210" y1="248" x2="144" y2="344"/>
+    <line x1="210" y1="248" x2="276" y2="344"/>
+    <line x1="210" y1="350" x2="172" y2="470"/>
+    <line x1="210" y1="350" x2="248" y2="470"/>
+  </g>
 
-    <!-- ══ STEHEN (Front, Gesicht zur Kamera) ══ -->
-    <!-- Kopf -->
-    <circle cx="260" cy="78" r="42"/>
-    <!-- Augen -->
-    <circle cx="244" cy="72" r="5" fill="#0f0f0f" stroke="none"/>
-    <circle cx="276" cy="72" r="5" fill="#0f0f0f" stroke="none"/>
-    <!-- Lächeln -->
-    <path d="M 244 90 Q 260 104 276 90" stroke-width="5"/>
-    <!-- Rumpf -->
-    <line x1="260" y1="124" x2="260" y2="252"/>
-    <!-- Arme -->
-    <line x1="260" y1="150" x2="194" y2="246"/>
-    <line x1="260" y1="150" x2="326" y2="246"/>
-    <!-- Beine -->
-    <line x1="260" y1="252" x2="222" y2="372"/>
-    <line x1="260" y1="252" x2="298" y2="372"/>
-
-    <!-- ══ GEHEN nach rechts (Profil) ══ -->
-    <!-- Kopf -->
-    <circle cx="720" cy="78" r="42"/>
-    <!-- Auge (zur Laufrichtung) -->
-    <circle cx="734" cy="72" r="5" fill="#0f0f0f" stroke="none"/>
-    <!-- Nase -->
-    <line x1="760" y1="84" x2="776" y2="88" stroke-width="6"/>
-    <!-- Rumpf (leicht nach vorn geneigt) -->
-    <line x1="720" y1="124" x2="706" y2="252"/>
-    <!-- Arme (gegengleich schwingend) -->
-    <line x1="720" y1="150" x2="766" y2="236"/>
-    <line x1="720" y1="150" x2="678" y2="244"/>
-    <!-- vorderes Bein (angehoben, Knie) -->
-    <line x1="706" y1="252" x2="740" y2="312"/>
-    <line x1="740" y1="312" x2="766" y2="350"/>
-    <!-- hinteres Bein (gestreckt nach hinten) -->
-    <line x1="706" y1="252" x2="678" y2="316"/>
-    <line x1="678" y1="316" x2="648" y2="372"/>
-
-    <!-- Bewegungs-Pfeil -->
+  <!-- ══ GEHEN nach rechts (Profil) ══ -->
+  <g stroke="#0f0f0f" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="560" cy="176" r="42"/>
+    <circle cx="574" cy="170" r="5" fill="#0f0f0f" stroke="none"/>
+    <line x1="600" y1="182" x2="616" y2="186" stroke-width="6"/>
+    <line x1="560" y1="222" x2="546" y2="350"/>
+    <line x1="560" y1="248" x2="606" y2="334"/>
+    <line x1="560" y1="248" x2="518" y2="342"/>
+    <line x1="546" y1="350" x2="580" y2="410"/>
+    <line x1="580" y1="410" x2="606" y2="448"/>
+    <line x1="546" y1="350" x2="518" y2="414"/>
+    <line x1="518" y1="414" x2="488" y2="470"/>
     <g stroke="#bbbbbb" stroke-width="5">
-      <line x1="800" y1="220" x2="880" y2="220"/>
-      <line x1="880" y1="220" x2="862" y2="206"/>
-      <line x1="880" y1="220" x2="862" y2="234"/>
+      <line x1="636" y1="300" x2="700" y2="300"/>
+      <line x1="700" y1="300" x2="684" y2="288"/>
+      <line x1="700" y1="300" x2="684" y2="312"/>
+    </g>
+  </g>
+
+  <!-- ══ HOVER: größer + winken (Front) ══ -->
+  <g stroke="#0f0f0f" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="900" cy="88" r="55"/>
+    <circle cx="879" cy="80" r="6.5" fill="#0f0f0f" stroke="none"/>
+    <circle cx="921" cy="80" r="6.5" fill="#0f0f0f" stroke="none"/>
+    <path d="M 876 96 Q 900 118 924 96" stroke-width="6.5"/>
+    <line x1="900" y1="148" x2="900" y2="314"/>
+    <!-- linker Arm hängt -->
+    <line x1="900" y1="181" x2="815" y2="300"/>
+    <!-- rechter Arm winkt (gehoben, Ellbogen) -->
+    <line x1="900" y1="181" x2="945" y2="150"/>
+    <line x1="945" y1="150" x2="985" y2="116"/>
+    <!-- Beine -->
+    <line x1="900" y1="314" x2="851" y2="470"/>
+    <line x1="900" y1="314" x2="949" y2="470"/>
+    <!-- Wink-Linien an der Hand -->
+    <g stroke="#bbbbbb" stroke-width="4" fill="none">
+      <path d="M 998 100 q 14 -6 22 -18"/>
+      <path d="M 1006 112 q 16 -4 26 -14"/>
     </g>
   </g>
 
   <g font-family="system-ui, sans-serif" fill="#888888" font-size="20" text-anchor="middle">
-    <text x="260" y="418">Stehen · Gesicht zur Kamera</text>
-    <text x="720" y="418">Gehen nach rechts</text>
+    <text x="210" y="512">Stehen · Gesicht zur Kamera</text>
+    <text x="560" y="512">Gehen nach rechts</text>
+    <text x="900" y="512">Hover · größer + winken</text>
   </g>
 </svg>
