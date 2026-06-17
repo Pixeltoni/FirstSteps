@@ -225,6 +225,25 @@
       margin-bottom: .7rem;
     }
     .sw-card__dots { font-size: .7rem; color: rgba(255,255,255,.45); margin-top: .35rem; }
+    .sw-card__btn {
+      display: inline-block;
+      margin-top: .9rem;
+      padding: .5rem .9rem;
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 6px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      font-family: inherit;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      text-align: center;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .sw-card__btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.5); }
+    .sw-card__btn:active { transform: scale(.97); }
     .sw-card__dot {
       width: 7px; height: 7px;
       border-radius: 50%;
@@ -728,24 +747,18 @@
         albums.forEach(({ folder, coverUrl, coverThumb, albumName, location, date }) => {
           const card = document.createElement('div');
           card.className = 'sw-card';
-          card.style.cursor = 'pointer';
-          card.setAttribute('role', 'link');
-          card.setAttribute('tabindex', '0');
-          card.setAttribute('aria-label', `Album „${albumName}" öffnen`);
           card.innerHTML = `
             <img class="sw-card__img" src="${coverThumb}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${coverUrl}'">
             <div class="sw-card__body">
               <div class="sw-card__name">${albumName}</div>
               <div class="sw-card__desc">${location || '—'}</div>
               <div class="sw-card__dots">${date || '—'}</div>
+              <button class="sw-card__btn" type="button">Album ansehen</button>
             </div>`;
-          /* Klick (oder Enter) öffnet direkt das passende Album in der Galerie.
-             Ein vorangegangenes Ziehen wird vom Capture-Listener auf swCards
-             unterdrückt, sodass Wischen die Navigation nicht auslöst. */
-          const openAlbum = () => { window.location.href = 'upload.html?album=' + encodeURIComponent(folder); };
-          card.addEventListener('click', openAlbum);
-          card.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAlbum(); }
+          /* Nur der Button navigiert – so löst Scrollen/Wischen über die Karte
+             keine versehentliche Navigation aus. */
+          card.querySelector('.sw-card__btn').addEventListener('click', () => {
+            window.location.href = 'upload.html?album=' + encodeURIComponent(folder);
           });
           cardsEl.appendChild(card);
         });
