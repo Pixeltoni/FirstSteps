@@ -849,27 +849,8 @@
       swHeader.classList.toggle('scrolled', window.scrollY > 10);
     }, { passive: true });
 
-    /* ── Navigations-Drawer (Burger-Menü) ── */
-    const sidebarBurger = document.getElementById('sidebarBurger');
-    const navDrawer     = document.getElementById('navDrawer');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    const drawerClose   = document.getElementById('drawerClose');
-    function openDrawer() {
-      navDrawer.classList.add('open');
-      drawerOverlay.classList.add('visible');
-      sidebarBurger.classList.add('is-open');
-    }
-    function closeDrawer() {
-      navDrawer.classList.remove('open');
-      drawerOverlay.classList.remove('visible');
-      sidebarBurger.classList.remove('is-open');
-    }
-    sidebarBurger.addEventListener('click', () => {
-      navDrawer.classList.contains('open') ? closeDrawer() : openDrawer();
-    });
-    drawerClose.addEventListener('click', closeDrawer);
-    drawerOverlay.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+    /* Hinweis: Die Burger-/Drawer-Logik lebt bereits in script.js – hier
+       NICHT duplizieren (sonst doppelte const-Deklaration → SyntaxError). */
   </script>
   <script>
     fetch('build-info.json?t=' + Date.now())
