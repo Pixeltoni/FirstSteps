@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsere Pläne — Erinnerungen</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .plans-main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 6.5rem 1.25rem 4rem;
+    }
+    .plans-head { margin-bottom: 2rem; }
+    .plans-head h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800; letter-spacing: -.03em; margin: 0 0 .4rem;
+    }
+    .plans-head p { color: var(--fg-muted); font-size: .95rem; max-width: 540px; }
+
+    /* ── Vorschlags-Formular ── */
+    .plan-form {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem;
+      margin-bottom: 2.5rem;
+      display: grid; gap: .8rem;
+    }
+    .plan-form__title { font-weight: 700; font-size: 1.05rem; margin-bottom: .2rem; }
+    .plan-form__row { display: grid; gap: .8rem; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 560px) { .plan-form__row { grid-template-columns: 1fr; } }
+    .plan-input, .plan-textarea {
+      width: 100%; box-sizing: border-box;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .7rem .85rem;
+      color: var(--fg); font-family: inherit; font-size: .9rem;
+    }
+    .plan-input:focus, .plan-textarea:focus { outline: none; border-color: var(--accent); }
+    .plan-input::placeholder, .plan-textarea::placeholder { color: var(--fg-muted); }
+    .plan-textarea { min-height: 92px; resize: vertical; line-height: 1.5; }
+    .plan-form__actions { display: flex; justify-content: flex-end; }
+    .plan-btn {
+      padding: .7rem 1.4rem; border-radius: 10px; border: none; cursor: pointer;
+      background: var(--accent); color: #fff; font-family: inherit;
+      font-size: .9rem; font-weight: 700; letter-spacing: .02em;
+      transition: background .15s, transform .1s;
+    }
+    .plan-btn:hover:not(:disabled) { background: var(--accent-2); }
+    .plan-btn:active { transform: scale(.97); }
+    .plan-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* ── Liste ── */
+    .plans-list { display: grid; gap: 1.1rem; }
+    .plans-empty { color: var(--fg-muted); text-align: center; padding: 2.5rem 0; font-size: .9rem; }
+
+    .plan-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.3rem 1.4rem;
+    }
+    .plan-card__head { display: flex; align-items: flex-start; gap: .75rem; }
+    .plan-card__name { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
+    .plan-card__meta {
+      display: flex; flex-wrap: wrap; gap: .35rem .9rem;
+      margin-top: .35rem; color: var(--fg-muted); font-size: .82rem;
+    }
+    .plan-card__meta span { display: inline-flex; align-items: center; gap: .32rem; }
+    .plan-card__desc {
+      margin-top: .85rem; color: var(--fg); font-size: .92rem; line-height: 1.55;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .plan-card__del {
+      margin-left: auto; flex: 0 0 auto;
+      background: none; border: none; color: var(--fg-muted);
+      cursor: pointer; font-size: .78rem; font-family: inherit; padding: .1rem .2rem;
+    }
+    .plan-card__del:hover { color: #d23f3f; }
+
+    /* ── Aktionen: Like + Kommentar ── */
+    .plan-actions {
+      display: flex; align-items: center; gap: .6rem;
+      margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid var(--border);
+    }
+    .plan-act {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .45rem .9rem; border-radius: 2rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--fg); font-size: .82rem; cursor: pointer; font-family: inherit;
+      transition: background .15s, transform .1s, border-color .15s;
+    }
+    .plan-act:hover { border-color: var(--fg-muted); }
+    .plan-act:active { transform: scale(.95); }
+    .plan-like.liked { background: rgba(232,69,69,.12); border-color: #e64545; color: #c93232; }
+    .plan-like.liked .plan-like-icon { fill: #e64545; stroke: #e64545; }
+    .plan-count { font-variant-numeric: tabular-nums; min-width: .6em; }
+
+    /* ── Kommentare ── */
+    .plan-comments { margin-top: 1rem; }
+    .plan-comments[hidden] { display: none; }
+    .plan-comments-list { display: flex; flex-direction: column; gap: .75rem; margin-bottom: .9rem; }
+    .plan-comment { font-size: .88rem; line-height: 1.5; }
+    .plan-comment-head { display: flex; align-items: baseline; gap: .5rem; margin-bottom: .1rem; }
+    .plan-comment-author { font-weight: 600; }
+    .plan-comment-time { color: var(--fg-muted); font-size: .72rem; }
+    .plan-comment-del {
+      margin-left: auto; background: none; border: none; color: var(--fg-muted);
+      cursor: pointer; font-size: .72rem; font-family: inherit; padding: 0;
+    }
+    .plan-comment-del:hover { color: #d23f3f; }
+    .plan-comment-body { white-space: pre-wrap; word-break: break-word; }
+    .plan-comment-empty { color: var(--fg-muted); font-size: .85rem; padding: .2rem 0 .6rem; }
+    .plan-comment-form { display: flex; flex-direction: column; gap: .5rem; }
+    .plan-comment-row { display: flex; gap: .5rem; }
+    .plan-comment-row .plan-input { flex: 1; }
+    .plan-comment-row .plan-btn { padding: .55rem 1rem; }
+
+    /* ── Toast ── */
+    #plansStatus {
+      position: fixed; left: 50%; bottom: 1.5rem; transform: translateX(-50%) translateY(2rem);
+      background: var(--fg); color: var(--bg);
+      padding: .7rem 1.2rem; border-radius: 10px; font-size: .85rem; font-weight: 600;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5000;
+      max-width: 90vw; text-align: center;
+    }
+    #plansStatus.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #plansStatus.error { background: #c93232; color: #fff; }
+
+    /* ── Password Screen (wie Galerie) ── */
+    #pwScreen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1.5rem; transition: opacity .4s;
+    }
+    #pwScreen.fade-out { opacity: 0; pointer-events: none; }
+    .pw-box {
+      width: min(380px, 88vw);
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 18px; padding: 2rem 2rem 2.25rem;
+      display: flex; flex-direction: column; gap: 1.25rem;
+    }
+    .pw-box__title { font-size: 1.35rem; font-weight: 700; letter-spacing: -.02em; text-align: center; }
+    .pw-box__sub { font-size: .78rem; color: var(--fg-muted); text-align: center; letter-spacing: .06em; margin-top: -.75rem; }
+    .pw-box__input {
+      width: 100%; box-sizing: border-box;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: .8rem 1rem; color: var(--fg); font-size: 1rem; font-family: inherit;
+    }
+    .pw-box__input:focus { outline: none; border-color: var(--accent); }
+    .pw-box__btn {
+      width: 100%; padding: .85rem; border-radius: 10px;
+      background: var(--accent); color: #fff; font-size: .95rem; font-weight: 700;
+      letter-spacing: .03em; cursor: pointer; border: none;
+    }
+    .pw-box__btn:hover { background: var(--accent-2); }
+    .pw-box__btn:disabled { opacity: .6; cursor: wait; }
+    .pw-box__error { color: #c93232; font-size: .82rem; text-align: center; min-height: 1em; margin-top: -.6rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Rail -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="index.html" class="sidebar__logo-mark" aria-label="Startseite">SP</a>
+    </div>
+    <div class="sidebar__mid">
+      <button class="sidebar__burger" id="sidebarBurger" aria-label="Menü öffnen">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="sidebar__bottom">
+      <a href="#" class="sidebar__icon" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- Navigation Drawer -->
+  <nav class="nav-drawer" id="navDrawer" aria-label="Hauptnavigation">
+    <div class="nav-drawer__header">
+      <span class="nav-drawer__title">Menü</span>
+      <button class="nav-drawer__close" id="drawerClose" aria-label="Schließen">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <ul class="nav-drawer__links">
+      <li><a href="index.html" class="drawer-link"><span class="drawer-link__num">00</span><span class="drawer-link__text">Startseite</span></a></li>
+      <li><a href="upload.html" class="drawer-link"><span class="drawer-link__num">01</span><span class="drawer-link__text">Galerie</span></a></li>
+      <li><a href="plaene.html" class="drawer-link"><span class="drawer-link__num">02</span><span class="drawer-link__text">Unsere Pläne</span></a></li>
+    </ul>
+    <div class="nav-drawer__footer">
+      <a href="mailto:hallo@smartstudio.at" class="nav-drawer__contact">hallo@smartstudio.at</a>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="sw-header" id="swHeader">
+    <div class="sw-header__logo">
+      <div class="sw-header__logo-box">E</div>
+      <span>Erinnerungen</span>
+    </div>
+  </header>
+
+  <!-- Password Screen -->
+  <div id="pwScreen">
+    <div class="pw-box">
+      <p class="pw-box__title">Unsere Pläne</p>
+      <p class="pw-box__sub">SMARTSTUDIO</p>
+      <input class="pw-box__input" id="pwInput" type="password" placeholder="Passwort" autocomplete="current-password" />
+      <p class="pw-box__error" id="pwError"></p>
+      <button class="pw-box__btn" id="pwSubmit" type="button">Weiter</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <main class="plans-main">
+    <div class="plans-head">
+      <h1>Unsere Pläne</h1>
+      <p>Sammelt hier Ideen für zukünftige Reisen und Unternehmungen. Schlagt etwas vor, kommentiert und liked die Ideen der anderen.</p>
+    </div>
+
+    <form class="plan-form" id="planForm">
+      <div class="plan-form__title">Neuen Vorschlag hinzufügen</div>
+      <div class="plan-form__row">
+        <input class="plan-input" id="planName" type="text" placeholder="Name (z. B. Roadtrip Italien)" maxlength="120" required>
+        <input class="plan-input" id="planLocation" type="text" placeholder="Ort (z. B. Toskana)" maxlength="120">
+      </div>
+      <input class="plan-input" id="planPeriod" type="text" placeholder="Zeitraum (z. B. Sommer 2026 oder 01.–10.07.2026)" maxlength="120">
+      <textarea class="plan-textarea" id="planDesc" placeholder="Beschreibung – worum geht's, was wollen wir machen?" maxlength="2000"></textarea>
+      <div class="plan-form__row">
+        <input class="plan-input" id="planAuthor" type="text" placeholder="Dein Name (optional)" maxlength="40" autocomplete="name">
+        <div class="plan-form__actions"><button class="plan-btn" id="planSubmit" type="submit">Vorschlag posten</button></div>
+      </div>
+    </form>
+
+    <div class="plans-list" id="plansList">
+      <p class="plans-empty">Lade Vorschläge…</p>
+    </div>
+  </main>
+
+  <div id="plansStatus"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://rtzvvthcdxklwayhsuha.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0enZ2dGhjZHhrbHdheWhzdWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzUxMzEsImV4cCI6MjA5Mzc1MTEzMX0.8nGc1tqVq2PL1QK2EArexbXpX01-OK8-9MfLUI4Wnfw';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    /* Geräte-Kennung – geteilt mit der Galerie, damit eigene Beiträge erkannt werden */
+    const CLIENT_ID = (() => {
+      let id = localStorage.getItem('gallery-client-id');
+      if (!id) { id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()); localStorage.setItem('gallery-client-id', id); }
+      return id;
+    })();
+
+    // ── DOM ──
+    const planForm     = document.getElementById('planForm');
+    const planName     = document.getElementById('planName');
+    const planLocation = document.getElementById('planLocation');
+    const planPeriod   = document.getElementById('planPeriod');
+    const planDesc     = document.getElementById('planDesc');
+    const planAuthor   = document.getElementById('planAuthor');
+    const planSubmit   = document.getElementById('planSubmit');
+    const plansList    = document.getElementById('plansList');
+    const statusEl     = document.getElementById('plansStatus');
+
+    planAuthor.value = localStorage.getItem('gallery-comment-name') || '';
+
+    let statusTimer = null;
+    function setStatus(msg, type) {
+      statusEl.textContent = msg;
+      statusEl.classList.toggle('error', type === 'error');
+      statusEl.classList.add('show');
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => statusEl.classList.remove('show'), 3000);
+    }
+
+    function fmtTime(iso) {
+      const d = new Date(iso);
+      return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+           + ' · ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    const ICON_PIN  = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+    const ICON_CAL  = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+    const ICON_HEART = '<svg class="plan-like-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    const ICON_CHAT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
+
+    // ── Daten laden ──
+    async function loadPlans() {
+      const [plansRes, likesRes, commentsRes] = await Promise.all([
+        db.from('plans').select('*').order('created_at', { ascending: false }),
+        db.from('plan_likes').select('plan_id, client_id'),
+        db.from('plan_comments').select('*').order('created_at', { ascending: true }),
+      ]);
+
+      if (plansRes.error) {
+        plansList.innerHTML = '<p class="plans-empty">Vorschläge konnten nicht geladen werden.</p>';
+        return;
+      }
+      const plans = plansRes.data || [];
+      const likes = likesRes.data || [];
+      const comments = commentsRes.data || [];
+
+      const likesByPlan = new Map();
+      for (const l of likes) {
+        if (!likesByPlan.has(l.plan_id)) likesByPlan.set(l.plan_id, []);
+        likesByPlan.get(l.plan_id).push(l.client_id);
+      }
+      const commentsByPlan = new Map();
+      for (const c of comments) {
+        if (!commentsByPlan.has(c.plan_id)) commentsByPlan.set(c.plan_id, []);
+        commentsByPlan.get(c.plan_id).push(c);
+      }
+
+      if (!plans.length) {
+        plansList.innerHTML = '<p class="plans-empty">Noch keine Vorschläge – mach den ersten!</p>';
+        return;
+      }
+
+      plansList.innerHTML = '';
+      for (const p of plans) {
+        plansList.appendChild(renderPlan(p, likesByPlan.get(p.id) || [], commentsByPlan.get(p.id) || []));
+      }
+    }
+
+    function renderPlan(plan, likeIds, comments) {
+      const card = document.createElement('article');
+      card.className = 'plan-card';
+
+      // Kopf
+      const head = document.createElement('div');
+      head.className = 'plan-card__head';
+      const headText = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'plan-card__name';
+      name.textContent = plan.name;
+      headText.appendChild(name);
+
+      const meta = document.createElement('div');
+      meta.className = 'plan-card__meta';
+      if (plan.location) { const s = document.createElement('span'); s.innerHTML = ICON_PIN; s.append(' ' + plan.location); meta.appendChild(s); }
+      if (plan.period)   { const s = document.createElement('span'); s.innerHTML = ICON_CAL; s.append(' ' + plan.period);   meta.appendChild(s); }
+      if (plan.location || plan.period) headText.appendChild(meta);
+      head.appendChild(headText);
+
+      if (plan.client_id && plan.client_id === CLIENT_ID) {
+        const del = document.createElement('button');
+        del.className = 'plan-card__del';
+        del.type = 'button';
+        del.textContent = 'Löschen';
+        del.addEventListener('click', () => deletePlan(plan.id, plan.name));
+        head.appendChild(del);
+      }
+      card.appendChild(head);
+
+      if (plan.description) {
+        const desc = document.createElement('div');
+        desc.className = 'plan-card__desc';
+        desc.textContent = plan.description;
+        card.appendChild(desc);
+      }
+
+      // Aktionen
+      const liked = likeIds.includes(CLIENT_ID);
+      const actions = document.createElement('div');
+      actions.className = 'plan-actions';
+
+      const likeBtn = document.createElement('button');
+      likeBtn.className = 'plan-act plan-like' + (liked ? ' liked' : '');
+      likeBtn.type = 'button';
+      likeBtn.innerHTML = ICON_HEART + '<span class="plan-count">' + likeIds.length + '</span>';
+      likeBtn.addEventListener('click', () => toggleLike(plan.id, likeBtn));
+
+      const commentBtn = document.createElement('button');
+      commentBtn.className = 'plan-act';
+      commentBtn.type = 'button';
+      commentBtn.innerHTML = ICON_CHAT + '<span class="plan-count">' + comments.length + '</span>';
+
+      actions.appendChild(likeBtn);
+      actions.appendChild(commentBtn);
+      card.appendChild(actions);
+
+      // Kommentare
+      const cWrap = document.createElement('div');
+      cWrap.className = 'plan-comments';
+      cWrap.hidden = true;
+
+      const cList = document.createElement('div');
+      cList.className = 'plan-comments-list';
+      renderComments(cList, comments);
+      cWrap.appendChild(cList);
+
+      const form = document.createElement('form');
+      form.className = 'plan-comment-form';
+      const nameInput = document.createElement('input');
+      nameInput.className = 'plan-input';
+      nameInput.type = 'text';
+      nameInput.placeholder = 'Dein Name';
+      nameInput.maxLength = 40;
+      nameInput.value = localStorage.getItem('gallery-comment-name') || '';
+      const row = document.createElement('div');
+      row.className = 'plan-comment-row';
+      const bodyInput = document.createElement('input');
+      bodyInput.className = 'plan-input';
+      bodyInput.type = 'text';
+      bodyInput.placeholder = 'Kommentar schreiben…';
+      bodyInput.maxLength = 500;
+      bodyInput.required = true;
+      const sendBtn = document.createElement('button');
+      sendBtn.className = 'plan-btn';
+      sendBtn.type = 'submit';
+      sendBtn.textContent = 'Senden';
+      row.appendChild(bodyInput);
+      row.appendChild(sendBtn);
+      form.appendChild(nameInput);
+      form.appendChild(row);
+      form.addEventListener('submit', e => addComment(e, plan.id, nameInput, bodyInput, sendBtn));
+      cWrap.appendChild(form);
+
+      card.appendChild(cWrap);
+
+      commentBtn.addEventListener('click', () => {
+        cWrap.hidden = !cWrap.hidden;
+        if (!cWrap.hidden) bodyInput.focus();
+      });
+
+      return card;
+    }
+
+    function renderComments(listEl, comments) {
+      listEl.innerHTML = '';
+      if (!comments.length) {
+        const p = document.createElement('p');
+        p.className = 'plan-comment-empty';
+        p.textContent = 'Noch keine Kommentare.';
+        listEl.appendChild(p);
+        return;
+      }
+      for (const c of comments) {
+        const wrap = document.createElement('div');
+        wrap.className = 'plan-comment';
+        const ch = document.createElement('div');
+        ch.className = 'plan-comment-head';
+        const author = document.createElement('span');
+        author.className = 'plan-comment-author';
+        author.textContent = c.author || 'Anonym';
+        const time = document.createElement('span');
+        time.className = 'plan-comment-time';
+        time.textContent = fmtTime(c.created_at);
+        ch.appendChild(author);
+        ch.appendChild(time);
+        if (c.client_id && c.client_id === CLIENT_ID) {
+          const del = document.createElement('button');
+          del.className = 'plan-comment-del';
+          del.type = 'button';
+          del.textContent = 'Löschen';
+          del.addEventListener('click', () => deleteComment(c.id));
+          ch.appendChild(del);
+        }
+        const body = document.createElement('div');
+        body.className = 'plan-comment-body';
+        body.textContent = c.body;
+        wrap.appendChild(ch);
+        wrap.appendChild(body);
+        listEl.appendChild(wrap);
+      }
+    }
+
+    // ── Aktionen ──
+    async function toggleLike(planId, btn) {
+      const countEl = btn.querySelector('.plan-count');
+      const wasLiked = btn.classList.contains('liked');
+      const cur = parseInt(countEl.textContent, 10) || 0;
+      // Optimistisches UI
+      btn.classList.toggle('liked', !wasLiked);
+      countEl.textContent = wasLiked ? Math.max(0, cur - 1) : cur + 1;
+      try {
+        if (wasLiked) {
+          await db.from('plan_likes').delete().eq('plan_id', planId).eq('client_id', CLIENT_ID);
+        } else {
+          await db.from('plan_likes').upsert({ plan_id: planId, client_id: CLIENT_ID });
+        }
+      } catch (_) { /* bei Fehler korrigiert der nächste Reload */ }
+      // Echten Stand nachladen
+      const { data } = await db.from('plan_likes').select('client_id').eq('plan_id', planId);
+      const rows = data || [];
+      btn.classList.toggle('liked', rows.some(r => r.client_id === CLIENT_ID));
+      countEl.textContent = rows.length;
+    }
+
+    async function addComment(e, planId, nameInput, bodyInput, sendBtn) {
+      e.preventDefault();
+      const body = bodyInput.value.trim();
+      if (!body) return;
+      const author = nameInput.value.trim() || 'Anonym';
+      localStorage.setItem('gallery-comment-name', nameInput.value.trim());
+      sendBtn.disabled = true;
+      const { error } = await db.from('plan_comments').insert({ plan_id: planId, author, body, client_id: CLIENT_ID });
+      sendBtn.disabled = false;
+      if (error) { setStatus('Kommentar konnte nicht gespeichert werden', 'error'); return; }
+      bodyInput.value = '';
+      await loadPlans();
+    }
+
+    async function deleteComment(id) {
+      if (!confirm('Diesen Kommentar wirklich löschen?')) return;
+      const { error } = await db.from('plan_comments').delete().eq('id', id);
+      if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
+      await loadPlans();
+    }
+
+    async function deletePlan(id, name) {
+      if (!confirm(`Vorschlag „${name}" inkl. aller Likes und Kommentare wirklich löschen?`)) return;
+      const { error } = await db.from('plans').delete().eq('id', id);
+      if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
+      setStatus('Vorschlag gelöscht', 'ok');
+      await loadPlans();
+    }
+
+    // ── Neuer Vorschlag ──
+    planForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = planName.value.trim();
+      if (!name) { planName.focus(); return; }
+      localStorage.setItem('gallery-comment-name', planAuthor.value.trim());
+      planSubmit.disabled = true;
+      planSubmit.textContent = 'Speichert…';
+      const { error } = await db.from('plans').insert({
+        name,
+        location: planLocation.value.trim() || null,
+        period: planPeriod.value.trim() || null,
+        description: planDesc.value.trim() || null,
+        client_id: CLIENT_ID,
+      });
+      planSubmit.disabled = false;
+      planSubmit.textContent = 'Vorschlag posten';
+      if (error) { setStatus('Vorschlag konnte nicht gespeichert werden', 'error'); return; }
+      planName.value = ''; planLocation.value = ''; planPeriod.value = ''; planDesc.value = '';
+      setStatus('Vorschlag hinzugefügt ✓', 'ok');
+      await loadPlans();
+    });
+
+    // ── Navigations-Drawer ──
+    const sidebarBurger = document.getElementById('sidebarBurger');
+    const navDrawer     = document.getElementById('navDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerClose   = document.getElementById('drawerClose');
+    function openDrawer() { navDrawer.classList.add('open'); drawerOverlay.classList.add('visible'); sidebarBurger.classList.add('is-open'); }
+    function closeDrawer() { navDrawer.classList.remove('open'); drawerOverlay.classList.remove('visible'); sidebarBurger.classList.remove('is-open'); }
+    sidebarBurger.addEventListener('click', () => { navDrawer.classList.contains('open') ? closeDrawer() : openDrawer(); });
+    drawerClose.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+    /* Header-Schatten beim Scrollen */
+    const swHeader = document.getElementById('swHeader');
+    window.addEventListener('scroll', () => { swHeader.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+
+    // ── Password Protection (gleiche Logik & Session wie Galerie) ──
+    const PW_HASH    = '0c78845b26a28951c473b4dfc9c1a5305a657db1b2b4481de86a2dcec564fdcd'; // SmartStudio
+    const PW_SESSION = 'gallery-auth-v1';
+    const pwScreen   = document.getElementById('pwScreen');
+    const pwInput    = document.getElementById('pwInput');
+    const pwSubmit   = document.getElementById('pwSubmit');
+    const pwError    = document.getElementById('pwError');
+
+    async function hashString(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    async function tryUnlock() {
+      pwError.textContent = '';
+      pwSubmit.disabled = true;
+      const hash = await hashString(pwInput.value);
+      if (hash === PW_HASH) {
+        sessionStorage.setItem(PW_SESSION, '1');
+        pwScreen.classList.add('fade-out');
+        setTimeout(() => pwScreen.remove(), 420);
+      } else {
+        pwError.textContent = 'Falsches Passwort';
+        pwInput.value = '';
+        pwInput.focus();
+      }
+      pwSubmit.disabled = false;
+    }
+    pwSubmit.addEventListener('click', tryUnlock);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+    if (sessionStorage.getItem(PW_SESSION)) pwScreen.remove();
+
+    // ── Init ──
+    loadPlans();
+  </script>
+</body>
+</html>
