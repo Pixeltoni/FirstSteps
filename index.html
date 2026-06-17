@@ -510,6 +510,7 @@
     </div>
     <ul class="nav-drawer__links">
       <li><a href="upload.html" class="drawer-link"><span class="drawer-link__num">01</span><span class="drawer-link__text">Galerie</span></a></li>
+      <li><a href="plaene.html" class="drawer-link"><span class="drawer-link__num">02</span><span class="drawer-link__text">Unsere Pläne</span></a></li>
     </ul>
     <div class="nav-drawer__footer">
       <a href="mailto:hallo@smartstudio.at" class="nav-drawer__contact">hallo@smartstudio.at</a>
@@ -847,6 +848,28 @@
     window.addEventListener('scroll', () => {
       swHeader.classList.toggle('scrolled', window.scrollY > 10);
     }, { passive: true });
+
+    /* ── Navigations-Drawer (Burger-Menü) ── */
+    const sidebarBurger = document.getElementById('sidebarBurger');
+    const navDrawer     = document.getElementById('navDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const drawerClose   = document.getElementById('drawerClose');
+    function openDrawer() {
+      navDrawer.classList.add('open');
+      drawerOverlay.classList.add('visible');
+      sidebarBurger.classList.add('is-open');
+    }
+    function closeDrawer() {
+      navDrawer.classList.remove('open');
+      drawerOverlay.classList.remove('visible');
+      sidebarBurger.classList.remove('is-open');
+    }
+    sidebarBurger.addEventListener('click', () => {
+      navDrawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+    drawerClose.addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
   </script>
   <script>
     fetch('build-info.json?t=' + Date.now())
