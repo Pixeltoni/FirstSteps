@@ -809,6 +809,10 @@
     /* Drag-to-scroll the cards row sideways with the mouse */
     let isDragging = false, dragStartX = 0, dragStartScroll = 0, dragMoved = 0;
     swCardsEl.addEventListener('pointerdown', (e) => {
+      // Beginnt der Druck auf dem "Album ansehen"-Button, KEIN Drag/Capture
+      // starten – sonst würde setPointerCapture das Klick-Event abfangen und
+      // der Button-Klick käme nie an.
+      if (e.target.closest('.sw-card__btn')) return;
       isDragging = true;
       dragMoved = 0;
       dragStartX = e.clientX;
@@ -830,8 +834,11 @@
     };
     swCardsEl.addEventListener('pointerup', endDrag);
     swCardsEl.addEventListener('pointercancel', endDrag);
-    /* Suppress accidental clicks that follow a drag */
+    /* Suppress accidental clicks that follow a drag – aber Klicks auf den
+       "Album ansehen"-Button nie unterdrücken (dragMoved kann von einem
+       früheren Wischen noch >5 sein). */
     swCardsEl.addEventListener('click', (e) => {
+      if (e.target.closest('.sw-card__btn')) return;
       if (dragMoved > 5) { e.preventDefault(); e.stopPropagation(); }
     }, true);
 
