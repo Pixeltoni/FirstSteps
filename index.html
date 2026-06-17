@@ -685,7 +685,7 @@
             allPhotos.push({ url, thumb, display, albumName: meta.name, location: meta.location, date: meta.date });
             /* First photo of the album becomes its cover in the cards row */
             if (i === 0) {
-              albums.push({ coverUrl: url, coverThumb: thumb, albumName: meta.name, location: meta.location, date: meta.date });
+              albums.push({ folder, coverUrl: url, coverThumb: thumb, albumName: meta.name, location: meta.location, date: meta.date });
             }
           });
         }
@@ -725,9 +725,13 @@
         /* Cards — one card per album (cover photo), so distinct albums are shown */
         const cardsEl = document.getElementById('swCards');
         cardsEl.innerHTML = '';
-        albums.forEach(({ coverUrl, coverThumb, albumName, location, date }) => {
+        albums.forEach(({ folder, coverUrl, coverThumb, albumName, location, date }) => {
           const card = document.createElement('div');
           card.className = 'sw-card';
+          card.style.cursor = 'pointer';
+          card.setAttribute('role', 'link');
+          card.setAttribute('tabindex', '0');
+          card.setAttribute('aria-label', `Album „${albumName}" öffnen`);
           card.innerHTML = `
             <img class="sw-card__img" src="${coverThumb}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${coverUrl}'">
             <div class="sw-card__body">
@@ -735,6 +739,14 @@
               <div class="sw-card__desc">${location || '—'}</div>
               <div class="sw-card__dots">${date || '—'}</div>
             </div>`;
+          /* Klick (oder Enter) öffnet direkt das passende Album in der Galerie.
+             Ein vorangegangenes Ziehen wird vom Capture-Listener auf swCards
+             unterdrückt, sodass Wischen die Navigation nicht auslöst. */
+          const openAlbum = () => { window.location.href = 'upload.html?album=' + encodeURIComponent(folder); };
+          card.addEventListener('click', openAlbum);
+          card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAlbum(); }
+          });
           cardsEl.appendChild(card);
         });
         updateCardsNav();

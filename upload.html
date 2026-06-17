@@ -2049,7 +2049,12 @@
     });
 
     // ── Init ──
-    loadFolders();
+    // Optionaler Parameter ?album=<Ordner> öffnet direkt das passende Album
+    // (z. B. beim Klick auf eine Album-Karte auf der Startseite).
+    loadFolders().then(() => {
+      const albumParam = new URLSearchParams(location.search).get('album');
+      if (albumParam) openAlbum(albumParam);
+    });
   </script>
 </body>
 </html>
