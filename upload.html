@@ -414,7 +414,7 @@
     }
     .lb__nav:hover { background: rgba(255,255,255,.22); }
     .lb__nav--prev { left: 1.25rem; }
-    .lb__nav--next { right: 1.25rem; }
+    .lb__nav--next { right: 5rem; }
     .lb__nav[hidden] { display: none; }
     .lb__counter {
       position: absolute; top: 1.85rem; left: 50%; transform: translateX(-50%);
@@ -422,32 +422,44 @@
     }
     @media (max-width: 600px) {
       .lb__nav--prev { left: .5rem; }
-      .lb__nav--next { right: .5rem; }
+      .lb__nav--next { right: 3.9rem; }
     }
 
     /* ── Lightbox: Likes & Kommentare ── */
+    /* Aktionsleiste vertikal an der rechten Seite – im (mobilen) Vollbild
+       immer sichtbar, anders als eine untere Leiste hinter der Browser-UI. */
     .lb__bar {
-      flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
-      gap: .6rem; padding: .85rem 1rem; flex-wrap: wrap;
+      position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      z-index: 6;
+      display: flex; flex-direction: column; align-items: center;
+      gap: .7rem; padding: 0;
     }
-    .lb__like, .lb__cbtn {
-      display: inline-flex; align-items: center; gap: .45rem;
-      padding: .5rem 1rem; border-radius: 2rem;
-      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
-      color: #fff; font-size: .85rem; cursor: pointer; font-family: inherit;
+    .lb__like, .lb__cbtn, .lb__full {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: .12rem; width: 54px; height: 54px; padding: 0; border-radius: 50%;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25);
+      color: #fff; font-size: .68rem; letter-spacing: 0; cursor: pointer; font-family: inherit;
       transition: background .15s, transform .1s;
     }
-    .lb__like:hover, .lb__cbtn:hover { background: rgba(255,255,255,.22); }
-    .lb__like:active { transform: scale(.94); }
+    .lb__like:hover, .lb__cbtn:hover, .lb__full:hover:not(:disabled) { background: rgba(255,255,255,.24); }
+    .lb__like:active, .lb__cbtn:active, .lb__full:active { transform: scale(.94); }
     .lb__like.liked { background: rgba(232,69,69,.92); border-color: #e64545; }
     .lb__like.liked .lb__like-icon { fill: #fff; }
-    .lb__like-count, .lb__comment-count { font-variant-numeric: tabular-nums; min-width: .6em; }
+    .lb__full:disabled, .lb__full.loading { opacity: .6; cursor: wait; }
+    .lb__full.loading { animation: lbPulse 1s ease-in-out infinite; }
+    @keyframes lbPulse { 50% { opacity: .35; } }
+    .lb__like-count, .lb__comment-count { font-variant-numeric: tabular-nums; min-width: .6em; line-height: 1; }
+    @media (max-width: 600px) {
+      .lb__bar { right: .6rem; gap: .55rem; }
+      .lb__like, .lb__cbtn, .lb__full { width: 48px; height: 48px; }
+    }
 
     .lb__comments {
-      flex: 0 0 auto; width: min(680px, 94vw); margin: 0 auto 1rem;
-      max-height: 42vh; display: flex; flex-direction: column;
-      background: rgba(22,22,24,.72); border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px; overflow: hidden;
+      position: absolute; left: 50%; bottom: 1.25rem; transform: translateX(-50%);
+      z-index: 7; width: min(680px, 92vw);
+      max-height: 50vh; display: flex; flex-direction: column;
+      background: rgba(22,22,24,.92); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,.5);
     }
     .lb__comments[hidden] { display: none; }
     .lb__comments-list {
@@ -832,7 +844,10 @@
         <svg class="lb__like-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <span class="lb__like-count" id="lbLikeCount">0</span>
       </button>
-      <button class="lb__full" id="lbFullBtn" hidden>Volle Auflösung anzeigen</button>
+      <button class="lb__full" id="lbFullBtn" type="button" title="Volle Auflösung anzeigen" aria-label="Volle Auflösung anzeigen" hidden>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        <span>HD</span>
+      </button>
       <button class="lb__cbtn" id="lbCommentToggle" type="button" aria-label="Kommentare">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         <span class="lb__comment-count" id="lbCommentCount">0</span>
@@ -1725,7 +1740,7 @@
       lbImg.src = display;
       lbFullBtn.hidden = display === full;
       lbFullBtn.disabled = false;
-      lbFullBtn.textContent = 'Volle Auflösung anzeigen';
+      lbFullBtn.classList.remove('loading');
 
       const many = lbItems.length > 1;
       lbPrev.hidden = !many;
@@ -1769,7 +1784,7 @@
     lbFullBtn.addEventListener('click', () => {
       if (!lbFullUrl) return;
       lbFullBtn.disabled = true;
-      lbFullBtn.textContent = 'Lädt…';
+      lbFullBtn.classList.add('loading');
       lbImg.onerror = null;
       lbImg.onload = () => { lbImg.onload = null; lbFullBtn.hidden = true; };
       lbImg.src = lbFullUrl;
