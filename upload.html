@@ -374,12 +374,17 @@
     .lb {
       position: fixed; inset: 0; z-index: 2000;
       background: rgba(0,0,0,.92); backdrop-filter: blur(6px);
-      display: grid; place-items: center;
+      display: flex; flex-direction: column;
       opacity: 0; pointer-events: none;
     }
     .lb.open { opacity: 1; pointer-events: all; }
+    .lb__stage {
+      position: relative; flex: 1 1 auto; min-height: 0;
+      display: grid; place-items: center;
+      width: 100%; padding: 3.5rem 1rem .5rem;
+    }
     .lb__img {
-      max-width: min(88vw, 1100px); max-height: 88vh;
+      max-width: min(88vw, 1100px); max-height: 100%;
       object-fit: contain; border-radius: 10px;
     }
     .lb__close {
@@ -391,8 +396,7 @@
     }
     .lb__close:hover { background: rgba(255,255,255,.22); }
     .lb__full {
-      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-      padding: .6rem 1.3rem; border-radius: 2rem;
+      padding: .55rem 1.1rem; border-radius: 2rem;
       background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
       color: #fff; font-size: .82rem; letter-spacing: .03em;
       cursor: pointer; font-family: inherit;
@@ -420,6 +424,65 @@
       .lb__nav--prev { left: .5rem; }
       .lb__nav--next { right: .5rem; }
     }
+
+    /* ── Lightbox: Likes & Kommentare ── */
+    .lb__bar {
+      flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+      gap: .6rem; padding: .85rem 1rem; flex-wrap: wrap;
+    }
+    .lb__like, .lb__cbtn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .5rem 1rem; border-radius: 2rem;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+      color: #fff; font-size: .85rem; cursor: pointer; font-family: inherit;
+      transition: background .15s, transform .1s;
+    }
+    .lb__like:hover, .lb__cbtn:hover { background: rgba(255,255,255,.22); }
+    .lb__like:active { transform: scale(.94); }
+    .lb__like.liked { background: rgba(232,69,69,.92); border-color: #e64545; }
+    .lb__like.liked .lb__like-icon { fill: #fff; }
+    .lb__like-count, .lb__comment-count { font-variant-numeric: tabular-nums; min-width: .6em; }
+
+    .lb__comments {
+      flex: 0 0 auto; width: min(680px, 94vw); margin: 0 auto 1rem;
+      max-height: 42vh; display: flex; flex-direction: column;
+      background: rgba(22,22,24,.72); border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px; overflow: hidden;
+    }
+    .lb__comments[hidden] { display: none; }
+    .lb__comments-list {
+      overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .75rem;
+    }
+    .lb__comment { color: #e9e9ea; font-size: .85rem; line-height: 1.45; }
+    .lb__comment-head { display: flex; align-items: baseline; gap: .5rem; margin-bottom: .1rem; }
+    .lb__comment-author { font-weight: 600; color: #fff; }
+    .lb__comment-time { color: rgba(255,255,255,.4); font-size: .72rem; }
+    .lb__comment-del {
+      margin-left: auto; background: none; border: none; color: rgba(255,255,255,.4);
+      cursor: pointer; font-size: .72rem; font-family: inherit; padding: 0;
+    }
+    .lb__comment-del:hover { color: #e64545; }
+    .lb__comment-body { white-space: pre-wrap; word-break: break-word; }
+    .lb__comment-empty { color: rgba(255,255,255,.5); font-size: .85rem; text-align: center; padding: .4rem; }
+    .lb__comment-form {
+      padding: .75rem 1rem .9rem; border-top: 1px solid rgba(255,255,255,.1);
+      display: flex; flex-direction: column; gap: .5rem;
+    }
+    .lb__comment-form input {
+      width: 100%; padding: .6rem .8rem; border-radius: 8px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+      color: #fff; font-family: inherit; font-size: .85rem;
+    }
+    .lb__comment-form input:focus { outline: none; border-color: rgba(255,255,255,.45); }
+    .lb__comment-form input::placeholder { color: rgba(255,255,255,.4); }
+    .lb__comment-row { display: flex; gap: .5rem; }
+    .lb__comment-row input { flex: 1; }
+    .lb__comment-row button {
+      padding: .6rem 1.1rem; border-radius: 8px; border: none; cursor: pointer;
+      background: #fff; color: #111; font-family: inherit; font-size: .85rem; font-weight: 600;
+    }
+    .lb__comment-row button:hover { background: rgba(255,255,255,.85); }
+    .lb__comment-row button:disabled { opacity: .5; cursor: not-allowed; }
 
     /* ── Password Screen ── */
     #pwScreen {
@@ -759,10 +822,32 @@
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-hidden="true">
     <button class="lb__close" id="lbClose">✕</button>
     <span class="lb__counter" id="lbCounter"></span>
-    <button class="lb__nav lb__nav--prev" id="lbPrev" aria-label="Vorheriges Bild" hidden>&#8249;</button>
-    <img class="lb__img" id="lbImg" src="" alt="" />
-    <button class="lb__nav lb__nav--next" id="lbNext" aria-label="Nächstes Bild" hidden>&#8250;</button>
-    <button class="lb__full" id="lbFullBtn" hidden>Volle Auflösung anzeigen</button>
+    <div class="lb__stage" id="lbStage">
+      <button class="lb__nav lb__nav--prev" id="lbPrev" aria-label="Vorheriges Bild" hidden>&#8249;</button>
+      <img class="lb__img" id="lbImg" src="" alt="" />
+      <button class="lb__nav lb__nav--next" id="lbNext" aria-label="Nächstes Bild" hidden>&#8250;</button>
+    </div>
+    <div class="lb__bar">
+      <button class="lb__like" id="lbLike" type="button" aria-pressed="false" aria-label="Gefällt mir">
+        <svg class="lb__like-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="lb__like-count" id="lbLikeCount">0</span>
+      </button>
+      <button class="lb__full" id="lbFullBtn" hidden>Volle Auflösung anzeigen</button>
+      <button class="lb__cbtn" id="lbCommentToggle" type="button" aria-label="Kommentare">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span class="lb__comment-count" id="lbCommentCount">0</span>
+      </button>
+    </div>
+    <div class="lb__comments" id="lbComments" hidden>
+      <div class="lb__comments-list" id="lbCommentsList"></div>
+      <form class="lb__comment-form" id="lbCommentForm">
+        <input id="lbCommentName" type="text" placeholder="Dein Name" maxlength="40" autocomplete="name">
+        <div class="lb__comment-row">
+          <input id="lbCommentBody" type="text" placeholder="Kommentar schreiben…" maxlength="500" required>
+          <button type="submit">Senden</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script>
@@ -1578,10 +1663,12 @@
 
     // ── Lightbox ──
     document.getElementById('lbClose').addEventListener('click', closeLb);
-    lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+    lb.addEventListener('click', e => { if (e.target === lb || e.target.id === 'lbStage') closeLb(); });
     document.addEventListener('keydown', e => {
       if (lb.classList.contains('open')) {
+        const typing = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
         if (e.key === 'Escape')     return closeLb();
+        if (typing) return;
         if (e.key === 'ArrowLeft')  return lbStep(-1);
         if (e.key === 'ArrowRight') return lbStep(1);
         return;
@@ -1598,8 +1685,10 @@
       lbImg.onload  = null;
       lbImg.src = '';
       lbFullBtn.hidden = true;
+      lbComments.hidden = true;
       lbItems = [];
       lbIndex = -1;
+      socialPath = null;
     }
 
     // Lightbox zeigt zuerst die Display-Version (~1600px); der Button
@@ -1618,6 +1707,7 @@
       lbItems = items.map(it => ({
         display: it.dataset.display || it.dataset.url,
         full:    it.dataset.url,
+        path:    it.dataset.path,
       }));
       lbIndex = items.indexOf(el);
       if (lbIndex < 0) lbIndex = 0;
@@ -1649,6 +1739,8 @@
           new Image().src = lbItems[n].display;
         }
       }
+
+      refreshSocial(lbItems[lbIndex].path);
     }
 
     function lbStep(dir) {
@@ -1681,6 +1773,157 @@
       lbImg.onerror = null;
       lbImg.onload = () => { lbImg.onload = null; lbFullBtn.hidden = true; };
       lbImg.src = lbFullUrl;
+    });
+
+    // ── Likes & Kommentare ──
+    // Likes/Kommentare liegen in Supabase (Tabellen image_likes, image_comments)
+    // und sind pro Bild über den Storage-Pfad (data-path) verknüpft.
+    const CLIENT_ID = (() => {
+      let id = localStorage.getItem('gallery-client-id');
+      if (!id) { id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()); localStorage.setItem('gallery-client-id', id); }
+      return id;
+    })();
+
+    const lbLike          = document.getElementById('lbLike');
+    const lbLikeCount     = document.getElementById('lbLikeCount');
+    const lbCommentToggle = document.getElementById('lbCommentToggle');
+    const lbCommentCount  = document.getElementById('lbCommentCount');
+    const lbComments      = document.getElementById('lbComments');
+    const lbCommentsList  = document.getElementById('lbCommentsList');
+    const lbCommentForm   = document.getElementById('lbCommentForm');
+    const lbCommentName   = document.getElementById('lbCommentName');
+    const lbCommentBody   = document.getElementById('lbCommentBody');
+    let socialPath = null;   // Pfad des aktuell angezeigten Bildes
+
+    lbCommentName.value = localStorage.getItem('gallery-comment-name') || '';
+
+    function setLikeUI(liked, count) {
+      lbLike.classList.toggle('liked', liked);
+      lbLike.setAttribute('aria-pressed', liked ? 'true' : 'false');
+      lbLikeCount.textContent = count;
+    }
+
+    function fmtTime(iso) {
+      const d = new Date(iso);
+      return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+           + ' · ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function refreshSocial(path) {
+      socialPath = path;
+      setLikeUI(false, '·');
+      lbCommentCount.textContent = '·';
+      lbCommentsList.innerHTML = '';
+      if (!path) return;
+
+      const [likeRes, commentRes] = await Promise.all([
+        db.from('image_likes').select('client_id').eq('image_path', path),
+        db.from('image_comments').select('*').eq('image_path', path).order('created_at', { ascending: true }),
+      ]);
+
+      // Antwort eines zwischenzeitlich gewechselten Bildes ignorieren
+      if (socialPath !== path) return;
+
+      const likeRows = likeRes.data || [];
+      setLikeUI(likeRows.some(r => r.client_id === CLIENT_ID), likeRows.length);
+
+      renderComments(commentRes.data || []);
+    }
+
+    function renderComments(rows) {
+      lbCommentCount.textContent = rows.length;
+      lbCommentsList.innerHTML = '';
+      if (!rows.length) {
+        const p = document.createElement('p');
+        p.className = 'lb__comment-empty';
+        p.textContent = 'Noch keine Kommentare – schreib den ersten!';
+        lbCommentsList.appendChild(p);
+        return;
+      }
+      for (const c of rows) {
+        const wrap = document.createElement('div');
+        wrap.className = 'lb__comment';
+
+        const head = document.createElement('div');
+        head.className = 'lb__comment-head';
+        const author = document.createElement('span');
+        author.className = 'lb__comment-author';
+        author.textContent = c.author || 'Anonym';
+        const time = document.createElement('span');
+        time.className = 'lb__comment-time';
+        time.textContent = fmtTime(c.created_at);
+        head.appendChild(author);
+        head.appendChild(time);
+
+        if (c.client_id && c.client_id === CLIENT_ID) {
+          const del = document.createElement('button');
+          del.className = 'lb__comment-del';
+          del.type = 'button';
+          del.textContent = 'Löschen';
+          del.addEventListener('click', () => deleteComment(c.id, c.image_path));
+          head.appendChild(del);
+        }
+
+        const body = document.createElement('div');
+        body.className = 'lb__comment-body';
+        body.textContent = c.body;
+
+        wrap.appendChild(head);
+        wrap.appendChild(body);
+        lbCommentsList.appendChild(wrap);
+      }
+    }
+
+    lbLike.addEventListener('click', async () => {
+      if (!socialPath) return;
+      const path = socialPath;
+      const wasLiked = lbLike.classList.contains('liked');
+      const cur = parseInt(lbLikeCount.textContent, 10) || 0;
+      // Optimistisches UI
+      setLikeUI(!wasLiked, wasLiked ? Math.max(0, cur - 1) : cur + 1);
+      try {
+        if (wasLiked) {
+          await db.from('image_likes').delete().eq('image_path', path).eq('client_id', CLIENT_ID);
+        } else {
+          await db.from('image_likes').upsert({ image_path: path, client_id: CLIENT_ID });
+        }
+      } catch (_) { /* bei Fehler gleicht refreshSocial wieder ab */ }
+      if (socialPath === path) {
+        const { data } = await db.from('image_likes').select('client_id').eq('image_path', path);
+        const rows = data || [];
+        setLikeUI(rows.some(r => r.client_id === CLIENT_ID), rows.length);
+      }
+    });
+
+    lbCommentToggle.addEventListener('click', () => {
+      lbComments.hidden = !lbComments.hidden;
+      if (!lbComments.hidden) lbCommentBody.focus();
+    });
+
+    async function deleteComment(id, path) {
+      const ok = await showConfirm('Kommentar löschen', 'Diesen Kommentar wirklich löschen?');
+      if (!ok) return;
+      await db.from('image_comments').delete().eq('id', id);
+      if (socialPath === path) refreshSocial(path);
+    }
+
+    lbCommentForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const path = socialPath;
+      const body = lbCommentBody.value.trim();
+      if (!path || !body) return;
+      const author = lbCommentName.value.trim() || 'Anonym';
+      localStorage.setItem('gallery-comment-name', lbCommentName.value.trim());
+
+      const submitBtn = lbCommentForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      const { error } = await db.from('image_comments').insert({
+        image_path: path, author, body, client_id: CLIENT_ID,
+      });
+      submitBtn.disabled = false;
+      if (error) { setStatus('Kommentar konnte nicht gespeichert werden', 'error'); return; }
+      lbCommentBody.value = '';
+      if (socialPath === path) refreshSocial(path);
     });
 
     // ── Password Protection ──
