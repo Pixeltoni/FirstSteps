@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Unsere Pläne — Erinnerungen</title>
+  <title>Coming Soon? — Erinnerungen</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -65,11 +65,6 @@
     }
     .plan-card__head { display: flex; align-items: flex-start; gap: .75rem; }
     .plan-card__name { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
-    .plan-card__meta {
-      display: flex; flex-wrap: wrap; gap: .35rem .9rem;
-      margin-top: .35rem; color: var(--fg-muted); font-size: .82rem;
-    }
-    .plan-card__meta span { display: inline-flex; align-items: center; gap: .32rem; }
     .plan-card__desc {
       margin-top: .85rem; color: var(--fg); font-size: .92rem; line-height: 1.55;
       white-space: pre-wrap; word-break: break-word;
@@ -98,25 +93,6 @@
     .plan-like.liked { background: rgba(232,69,69,.12); border-color: #e64545; color: #c93232; }
     .plan-like.liked .plan-like-icon { fill: #e64545; stroke: #e64545; }
     .plan-count { font-variant-numeric: tabular-nums; min-width: .6em; }
-    .plan-join.joined { background: rgba(72,160,90,.14); border-color: #4ba35e; color: #2f8044; }
-
-    /* ── Datumsfeld im Formular ── */
-    .plan-date-label {
-      display: flex; flex-direction: column; gap: .3rem;
-      font-size: .72rem; color: var(--fg-muted);
-    }
-
-    /* ── Teilnehmer-Chips ── */
-    .plan-participants { margin-top: .85rem; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
-    .plan-participants.empty { color: var(--fg-muted); font-size: .82rem; }
-    .plan-participants__label { font-size: .82rem; color: var(--fg-muted); }
-    .plan-chip {
-      display: inline-flex; align-items: center;
-      padding: .22rem .6rem; border-radius: 2rem;
-      background: var(--bg-card); border: 1px solid var(--border);
-      font-size: .78rem; color: var(--fg);
-    }
-    .plan-chip.me { background: rgba(232,131,74,.14); border-color: var(--accent); color: var(--accent-2); font-weight: 600; }
 
     /* ── Sortier-Leiste ── */
     .plans-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.1rem; }
@@ -246,7 +222,7 @@
   <!-- Password Screen -->
   <div id="pwScreen">
     <div class="pw-box">
-      <p class="pw-box__title">Unsere Pläne</p>
+      <p class="pw-box__title">Coming Soon?</p>
       <p class="pw-box__sub">SMARTSTUDIO</p>
       <input class="pw-box__input" id="pwInput" type="password" placeholder="Passwort" autocomplete="current-password" />
       <p class="pw-box__error" id="pwError"></p>
@@ -257,25 +233,14 @@
   <!-- Content -->
   <main class="plans-main">
     <div class="plans-head">
-      <h1>Unsere Pläne</h1>
-      <p>Sammelt hier Ideen für zukünftige Reisen und Unternehmungen. Schlagt etwas vor, kommentiert und liked die Ideen der anderen.</p>
+      <h1>Coming Soon?</h1>
+      <p>Was fehlt euch auf dieser Website? Sammelt hier Ideen und Vorschläge für neue Funktionen – schlagt etwas vor, kommentiert und liked die Ideen der anderen.</p>
     </div>
 
     <form class="plan-form" id="planForm">
       <div class="plan-form__title">Neuen Vorschlag hinzufügen</div>
-      <div class="plan-form__row">
-        <input class="plan-input" id="planName" type="text" placeholder="Name (z. B. Roadtrip Italien)" maxlength="120" required>
-        <input class="plan-input" id="planLocation" type="text" placeholder="Ort (z. B. Toskana)" maxlength="120">
-      </div>
-      <div class="plan-form__row">
-        <label class="plan-date-label">Datum (von)
-          <input class="plan-input" id="planDate" type="date" required>
-        </label>
-        <label class="plan-date-label">bis (optional, für einen Zeitraum)
-          <input class="plan-input" id="planEndDate" type="date">
-        </label>
-      </div>
-      <textarea class="plan-textarea" id="planDesc" placeholder="Beschreibung – worum geht's, was wollen wir machen?" maxlength="2000"></textarea>
+      <input class="plan-input" id="planName" type="text" placeholder="Name (z. B. Dark Mode)" maxlength="120" required>
+      <textarea class="plan-textarea" id="planDesc" placeholder="Beschreibung – was soll die Website können?" maxlength="2000"></textarea>
       <div class="plan-form__row">
         <input class="plan-input" id="planAuthor" type="text" placeholder="Dein Name (optional)" maxlength="40" autocomplete="name">
         <div class="plan-form__actions"><button class="plan-btn" id="planSubmit" type="submit">Vorschlag posten</button></div>
@@ -286,9 +251,7 @@
       <span class="plans-toolbar__label">Sortieren nach:</span>
       <div class="plans-sort" id="plansSort">
         <button class="plans-sort__btn is-active" data-sort="new" type="button">Neueste</button>
-        <button class="plans-sort__btn" data-sort="date" type="button">Datum</button>
         <button class="plans-sort__btn" data-sort="likes" type="button">Likes</button>
-        <button class="plans-sort__btn" data-sort="participants" type="button">Teilnehmer</button>
       </div>
     </div>
 
@@ -312,24 +275,15 @@
     })();
 
     // ── DOM ──
-    const planForm     = document.getElementById('planForm');
-    const planName     = document.getElementById('planName');
-    const planLocation = document.getElementById('planLocation');
-    const planDate     = document.getElementById('planDate');
-    const planEndDate  = document.getElementById('planEndDate');
-    const planDesc     = document.getElementById('planDesc');
-    const planAuthor   = document.getElementById('planAuthor');
-    const planSubmit   = document.getElementById('planSubmit');
-    const plansList    = document.getElementById('plansList');
-    const statusEl     = document.getElementById('plansStatus');
+    const planForm   = document.getElementById('planForm');
+    const planName   = document.getElementById('planName');
+    const planDesc   = document.getElementById('planDesc');
+    const planAuthor = document.getElementById('planAuthor');
+    const planSubmit = document.getElementById('planSubmit');
+    const plansList  = document.getElementById('plansList');
+    const statusEl   = document.getElementById('plansStatus');
 
     planAuthor.value = localStorage.getItem('gallery-comment-name') || '';
-
-    // Enddatum kann nicht vor dem Startdatum liegen
-    planDate.addEventListener('change', () => {
-      planEndDate.min = planDate.value || '';
-      if (planEndDate.value && planEndDate.value < planDate.value) planEndDate.value = '';
-    });
 
     let statusTimer = null;
     function setStatus(msg, type) {
@@ -346,22 +300,11 @@
            + ' · ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // 'YYYY-MM-DD' → 'DD.MM.YYYY' (ohne Zeitzonen-Verschiebung)
-    function fmtDate(d) {
-      if (!d) return '';
-      const [y, m, day] = d.split('-');
-      return `${day}.${m}.${y}`;
-    }
-
-    const ICON_PIN  = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
-    const ICON_CAL  = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
     const ICON_HEART = '<svg class="plan-like-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
     const ICON_CHAT = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
-    const ICON_HAND = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>';
-    const ICON_CLOCK = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 
     // ── Daten laden ──
-    let plansData = [];      // [{ plan, likeIds, comments, participants }]
+    let plansData = [];      // [{ plan, likeIds, comments }]
     let sortMode  = 'new';
 
     function groupBy(rows, key) {
@@ -371,11 +314,10 @@
     }
 
     async function loadPlans() {
-      const [plansRes, likesRes, commentsRes, partsRes] = await Promise.all([
-        db.from('plans').select('*'),
-        db.from('plan_likes').select('plan_id, client_id'),
-        db.from('plan_comments').select('*').order('created_at', { ascending: true }),
-        db.from('plan_participants').select('plan_id, client_id, name').order('created_at', { ascending: true }),
+      const [plansRes, likesRes, commentsRes] = await Promise.all([
+        db.from('website_suggestions').select('*'),
+        db.from('website_suggestion_likes').select('suggestion_id, client_id'),
+        db.from('website_suggestion_comments').select('*').order('created_at', { ascending: true }),
       ]);
 
       if (plansRes.error) {
@@ -383,15 +325,13 @@
         return;
       }
 
-      const likesByPlan    = groupBy(likesRes.data || [], 'plan_id');
-      const commentsByPlan = groupBy(commentsRes.data || [], 'plan_id');
-      const partsByPlan    = groupBy(partsRes.data || [], 'plan_id');
+      const likesByPlan    = groupBy(likesRes.data || [], 'suggestion_id');
+      const commentsByPlan = groupBy(commentsRes.data || [], 'suggestion_id');
 
       plansData = (plansRes.data || []).map(p => ({
         plan: p,
-        likeIds:      (likesByPlan.get(p.id) || []).map(l => l.client_id),
-        comments:      commentsByPlan.get(p.id) || [],
-        participants:  partsByPlan.get(p.id) || [],
+        likeIds:  (likesByPlan.get(p.id) || []).map(l => l.client_id),
+        comments:  commentsByPlan.get(p.id) || [],
       }));
 
       renderList();
@@ -404,25 +344,15 @@
       }
       const byNewest = (a, b) => new Date(b.plan.created_at) - new Date(a.plan.created_at);
       const sorted = [...plansData];
-      if (sortMode === 'date') {
-        sorted.sort((a, b) => {
-          const da = a.plan.plan_date, dbb = b.plan.plan_date;
-          if (da && dbb) return da < dbb ? -1 : da > dbb ? 1 : 0; // frühestes zuerst
-          if (da) return -1;                                       // mit Datum vor ohne
-          if (dbb) return 1;
-          return byNewest(a, b);
-        });
-      } else if (sortMode === 'likes') {
+      if (sortMode === 'likes') {
         sorted.sort((a, b) => (b.likeIds.length - a.likeIds.length) || byNewest(a, b));
-      } else if (sortMode === 'participants') {
-        sorted.sort((a, b) => (b.participants.length - a.participants.length) || byNewest(a, b));
       } else {
         sorted.sort(byNewest);
       }
 
       plansList.innerHTML = '';
       for (const it of sorted) {
-        plansList.appendChild(renderPlan(it.plan, it.likeIds, it.comments, it.participants));
+        plansList.appendChild(renderPlan(it.plan, it.likeIds, it.comments));
       }
     }
 
@@ -435,7 +365,7 @@
       renderList();
     });
 
-    function renderPlan(plan, likeIds, comments, participants) {
+    function renderPlan(plan, likeIds, comments) {
       const card = document.createElement('article');
       card.className = 'plan-card';
 
@@ -447,19 +377,6 @@
       name.className = 'plan-card__name';
       name.textContent = plan.name;
       headText.appendChild(name);
-
-      const meta = document.createElement('div');
-      meta.className = 'plan-card__meta';
-      if (plan.location)  { const s = document.createElement('span'); s.innerHTML = ICON_PIN;  s.append(' ' + plan.location); meta.appendChild(s); }
-      if (plan.plan_date) {
-        const s = document.createElement('span'); s.innerHTML = ICON_CAL;
-        const range = plan.plan_end_date && plan.plan_end_date !== plan.plan_date
-          ? fmtDate(plan.plan_date) + ' – ' + fmtDate(plan.plan_end_date)
-          : fmtDate(plan.plan_date);
-        s.append(' ' + range); meta.appendChild(s);
-      }
-      if (plan.period)    { const s = document.createElement('span'); s.innerHTML = ICON_CLOCK; s.append(' ' + plan.period); meta.appendChild(s); }
-      if (plan.location || plan.plan_date || plan.period) headText.appendChild(meta);
       head.appendChild(headText);
 
       if (plan.client_id && plan.client_id === CLIENT_ID) {
@@ -479,29 +396,8 @@
         card.appendChild(desc);
       }
 
-      // Teilnehmer ("Wer ist dabei?")
-      const partWrap = document.createElement('div');
-      partWrap.className = 'plan-participants';
-      if (participants.length) {
-        const label = document.createElement('span');
-        label.className = 'plan-participants__label';
-        label.textContent = `Dabei (${participants.length}):`;
-        partWrap.appendChild(label);
-        for (const p of participants) {
-          const chip = document.createElement('span');
-          chip.className = 'plan-chip' + (p.client_id === CLIENT_ID ? ' me' : '');
-          chip.textContent = p.name || 'Anonym';
-          partWrap.appendChild(chip);
-        }
-      } else {
-        partWrap.classList.add('empty');
-        partWrap.textContent = 'Noch niemand dabei.';
-      }
-      card.appendChild(partWrap);
-
       // Aktionen
       const liked = likeIds.includes(CLIENT_ID);
-      const amIn  = participants.some(p => p.client_id === CLIENT_ID);
       const actions = document.createElement('div');
       actions.className = 'plan-actions';
 
@@ -511,19 +407,12 @@
       likeBtn.innerHTML = ICON_HEART + '<span class="plan-count">' + likeIds.length + '</span>';
       likeBtn.addEventListener('click', () => toggleLike(plan.id, likeBtn));
 
-      const joinBtn = document.createElement('button');
-      joinBtn.className = 'plan-act plan-join' + (amIn ? ' joined' : '');
-      joinBtn.type = 'button';
-      joinBtn.innerHTML = ICON_HAND + '<span>' + (amIn ? 'Du bist dabei' : 'Ich bin dabei') + '</span>';
-      joinBtn.addEventListener('click', () => toggleParticipation(plan.id, amIn));
-
       const commentBtn = document.createElement('button');
       commentBtn.className = 'plan-act';
       commentBtn.type = 'button';
       commentBtn.innerHTML = ICON_CHAT + '<span class="plan-count">' + comments.length + '</span>';
 
       actions.appendChild(likeBtn);
-      actions.appendChild(joinBtn);
       actions.appendChild(commentBtn);
       card.appendChild(actions);
 
@@ -614,7 +503,7 @@
     }
 
     // ── Aktionen ──
-    async function toggleLike(planId, btn) {
+    async function toggleLike(suggestionId, btn) {
       const countEl = btn.querySelector('.plan-count');
       const wasLiked = btn.classList.contains('liked');
       const cur = parseInt(countEl.textContent, 10) || 0;
@@ -623,44 +512,29 @@
       countEl.textContent = wasLiked ? Math.max(0, cur - 1) : cur + 1;
       try {
         if (wasLiked) {
-          await db.from('plan_likes').delete().eq('plan_id', planId).eq('client_id', CLIENT_ID);
+          await db.from('website_suggestion_likes').delete().eq('suggestion_id', suggestionId).eq('client_id', CLIENT_ID);
         } else {
-          await db.from('plan_likes').upsert({ plan_id: planId, client_id: CLIENT_ID });
+          await db.from('website_suggestion_likes').upsert({ suggestion_id: suggestionId, client_id: CLIENT_ID });
         }
       } catch (_) { /* bei Fehler korrigiert der nächste Reload */ }
       // Echten Stand nachladen
-      const { data } = await db.from('plan_likes').select('client_id').eq('plan_id', planId);
+      const { data } = await db.from('website_suggestion_likes').select('client_id').eq('suggestion_id', suggestionId);
       const rows = data || [];
       btn.classList.toggle('liked', rows.some(r => r.client_id === CLIENT_ID));
       countEl.textContent = rows.length;
       // lokalen Cache aktualisieren, damit Sortierung nach Likes stimmt
-      const entry = plansData.find(p => p.plan.id === planId);
+      const entry = plansData.find(p => p.plan.id === suggestionId);
       if (entry) entry.likeIds = rows.map(r => r.client_id);
     }
 
-    async function toggleParticipation(planId, amIn) {
-      if (amIn) {
-        const { error } = await db.from('plan_participants').delete().eq('plan_id', planId).eq('client_id', CLIENT_ID);
-        if (error) { setStatus('Konnte nicht aktualisiert werden', 'error'); return; }
-      } else {
-        const saved = (localStorage.getItem('gallery-comment-name') || '').trim();
-        const name = (window.prompt('Dein Name (wird bei „Dabei" angezeigt):', saved) || '').trim();
-        if (!name) return; // abgebrochen oder leer
-        localStorage.setItem('gallery-comment-name', name);
-        const { error } = await db.from('plan_participants').upsert({ plan_id: planId, client_id: CLIENT_ID, name });
-        if (error) { setStatus('Konnte nicht gespeichert werden', 'error'); return; }
-      }
-      await loadPlans();
-    }
-
-    async function addComment(e, planId, nameInput, bodyInput, sendBtn) {
+    async function addComment(e, suggestionId, nameInput, bodyInput, sendBtn) {
       e.preventDefault();
       const body = bodyInput.value.trim();
       if (!body) return;
       const author = nameInput.value.trim() || 'Anonym';
       localStorage.setItem('gallery-comment-name', nameInput.value.trim());
       sendBtn.disabled = true;
-      const { error } = await db.from('plan_comments').insert({ plan_id: planId, author, body, client_id: CLIENT_ID });
+      const { error } = await db.from('website_suggestion_comments').insert({ suggestion_id: suggestionId, author, body, client_id: CLIENT_ID });
       sendBtn.disabled = false;
       if (error) { setStatus('Kommentar konnte nicht gespeichert werden', 'error'); return; }
       bodyInput.value = '';
@@ -669,14 +543,14 @@
 
     async function deleteComment(id) {
       if (!confirm('Diesen Kommentar wirklich löschen?')) return;
-      const { error } = await db.from('plan_comments').delete().eq('id', id);
+      const { error } = await db.from('website_suggestion_comments').delete().eq('id', id);
       if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
       await loadPlans();
     }
 
     async function deletePlan(id, name) {
       if (!confirm(`Vorschlag „${name}" inkl. aller Likes und Kommentare wirklich löschen?`)) return;
-      const { error } = await db.from('plans').delete().eq('id', id);
+      const { error } = await db.from('website_suggestions').delete().eq('id', id);
       if (error) { setStatus('Löschen fehlgeschlagen', 'error'); return; }
       setStatus('Vorschlag gelöscht', 'ok');
       await loadPlans();
@@ -687,26 +561,18 @@
       e.preventDefault();
       const name = planName.value.trim();
       if (!name) { planName.focus(); return; }
-      if (!planDate.value) { setStatus('Bitte ein Datum angeben', 'error'); planDate.focus(); return; }
-      // Enddatum darf nicht vor dem Startdatum liegen
-      if (planEndDate.value && planEndDate.value < planDate.value) {
-        setStatus('Das Enddatum liegt vor dem Startdatum', 'error'); planEndDate.focus(); return;
-      }
       localStorage.setItem('gallery-comment-name', planAuthor.value.trim());
       planSubmit.disabled = true;
       planSubmit.textContent = 'Speichert…';
-      const { error } = await db.from('plans').insert({
+      const { error } = await db.from('website_suggestions').insert({
         name,
-        location: planLocation.value.trim() || null,
-        plan_date: planDate.value,
-        plan_end_date: planEndDate.value || null,
         description: planDesc.value.trim() || null,
         client_id: CLIENT_ID,
       });
       planSubmit.disabled = false;
       planSubmit.textContent = 'Vorschlag posten';
       if (error) { setStatus('Vorschlag konnte nicht gespeichert werden', 'error'); return; }
-      planName.value = ''; planLocation.value = ''; planDate.value = ''; planEndDate.value = ''; planDesc.value = '';
+      planName.value = ''; planDesc.value = '';
       setStatus('Vorschlag hinzugefügt ✓', 'ok');
       await loadPlans();
     });
