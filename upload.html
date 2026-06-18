@@ -380,11 +380,13 @@
     .lb.open { opacity: 1; pointer-events: all; }
     .lb__stage {
       position: relative; flex: 1 1 auto; min-height: 0;
-      display: grid; place-items: center;
-      width: 100%; padding: 3.5rem 1rem .5rem;
+      display: flex; align-items: safe center; justify-content: center;
+      width: 100%; padding: 3.5rem 1rem 1.5rem;
+      overflow: auto; -webkit-overflow-scrolling: touch;
     }
     .lb__img {
-      max-width: min(88vw, 1100px); max-height: 100%;
+      flex: 0 0 auto;
+      max-width: min(92vw, 1100px); height: auto; width: auto;
       object-fit: contain; border-radius: 10px;
     }
     .lb__close {
@@ -405,7 +407,7 @@
     .lb__full:disabled { opacity: .6; cursor: wait; }
     .lb__full[hidden] { display: none; }
     .lb__nav {
-      position: absolute; top: 50%; transform: translateY(-50%);
+      position: fixed; top: 50%; transform: translateY(-50%);
       width: 48px; height: 48px; border-radius: 50%;
       background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
       color: #fff; font-size: 1.5rem; line-height: 1;
@@ -896,6 +898,7 @@
     const progressFill = document.getElementById('progressFill');
     const lb          = document.getElementById('lb');
     const lbImg       = document.getElementById('lbImg');
+    const lbStage     = document.getElementById('lbStage');
 
     let currentFolder = null;       // null = folder list view; else album path
     let pendingFiles  = [];
@@ -1738,6 +1741,7 @@
       // Keine Display-Version vorhanden (z.B. noch nicht optimiert) → Original zeigen
       lbImg.onerror = () => { lbImg.onerror = null; lbImg.src = full; lbFullBtn.hidden = true; };
       lbImg.src = display;
+      lbStage.scrollTop = 0;   // bei neuem Bild wieder nach oben
       lbFullBtn.hidden = display === full;
       lbFullBtn.disabled = false;
       lbFullBtn.classList.remove('loading');
