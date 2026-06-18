@@ -267,9 +267,11 @@
         <input class="plan-input" id="planLocation" type="text" placeholder="Ort (z. B. Toskana)" maxlength="120">
       </div>
       <div class="plan-form__row">
-        <input class="plan-input" id="planPeriod" type="text" placeholder="Zeitraum (z. B. Sommer 2026)" maxlength="120">
-        <label class="plan-date-label">Geplantes Datum (optional, zum Sortieren)
-          <input class="plan-input" id="planDate" type="date">
+        <label class="plan-date-label">Datum (von)
+          <input class="plan-input" id="planDate" type="date" required>
+        </label>
+        <label class="plan-date-label">bis (optional, für einen Zeitraum)
+          <input class="plan-input" id="planEndDate" type="date">
         </label>
       </div>
       <textarea class="plan-textarea" id="planDesc" placeholder="Beschreibung – worum geht's, was wollen wir machen?" maxlength="2000"></textarea>
@@ -312,8 +314,8 @@
     const planForm     = document.getElementById('planForm');
     const planName     = document.getElementById('planName');
     const planLocation = document.getElementById('planLocation');
-    const planPeriod   = document.getElementById('planPeriod');
     const planDate     = document.getElementById('planDate');
+    const planEndDate  = document.getElementById('planEndDate');
     const planDesc     = document.getElementById('planDesc');
     const planAuthor   = document.getElementById('planAuthor');
     const planSubmit   = document.getElementById('planSubmit');
@@ -321,6 +323,12 @@
     const statusEl     = document.getElementById('plansStatus');
 
     planAuthor.value = localStorage.getItem('gallery-comment-name') || '';
+
+    // Enddatum kann nicht vor dem Startdatum liegen
+    planDate.addEventListener('change', () => {
+      planEndDate.min = planDate.value || '';
+      if (planEndDate.value && planEndDate.value < planDate.value) planEndDate.value = '';
+    });
 
     let statusTimer = null;
     function setStatus(msg, type) {
@@ -441,9 +449,15 @@
 
       const meta = document.createElement('div');
       meta.className = 'plan-card__meta';
-      if (plan.location)  { const s = document.createElement('span'); s.innerHTML = ICON_PIN;  s.append(' ' + plan.location);          meta.appendChild(s); }
-      if (plan.plan_date) { const s = document.createElement('span'); s.innerHTML = ICON_CAL;  s.append(' ' + fmtDate(plan.plan_date)); meta.appendChild(s); }
-      if (plan.period)    { const s = document.createElement('span'); s.innerHTML = ICON_CLOCK; s.append(' ' + plan.period);            meta.appendChild(s); }
+      if (plan.location)  { const s = document.createElement('span'); s.innerHTML = ICON_PIN;  s.append(' ' + plan.location); meta.appendChild(s); }
+      if (plan.plan_date) {
+        const s = document.createElement('span'); s.innerHTML = ICON_CAL;
+        const range = plan.plan_end_date && plan.plan_end_date !== plan.plan_date
+          ? fmtDate(plan.plan_date) + ' – ' + fmtDate(plan.plan_end_date)
+          : fmtDate(plan.plan_date);
+        s.append(' ' + range); meta.appendChild(s);
+      }
+      if (plan.period)    { const s = document.createElement('span'); s.innerHTML = ICON_CLOCK; s.append(' ' + plan.period); meta.appendChild(s); }
       if (plan.location || plan.plan_date || plan.period) headText.appendChild(meta);
       head.appendChild(headText);
 
@@ -672,21 +686,26 @@
       e.preventDefault();
       const name = planName.value.trim();
       if (!name) { planName.focus(); return; }
+      if (!planDate.value) { setStatus('Bitte ein Datum angeben', 'error'); planDate.focus(); return; }
+      // Enddatum darf nicht vor dem Startdatum liegen
+      if (planEndDate.value && planEndDate.value < planDate.value) {
+        setStatus('Das Enddatum liegt vor dem Startdatum', 'error'); planEndDate.focus(); return;
+      }
       localStorage.setItem('gallery-comment-name', planAuthor.value.trim());
       planSubmit.disabled = true;
       planSubmit.textContent = 'Speichert…';
       const { error } = await db.from('plans').insert({
         name,
         location: planLocation.value.trim() || null,
-        period: planPeriod.value.trim() || null,
-        plan_date: planDate.value || null,
+        plan_date: planDate.value,
+        plan_end_date: planEndDate.value || null,
         description: planDesc.value.trim() || null,
         client_id: CLIENT_ID,
       });
       planSubmit.disabled = false;
       planSubmit.textContent = 'Vorschlag posten';
       if (error) { setStatus('Vorschlag konnte nicht gespeichert werden', 'error'); return; }
-      planName.value = ''; planLocation.value = ''; planPeriod.value = ''; planDate.value = ''; planDesc.value = '';
+      planName.value = ''; planLocation.value = ''; planDate.value = ''; planEndDate.value = ''; planDesc.value = '';
       setStatus('Vorschlag hinzugefügt ✓', 'ok');
       await loadPlans();
     });
